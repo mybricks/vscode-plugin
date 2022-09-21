@@ -1,0 +1,17 @@
+{
+  "name": "@your-team/pc-lib0",
+  "version": "1.0.0",
+  "description": "Webbricks PC组件库",
+  "main": "index.js",
+  "scripts": {
+
+  },
+  "license": "ISC",
+  "dependencies": {
+
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.20",
+    "@types/react-dom": "^18.0.20"
+  }
+}

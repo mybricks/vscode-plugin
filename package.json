@@ -1,0 +1,80 @@
+{
+  "name": "@mybricks/vscode-plugin",
+  "description": "vscode plugin for mybricks",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.71.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onView:mybricks_welcome",
+    "onView:mybricks_debugger",
+    "onCommand:mybricks.helloWorld",
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "viewsWelcome": [
+      {
+        "view": "nodeDependencies",
+        "contents": "No node dependencies found [learn more](https://www.npmjs.com/).\n[Add Dependency](command:nodeDependencies.addEntry)"
+      }
+    ],
+    "commands": [
+      {
+        "command": "mybricks.helloWorld",
+        "title": "Hello World"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "mybricks",
+          "title": "Mybricks",
+          "icon": "icon.png"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "type": "webview",
+          "id": "mybricks_debugger",
+          "name": "Mybricks",
+          "when": "mybricks.showDebugger"
+        }
+      ],
+      "mybricks": [
+        {
+          "type": "webview",
+          "id": "mybricks_welcome",
+          "name": "欢迎使用"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^9.0.13",
+    "@types/node": "16.x",
+    "@types/vscode": "^1.71.0",
+    "@typescript-eslint/eslint-plugin": "^5.31.0",
+    "@typescript-eslint/parser": "^5.31.0",
+    "@vscode/test-electron": "^2.1.5",
+    "eslint": "^8.20.0",
+    "ts-loader": "^9.3.1",
+    "typescript": "^4.7.4",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0"
+  },
+  "dependencies": {
+    "fs-extra": "^10.1.0"
+  }
+}
