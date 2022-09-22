@@ -5,7 +5,6 @@ node_modules
 /**/node_modules
 tags/*
 .history
-.vscode/
 .tmp/
 package-lock.json
 dist/
