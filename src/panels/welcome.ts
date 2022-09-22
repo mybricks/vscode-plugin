@@ -1,3 +1,12 @@
+/**
+ * MyBricks Opensource
+ * https://mybricks.world
+ * This source code is licensed under the MIT license.
+ *
+ * CheMingjun @2019
+ * mybricks@126.com
+ */
+
 import * as vscode from "vscode";
 
 import * as fse from 'fs-extra';
