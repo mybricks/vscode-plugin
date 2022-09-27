@@ -13,7 +13,7 @@
     "onView:mybricks_welcome",
     "onView:mybricks_debugger",
     "onCommand:mybricks.helloWorld",
-    "onStartupFinished"
+    "*"
   ],
   "contributes": {
     "viewsWelcome": [
@@ -23,6 +23,10 @@
       }
     ],
     "commands": [
+      {
+        "command": "mybricks.create.comlib",
+        "title": "创建组件"
+      },
       {
         "command": "mybricks.helloWorld",
         "title": "Hello World"
@@ -38,19 +42,19 @@
       ]
     },
     "views": {
+      "mybricks": [
+        {
+          "type": "webview",
+          "id": "mybricks_welcome",
+          "name": "欢迎使用"
+        }
+      ],
       "explorer": [
         {
           "type": "webview",
           "id": "mybricks_debugger",
           "name": "Mybricks",
           "when": "mybricks.showDebugger"
-        }
-      ],
-      "mybricks": [
-        {
-          "type": "webview",
-          "id": "mybricks_welcome",
-          "name": "欢迎使用"
         }
       ]
     }

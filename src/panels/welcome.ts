@@ -14,7 +14,7 @@ import * as fse from 'fs-extra';
 export class WelcomePanelProvider implements vscode.WebviewViewProvider {
   private _view?: vscode.WebviewView;
 
-  constructor(private readonly _extensionUri: vscode.Uri) {}
+  constructor(private readonly _extensionUri: vscode.Uri) { }
 
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
@@ -37,23 +37,19 @@ export class WelcomePanelProvider implements vscode.WebviewViewProvider {
         case "create": {
           const saveRtn = await vscode.window.showSaveDialog({
             title: "请选择项目要保存的文件夹",
-
             //canSelectFolders: true,
             //canSelectFiles: false,
             //canSelectMany: false,
           });
 
-          const projectDir = saveRtn?.fsPath
-          if(projectDir){
+          const projectDir = saveRtn?.fsPath;
+
+          if (projectDir) {
             const tptDirPath = vscode.Uri.joinPath(this._extensionUri, "_templates/comlib-pc").fsPath;
-
-            console.log(projectDir,tptDirPath);
-
-
-            fse.copySync(tptDirPath,projectDir);
-  
+            console.log(projectDir, tptDirPath);
+            fse.copySync(tptDirPath, projectDir);
             const newUrl = vscode.Uri.parse(projectDir);
-            vscode.commands.executeCommand(`vscode.openFolder`, newUrl,true);
+            vscode.commands.executeCommand(`vscode.openFolder`, newUrl, false);
           }
           break;
         }
@@ -96,7 +92,7 @@ export class WelcomePanelProvider implements vscode.WebviewViewProvider {
 			</head>
 			<body>
 				<button class="button-new" data-type='pcComLib'>新建 PC组件库</button>
-                <button class="button-new" data-type='plugin'>新建 插件</button>
+        <button class="button-new" data-type='plugin'>新建 插件</button>
 				<script nonce="${nonce}" src="${scriptUri}"></script>
 			</body>
 			</html>`;
