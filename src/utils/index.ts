@@ -43,12 +43,11 @@ export function checkIsMybricksProject() {
     return false;
   }
 
-  const wsPath = wsFolders[0].uri.path;
   const wsFsPath = wsFolders[0].uri.fsPath;
   const mybricksFilePath = path.join(wsFsPath, '/mybricks.json');
 
   if (fse.existsSync(mybricksFilePath)) {
-    return true
+    return true;
   } else {
     return false;
   }

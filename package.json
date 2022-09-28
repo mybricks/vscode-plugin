@@ -26,10 +26,6 @@
       {
         "command": "mybricks.create.comlib",
         "title": "创建组件"
-      },
-      {
-        "command": "mybricks.helloWorld",
-        "title": "Hello World"
       }
     ],
     "viewsContainers": {
@@ -54,7 +50,7 @@
           "type": "webview",
           "id": "mybricks_debugger",
           "name": "Mybricks",
-          "when": "mybricks.showDebugger"
+          "when": "mybricks:isComlib"
         }
       ]
     }

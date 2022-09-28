@@ -7,8 +7,15 @@ let mainStatusBarItem: vscode.StatusBarItem;
 export function createStatusBar() {
   mainStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, -10000);
   updateStatusBar();
-  mainStatusBarItem.show();
   return mainStatusBarItem;
+}
+
+export function showStatusBar(status: boolean) {
+  if (status) {
+    mainStatusBarItem.show();
+  } else {
+    mainStatusBarItem.hide();
+  }
 }
 
 export function updateStatusBar(workspaceStatus?: string) {
