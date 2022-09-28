@@ -8,9 +8,10 @@
  */
 import * as vscode from 'vscode';
 import commonds from './commonds';
+import { WORKSPACE_STATUS } from './constants';
 import { WelcomePanelProvider } from './panels/welcome';
 import { DebuggerPanelProvider } from './panels/debugger';
-import { createStatusBar, showStatusBar } from './statusBar';
+import { createStatusBar, showStatusBar, updateStatusBar } from './statusBar';
 import { logger, autoSetContextByProject, checkIsMybricksProject } from "./utils";
 
 export function activate(context: vscode.ExtensionContext) {
@@ -56,4 +57,6 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() { }
+export function deactivate() {
+  updateStatusBar(WORKSPACE_STATUS.DEV);
+}
