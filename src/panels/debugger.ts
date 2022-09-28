@@ -50,11 +50,13 @@ export class DebuggerPanelProvider implements vscode.WebviewViewProvider {
 
         //停止调试
         case 'dev': {
+          vscode.commands.executeCommand("mybricks.stop");
           break;
         }
 
         //构建
         case 'build': {
+          vscode.commands.executeCommand("mybricks.start");
           // 当前选中的文件路径
           // const wsFolders = vscode.workspace.workspaceFolders;
 
