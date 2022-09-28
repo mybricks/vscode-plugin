@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import * as path from 'path';
+import * as fes from 'fs-extra';
 const DebugStatusPrefix = 'MYBRICKS_BUILD_ID_';
 
 class DebugStatus {
@@ -8,41 +8,39 @@ class DebugStatus {
   initStatus(id, methods) {
     const envId = `${DebugStatusPrefix}${id}`;
     const timeId = setInterval(() => {
-      const f = fs.existsSync(path.join(__dirname, `${envId}.txt`));
+      const envMap = fes.readJSONSync(path.join(__dirname, './.temp/mybricks_env.json'));
+      const status = envMap[envId].status;
+      const lastStatus = this.statusMap[envId].status;
 
-      if (f) {
-        console.log('构建完成')
-        methods.done();
-      } else {
-        methods.close();
-        clearInterval(timeId);
-        this.statusMap[id] = null;
-        console.log('关闭')
-      }
+      console.log({
+        status,
+        lastStatus
+      })
 
-      console.log(process.env[envId], 'process.env[envId]', envId)
-
-      switch (process.env[envId]) {
+      switch (status) {
         case 'build':
-          console.log('构建中')
-          methods.build();
+          console.log('构建中');
           break;
         case 'done':
-          console.log('构建完成')
-          methods.done();
+          if (lastStatus !== status) {
+            console.log('构建好了');
+            methods.done();
+          }
           break;
         case 'close':
-          methods.close();
+          console.log('关闭');
           clearInterval(timeId);
-          this.statusMap[id] = null;
-          console.log('关闭')
+          Reflect.deleteProperty(this.statusMap, envId);
+          methods.close();
           break;
         default:
           break;
       }
+
+      this.statusMap[envId].status = status;
     }, 1000);
 
-    this.statusMap[id] = {
+    this.statusMap[envId] = {
       status: 'build',
       timeId
     };

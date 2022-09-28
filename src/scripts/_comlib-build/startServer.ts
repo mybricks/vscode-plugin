@@ -1,4 +1,5 @@
 import * as path from 'path';
+import * as fse from 'fs-extra';
 import * as vscode from 'vscode';
 
 import { debugStatus } from '../utils';
@@ -13,12 +14,25 @@ export function startServer (comlibPath: string): void {
     terminal = vscode.window.createTerminal(terminalName);
   }
 
-  debugStatus.initStatus(terminal.name, {
-    close: () => {
-      terminal?.dispose();
-    }
-  })
+  vscode.window.onDidCloseTerminal((e) => {
+    console.log(e, 'onDidCloseTerminal');
+  });
 
-  terminal.sendText(`export entry=${comlibPath} entryId=${terminal.name} && npm run --prefix ${path.join(__dirname, '../')} test`);
+  debugStatus.initStatus(terminal.name, {
+    done: () => {
+      console.log('加载好了');
+    },
+    close: () => {
+      console.log('关闭')
+      // terminal?.dispose();
+    }
+  });
+
+  const envMap = fse.readJSONSync(path.join(__dirname, './.temp/mybricks_env.json'));
+
+  envMap[`MYBRICKS_BUILD_ID_${terminal.name}`] = {status: 'build'};
+  fse.writeJSONSync(path.join(__dirname, './.temp/mybricks_env.json'), envMap);
+
+  terminal.sendText(`export entry=${comlibPath} entryId=${terminal.name} && npm run --prefix ${path.join(__dirname, '../')} dev:comlib`);
   terminal.show();
 }
