@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { COMMANDS, WORKSPACE_STATUS } from '../constants';
-import { logger, setStatusBarBackground } from "../utils";
+import { setStatusBarBackground } from "../utils";
 
 let mainStatusBarItem: vscode.StatusBarItem;
 
@@ -25,43 +25,26 @@ export function updateStatusBar(workspaceStatus?: string) {
   let background;
 
   switch (workspaceStatus) {
-    //开发中
+    //开发态
     case WORKSPACE_STATUS.DEV:
       icon = "debug-start";
       text = `Mybricks: 点击调试 $(${icon})`;
-      command = COMMANDS.STOP_DEBUG;
-      background = "";
+      command = COMMANDS.START;
+      background = "#116dc1";
       break;
 
-    //构建中
-    case WORKSPACE_STATUS.COMPILE:
-    case WORKSPACE_STATUS.BUILD:
-      icon = "loading";
-      text = `Mybricks: 构建中 $(${icon})`;
-      command = COMMANDS.STOP_DEBUG;
-      background = "#381712";
-      break;
-
-    //构建异常
-    case WORKSPACE_STATUS.ERROR:
-      icon = "warning";
-      text = `Mybricks: 构建失败 $(${icon})`;
-      command = COMMANDS.STOP_DEBUG;
-      background = "#983612";
-      break;
-
-    //调试中
+    //调试态
     case WORKSPACE_STATUS.DEBUG:
       icon = "debug-pause";
       text = `Mybricks: 调试中 $(${icon})`;
-      command = COMMANDS.STOP_DEBUG;
-      background = "#003732";
+      command = COMMANDS.STOP;
+      background = "#c35d33";
       break;
     default:
       icon = "debug-start";
       text = `Mybricks: 点击调试 $(${icon})`;
-      command = COMMANDS.STOP_DEBUG;
-      background = "";
+      command = COMMANDS.START;
+      background = "#116dc1";
       break;
   }
 

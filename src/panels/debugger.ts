@@ -40,6 +40,7 @@ export class DebuggerPanelProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
+    //
     webviewView.webview.onDidReceiveMessage(async (data) => {
       console.log("onDidReceiveMessage", data);
       switch (data.action) {
@@ -51,20 +52,25 @@ export class DebuggerPanelProvider implements vscode.WebviewViewProvider {
 
         //构建
         case 'build': {
+          vscode.commands.executeCommand("stop");
+
           // 当前选中的文件路径
-          const wsFolders = vscode.workspace.workspaceFolders;
+          // const wsFolders = vscode.workspace.workspaceFolders;
 
-          if (wsFolders) {
-            updateStatusBar(WORKSPACE_STATUS.BUILD);
-            const docPath = wsFolders[0].uri.fsPath;
-            const configName = 'mybricks.json';
-            const { id, editJS } = build(docPath, configName);
-            const editJSPath = path.join(tempPath, `${id.replace(/@|\//gi, '_')}.js`);
+          // if (wsFolders) {
+          //   const docPath = wsFolders[0].uri.fsPath;
+          //   const configName = 'mybricks.json';
+          //   const { id, editJS } = build(docPath, configName);
+          //   const editJSPath = path.join(tempPath, `${id.replace(/@|\//gi, '_')}.js`);
 
-            fse.writeFileSync(editJSPath, editJS);
+          //   fse.writeFileSync(editJSPath, editJS);
 
-            await startServer(editJSPath);
-          }
+          //   try {
+          //     await startServer(editJSPath);
+          //   } catch (e) {
+          //     console.log(e);
+          //   }
+          // }
         }
       }
     });

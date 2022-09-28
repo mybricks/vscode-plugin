@@ -1,10 +1,10 @@
 import { registerCommand } from "../utils";
 import { COMMANDS } from "../constants";
 
-import startDebug from './start_debug';
-import stopDebug from './stop_debug';
+import start from './start';
+import stop from './stop';
 
 export default [
-  registerCommand(COMMANDS.START_DEBUG, startDebug),
-  registerCommand(COMMANDS.STOP_DEBUG, stopDebug),
+  registerCommand(COMMANDS.START, start),
+  registerCommand(COMMANDS.STOP, stop),
 ];

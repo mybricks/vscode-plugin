@@ -1,5 +1,5 @@
 export default {
-  '@init'({style}) {
+  '@init'({ style }) {
     style.width = 80;
     style.height = 50;
   },
@@ -13,10 +13,10 @@ export default {
           title: '文字标题',
           type: 'text',
           value: {
-            get({data}) {
+            get({ data }) {
               return data.text;
             },
-            set({data}, value: string) {
+            set({ data }, value: string) {
               data.text = value;
             }
           }
@@ -29,10 +29,10 @@ export default {
             plugins: ['border', 'font', 'bgcolor', 'bgimage']
           },
           value: {
-            get: ({data}) => {
+            get: ({ data }) => {
               return data.style;
             },
-            set: ({data}, value) => {
+            set: ({ data }, value) => {
               data.style = value;
             }
           }

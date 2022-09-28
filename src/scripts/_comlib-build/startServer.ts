@@ -28,11 +28,11 @@ export function startServer(comlibPath: string): void {
     build: () => {
       updateStatusBar(WORKSPACE_STATUS.BUILD);
     },
-
     done: (url: string) => {
       console.log('加载好了');
       vscode.env.openExternal(vscode.Uri.parse(`mybricks://app=pc-ms&debug=1&comlib-url=${url}`));
       updateStatusBar(WORKSPACE_STATUS.DEBUG);
+      vscode.postMessage({ action: 'debug' });
     },
     close: () => {
       console.log('关闭');

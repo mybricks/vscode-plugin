@@ -2,10 +2,11 @@ import * as path from 'path'
 import * as fse from 'fs-extra';
 import * as vscode from 'vscode';
 
+
 export function logger(...args: any) {
-  console.log("==========");
+  console.log("======");
   console.error("[Mybricks]", ...args);
-  console.log("==========");
+  console.log("======");
 }
 
 
@@ -71,7 +72,7 @@ export function getJsonFile<T extends object>(filePath: string): T {
 
   try {
     rst = fse.readJSONSync(filePath);
-  } catch (e) {}
+  } catch (e) { }
 
   return rst;
 }

@@ -190,10 +190,3 @@ function getComString (com: T_ComConfig, comPath: string, arrPath: string[] = []
 
   return comStr;
 }
-
-
-function logger(val: any) {
-  console.log("==========⬇️⬇️⬇️==========");
-  console.log(val);
-  console.log("==========⬆️⬆️⬆️==========");
-}

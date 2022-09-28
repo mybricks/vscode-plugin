@@ -19,8 +19,27 @@ export function activate(context: vscode.ExtensionContext) {
 
   const { subscriptions, extensionPath } = context;
 
-  //自动设置全局变量
+  logger("extensionPath", extensionPath);
+  logger("context.extensionUri", context.extensionUri);
+
   autoSetContextByProject();
+
+  subscriptions.push(createStatusBar());
+  if (checkIsMybricksProject()) {
+    showStatusBar(true);
+  } else {
+    showStatusBar(false);
+  }
+
+  vscode.window.onDidChangeActiveTextEditor((editor) => {
+    autoSetContextByProject();
+    if (checkIsMybricksProject()) {
+      showStatusBar(true);
+    } else {
+      showStatusBar(false);
+    }
+  });
+
 
   //注册 UI
   const welcomePanel = new WelcomePanelProvider(context.extensionUri);
@@ -34,25 +53,6 @@ export function activate(context: vscode.ExtensionContext) {
   //注册所有命令
   subscriptions.push(...commonds);
 
-  //注册 statusbar
-  subscriptions.push(createStatusBar());
-  if (checkIsMybricksProject()) {
-    showStatusBar(true);
-  } else {
-    showStatusBar(false);
-  }
-
-  vscode.window.onDidChangeActiveTextEditor((editor) => {
-    autoSetContextByProject();
-
-
-    if (checkIsMybricksProject()) {
-      showStatusBar(true);
-    } else {
-      showStatusBar(false);
-    }
-
-  });
 
 }
 
