@@ -12,9 +12,8 @@ import * as vscode from 'vscode';
 import * as path from 'path'
 import * as fse from 'fs-extra';
 
-import { updateStatusBar } from '../statusBar'; 
+import { updateStatusBar } from '../statusBar';
 import { WORKSPACE_STATUS } from '../constants';
-
 
 import { build, tempPath, startServer } from '../scripts/_comlib-build';
 
@@ -42,13 +41,21 @@ export class DebuggerPanelProvider implements vscode.WebviewViewProvider {
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
     webviewView.webview.onDidReceiveMessage(async (data) => {
-      switch (data.type) {
-        case 'debug': {
+      console.log("onDidReceiveMessage", data);
+      switch (data.action) {
+
+        //停止调试
+        case 'dev': {
+          break;
+        }
+
+        //构建
+        case 'build': {
           // 当前选中的文件路径
           const wsFolders = vscode.workspace.workspaceFolders;
 
           if (wsFolders) {
-            updateStatusBar(WORKSPACE_STATUS.COMPILE);
+            updateStatusBar(WORKSPACE_STATUS.BUILD);
             const docPath = wsFolders[0].uri.fsPath;
             const configName = 'mybricks.json';
             const { id, editJS } = build(docPath, configName);
@@ -61,19 +68,6 @@ export class DebuggerPanelProvider implements vscode.WebviewViewProvider {
         }
       }
     });
-  }
-
-  public addColor() {
-    if (this._view) {
-      this._view.show?.(true); // `show` is not implemented in 1.49 but is for 1.50 insiders
-      this._view.webview.postMessage({ type: 'addColor' });
-    }
-  }
-
-  public clearColors() {
-    if (this._view) {
-      this._view.webview.postMessage({ type: 'clearColors' });
-    }
   }
 
   private _getHtmlForWebview(webview: vscode.Webview) {
@@ -99,7 +93,7 @@ export class DebuggerPanelProvider implements vscode.WebviewViewProvider {
 			<body>
 				
         <button class="button-new" style="display: block;" data-type='dev'>调试</button>
-				<button class="button-new" style="display: none;" data-type='complie'>构建中</button>
+				<button class="button-new" style="display: none;" data-type='build'>构建中</button>
 				<button class="button-new" style="display: none;" data-type='debug'>调试中</button>
 
         <script nonce="${nonce}" src="${scriptUri}"></script>

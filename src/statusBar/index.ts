@@ -35,6 +35,7 @@ export function updateStatusBar(workspaceStatus?: string) {
 
     //构建中
     case WORKSPACE_STATUS.COMPILE:
+    case WORKSPACE_STATUS.BUILD:
       icon = "loading";
       text = `Mybricks: 构建中 $(${icon})`;
       command = COMMANDS.STOP_DEBUG;

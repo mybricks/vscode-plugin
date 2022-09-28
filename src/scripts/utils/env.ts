@@ -20,6 +20,7 @@ class DebugStatus {
       switch (status) {
         case 'build':
           console.log('构建中');
+          methods.build();
           break;
         case 'done':
           if (lastStatus !== status) {

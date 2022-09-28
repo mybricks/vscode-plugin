@@ -1,52 +1,69 @@
-//@ts-check
-
 // This script will be run within the webview itself
 // It cannot access the main VS Code APIs directly.
 (function () {
     const vscode = acquireVsCodeApi();
 
-    const oldState = vscode.getState() || { colors: [] };
-
-    /** @type {Array<{ value: string }>} */
-    let colors = oldState.colors;
+    setup();
 
     document.querySelector(`[data-type='dev']`)?.addEventListener('click', () => {
-        vscode.postMessage({ type: 'debug' });
+        vscode.postMessage({ action: 'build' });
+        updateButtonStatus('build');
     });
 
-    document.querySelector(`[data-type='complie']`)?.addEventListener('click', () => {
-        vscode.postMessage({ type: 'complie' });
+    document.querySelector(`[data-type='build']`)?.addEventListener('click', () => {
+        // noop
     });
 
     document.querySelector(`[data-type='debug']`)?.addEventListener('click', () => {
-        vscode.postMessage({ type: 'dev' });
+        vscode.postMessage({ action: 'dev' });
+        updateButtonStatus('debug');
     });
-
 
     // Handle messages sent from the extension to the webview
     window.addEventListener('message', event => {
         const message = event.data; // The json data that the extension sent
-        switch (message.type) {
-            case 'debug': {
-                document.querySelector(`[data-type='dev']`).style.display = 'block';
-                document.querySelector(`[data-type='complie']`).style.display = 'none';
-                document.querySelector(`[data-type='debug']`).style.display = 'none';
-                break;
-            }
-            case 'complie': {
-                document.querySelector(`[data-type='dev']`).style.display = 'none';
-                document.querySelector(`[data-type='complie']`).style.display = 'block';
-                document.querySelector(`[data-type='debug']`).style.display = 'none';
-                break;
-            }
+        switch (message.action) {
             case 'dev': {
-                document.querySelector(`[data-type='dev']`).style.display = 'none';
-                document.querySelector(`[data-type='complie']`).style.display = 'none';
-                document.querySelector(`[data-type='debug']`).style.display = 'block';
+                updateButtonStatus("dev");
+                break;
+            }
+            case 'build': {
+                updateButtonStatus("build");
+                break;
+            }
+            case 'debug': {
+                updateButtonStatus("debug");
                 break;
             }
         }
     });
+
+
+    function setup() {
+        updateButtonStatus("dev");
+    }
+
+    function updateButtonStatus(status) {
+        switch (status) {
+            case "dev":
+                document.querySelector(`[data-type='dev']`).style.display = 'block';
+                document.querySelector(`[data-type='build']`).style.display = 'none';
+                document.querySelector(`[data-type='debug']`).style.display = 'none';
+                break;
+
+            case "build":
+                document.querySelector(`[data-type='dev']`).style.display = 'none';
+                document.querySelector(`[data-type='build']`).style.display = 'block';
+                document.querySelector(`[data-type='debug']`).style.display = 'none';
+                break;
+
+            case "debug":
+                document.querySelector(`[data-type='dev']`).style.display = 'none';
+                document.querySelector(`[data-type='build']`).style.display = 'none';
+                document.querySelector(`[data-type='debug']`).style.display = 'block';
+                break;
+        }
+    }
 
 }());
 
