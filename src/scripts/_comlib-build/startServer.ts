@@ -3,6 +3,9 @@ import * as fse from 'fs-extra';
 import * as vscode from 'vscode';
 
 import { debugStatus } from '../utils';
+import { updateStatusBar } from '../../statusBar'; 
+import { WORKSPACE_STATUS } from '../../constants';
+
 
 const terminalName: string = 'mybricks';
 
@@ -16,15 +19,20 @@ export function startServer (comlibPath: string): void {
 
   vscode.window.onDidCloseTerminal((e) => {
     console.log(e, 'onDidCloseTerminal');
+    updateStatusBar();
   });
 
+  
+
   debugStatus.initStatus(terminal.name, {
-    done: () => {
+    done: (url: string) => {
       console.log('加载好了');
+      vscode.env.openExternal( vscode.Uri.parse(`mybricks://app=pc-ms&debug=1&comlib-url=${url}`));
+      updateStatusBar(WORKSPACE_STATUS.DEBUG);
     },
     close: () => {
-      console.log('关闭')
-      // terminal?.dispose();
+      console.log('关闭');
+      updateStatusBar();
     }
   });
 

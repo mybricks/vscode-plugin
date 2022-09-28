@@ -12,6 +12,10 @@ import * as vscode from 'vscode';
 import * as path from 'path'
 import * as fse from 'fs-extra';
 
+import { updateStatusBar } from '../statusBar'; 
+import { WORKSPACE_STATUS } from '../constants';
+
+
 import { build, tempPath, startServer } from '../scripts/_comlib-build';
 
 export class DebuggerPanelProvider implements vscode.WebviewViewProvider {
@@ -44,6 +48,7 @@ export class DebuggerPanelProvider implements vscode.WebviewViewProvider {
           const wsFolders = vscode.workspace.workspaceFolders;
 
           if (wsFolders) {
+            updateStatusBar(WORKSPACE_STATUS.COMPILE);
             const docPath = wsFolders[0].uri.fsPath;
             const configName = 'mybricks.json';
             const { id, editJS } = build(docPath, configName);
