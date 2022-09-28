@@ -55,25 +55,8 @@ export class DebuggerPanelProvider implements vscode.WebviewViewProvider {
         }
 
         //构建
-        case 'build': {
+        case 'debug': {
           vscode.commands.executeCommand("mybricks.start");
-          // 当前选中的文件路径
-          // const wsFolders = vscode.workspace.workspaceFolders;
-
-          // if (wsFolders) {
-          //   const docPath = wsFolders[0].uri.fsPath;
-          //   const configName = 'mybricks.json';
-          //   const { id, editJS } = build(docPath, configName);
-          //   const editJSPath = path.join(tempPath, `${id.replace(/@|\//gi, '_')}.js`);
-
-          //   fse.writeFileSync(editJSPath, editJS);
-
-          //   try {
-          //     await startServer(editJSPath);
-          //   } catch (e) {
-          //     console.log(e);
-          //   }
-          // }
         }
       }
     });

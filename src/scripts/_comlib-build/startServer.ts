@@ -31,7 +31,6 @@ export function startServer(comlibPath: string): void {
   debugStatus.initStatus(terminal, {
     build: () => {
       // @ts-ignore
-      updateStatusBar(WORKSPACE_STATUS.BUILD);
     },
     done: (url: string) => {
       console.log('加载好了');
