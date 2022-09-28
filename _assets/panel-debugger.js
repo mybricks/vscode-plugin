@@ -6,17 +6,13 @@
     setup();
 
     document.querySelector(`[data-type='dev']`)?.addEventListener('click', () => {
-        vscode.postMessage({ action: 'build' });
-        updateButtonStatus('build');
-    });
-
-    document.querySelector(`[data-type='build']`)?.addEventListener('click', () => {
-        // noop
+        vscode.postMessage({ action: 'debug' });
+        updateButtonStatus('debug');
     });
 
     document.querySelector(`[data-type='debug']`)?.addEventListener('click', () => {
         vscode.postMessage({ action: 'dev' });
-        updateButtonStatus('debug');
+        updateButtonStatus('dev');
     });
 
     // Handle messages sent from the extension to the webview
@@ -28,7 +24,6 @@
                 break;
             }
             case 'debug': {
-                console.log("adfadfadsfasdsdaf")
                 updateButtonStatus("debug");
                 break;
             }
@@ -44,13 +39,11 @@
         switch (status) {
             case "dev":
                 document.querySelector(`[data-type='dev']`).style.display = 'block';
-                document.querySelector(`[data-type='build']`).style.display = 'none';
                 document.querySelector(`[data-type='debug']`).style.display = 'none';
                 break;
 
             case "debug":
                 document.querySelector(`[data-type='dev']`).style.display = 'none';
-                document.querySelector(`[data-type='build']`).style.display = 'none';
                 document.querySelector(`[data-type='debug']`).style.display = 'block';
                 break;
         }

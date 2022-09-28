@@ -100,7 +100,6 @@ export class DebuggerPanelProvider implements vscode.WebviewViewProvider {
 			<body>
 				
         <button class="button-new" style="display: block;" data-type='dev'>调试</button>
-				<button class="button-new" style="display: none;" data-type='build'>构建中</button>
 				<button class="button-new" style="display: none;" data-type='debug'>调试中</button>
 
         <script nonce="${nonce}" src="${scriptUri}"></script>
