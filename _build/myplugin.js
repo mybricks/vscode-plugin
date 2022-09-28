@@ -15,12 +15,15 @@ module.exports =  class Testplugin {
     compiler.hooks.done.tap('Done', (...args) => {
       console.log('args 编译完成 打开', this.envId);
 
+      // TODO
       const env = fse.readJSONSync(mybricksEnvPath);
+      const devServer = compiler.options.devServer;
 
       if (!env[this.envId]) {
-        env[this.envId] = {status: 'done'};
+        env[this.envId] = {status: 'done', url: `http://${devServer.host}:${devServer.port}/bundle.js`};
       } else {
         env[this.envId].status = 'done';
+        env[this.envId].url = `http://${devServer.host}:${devServer.port}/bundle.js`;
       }
 
       fse.writeJSONSync(mybricksEnvPath, env);

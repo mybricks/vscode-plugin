@@ -19,6 +19,7 @@ export function startServer(comlibPath: string): void {
 
   vscode.window.onDidCloseTerminal((e) => {
     console.log(e, 'onDidCloseTerminal');
+    debugStatus.close(e.name);
     updateStatusBar();
   });
 

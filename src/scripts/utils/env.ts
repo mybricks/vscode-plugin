@@ -5,17 +5,13 @@ const DebugStatusPrefix = 'MYBRICKS_BUILD_ID_';
 class DebugStatus {
   statusMap: any = {};
 
-  initStatus(id, methods) {
+  initStatus (id: string, methods: any) {
     const envId = `${DebugStatusPrefix}${id}`;
     const timeId = setInterval(() => {
       const envMap = fes.readJSONSync(path.join(__dirname, './.temp/mybricks_env.json'));
       const status = envMap[envId].status;
       const lastStatus = this.statusMap[envId].status;
 
-      console.log({
-        status,
-        lastStatus
-      })
 
       switch (status) {
         case 'build':
@@ -25,7 +21,7 @@ class DebugStatus {
         case 'done':
           if (lastStatus !== status) {
             console.log('构建好了');
-            methods.done();
+            methods.done(envMap[envId].url);
           }
           break;
         case 'close':
@@ -45,6 +41,12 @@ class DebugStatus {
       status: 'build',
       timeId
     };
+  }
+
+  close (id: string) {
+    const envId = `${DebugStatusPrefix}${id}`;
+    clearInterval(this.statusMap[envId].timeId);
+    Reflect.deleteProperty(this.statusMap, envId);
   }
 }
 
