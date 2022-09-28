@@ -21,7 +21,10 @@ export class DebuggerPanelProvider implements vscode.WebviewViewProvider {
   private _view?: vscode.WebviewView;
 
   constructor(private readonly _extensionUri: vscode.Uri) {
+  }
 
+  public getWebview() {
+    return this._view;
   }
 
   public resolveWebviewView(
@@ -52,8 +55,6 @@ export class DebuggerPanelProvider implements vscode.WebviewViewProvider {
 
         //构建
         case 'build': {
-          vscode.commands.executeCommand("stop");
-
           // 当前选中的文件路径
           // const wsFolders = vscode.workspace.workspaceFolders;
 

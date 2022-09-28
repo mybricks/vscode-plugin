@@ -10,8 +10,8 @@ export default function () {
   updateStatusBar(WORKSPACE_STATUS.DEV);
 
   //修改 button 状态
+  vscode.commands.executeCommand("mybricks.buttonUi.dev");
 
   //执行结束调试
-
-
+  debugStatus.close("mybricks");
 }

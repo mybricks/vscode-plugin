@@ -12,8 +12,7 @@ export default async function () {
   updateStatusBar(WORKSPACE_STATUS.DEBUG);
 
   //修改 button 状态
-
-
+  vscode.commands.executeCommand("mybricks.buttonUi.debug");
 
   //执行开启调试
   const wsFolders = vscode.workspace.workspaceFolders;

@@ -27,11 +27,8 @@
                 updateButtonStatus("dev");
                 break;
             }
-            case 'build': {
-                updateButtonStatus("build");
-                break;
-            }
             case 'debug': {
+                console.log("adfadfadsfasdsdaf")
                 updateButtonStatus("debug");
                 break;
             }
@@ -48,12 +45,6 @@
             case "dev":
                 document.querySelector(`[data-type='dev']`).style.display = 'block';
                 document.querySelector(`[data-type='build']`).style.display = 'none';
-                document.querySelector(`[data-type='debug']`).style.display = 'none';
-                break;
-
-            case "build":
-                document.querySelector(`[data-type='dev']`).style.display = 'none';
-                document.querySelector(`[data-type='build']`).style.display = 'block';
                 document.querySelector(`[data-type='debug']`).style.display = 'none';
                 break;
 

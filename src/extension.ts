@@ -19,9 +19,6 @@ export function activate(context: vscode.ExtensionContext) {
 
   const { subscriptions, extensionPath } = context;
 
-  logger("extensionPath", extensionPath);
-  logger("context.extensionUri", context.extensionUri);
-
   autoSetContextByProject();
 
   subscriptions.push(createStatusBar());
@@ -45,6 +42,14 @@ export function activate(context: vscode.ExtensionContext) {
   const welcomePanel = new WelcomePanelProvider(context.extensionUri);
   const debuggerPanel = new DebuggerPanelProvider(context.extensionUri);
 
+  subscriptions.push(vscode.commands.registerCommand("mybricks.buttonUi.dev", () => {
+    debuggerPanel.getWebview().webview.postMessage({ action: "dev" });
+  }));
+
+  subscriptions.push(vscode.commands.registerCommand("mybricks.buttonUi.debug", () => {
+    debuggerPanel.getWebview().webview.postMessage({ action: "debug" });
+  }));
+
   subscriptions.push(
     vscode.window.registerWebviewViewProvider("mybricks_welcome", welcomePanel),
     vscode.window.registerWebviewViewProvider("mybricks_debugger", debuggerPanel)
@@ -52,8 +57,6 @@ export function activate(context: vscode.ExtensionContext) {
 
   //注册所有命令
   subscriptions.push(...commonds);
-
-
 }
 
 // this method is called when your extension is deactivated
