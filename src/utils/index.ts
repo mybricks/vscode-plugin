@@ -1,7 +1,6 @@
-import * as vscode from "vscode";
 import * as path from 'path'
 import * as fse from 'fs-extra';
-import * as fs from 'fs';
+import * as vscode from 'vscode';
 
 export function logger(...args: any) {
   console.log("==========");
@@ -60,9 +59,6 @@ export function getWorkspacePath() {
   return uri;
 }
 
-/**
- * 通用
- */
 export const opToString = Object.prototype.toString;
 export const opIsArray = Array.isArray;
 
@@ -75,10 +71,8 @@ export function getJsonFile<T extends object>(filePath: string): T {
   let rst = {} as T;
 
   try {
-    const objString = fs.readFileSync(filePath, 'utf-8');
-
-    rst = JSON.parse(objString);
-  } catch (e) { }
+    rst = fse.readJSONSync(filePath);
+  } catch (e) {}
 
   return rst;
 }
