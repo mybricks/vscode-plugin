@@ -1,13 +1,9 @@
-/**
- * script通用
- */
-
 import * as fs from 'fs';
 import * as path from 'path';
-import { getJsonFile } from '../../utils';
-
-export { imgToDataUri } from './image';
 export { debugStatus } from './env';
+export { imgToDataUri } from './image';
+import { getJsonFile } from '../../utils';
+import { MybricksConfigCom } from '../../types';
 
 /**
  * 获取组件库入口文件配置项
@@ -21,7 +17,7 @@ export function getEntryCfg (docPath: string, configPath: string): {
   libPath: string;
   debugger: string;
   description: string;
-  comAry: Array<T_MybricksConfigCom>;
+  comAry: Array<MybricksConfigCom>;
   [key: string]: any;
 } {
   const pkg = getJsonFile<{name: string, version: string, description: string}>(path.join(docPath, './package.json'));
@@ -36,7 +32,7 @@ export function getEntryCfg (docPath: string, configPath: string): {
   };
 
   if (fs.existsSync(configPath)) {
-    const cfgJson = getJsonFile<{comAry: T_MybricksConfigCom[]}>(configPath);
+    const cfgJson = getJsonFile<{comAry: MybricksConfigCom[]}>(configPath);
 
     Object.assign(cfg, cfgJson);
   };

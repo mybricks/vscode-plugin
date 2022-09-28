@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { getEntryCfg, imgToDataUri } from '../utils';
 import { getJsonFile, opToString } from '../../utils';
+import { ComConfig, MybricksConfigCom } from '../../types';
 
 /**
  * 字符串拼接组件库.js并启动webpack-dev-server
@@ -65,7 +66,7 @@ function initEditJS ({libName, libVersion, description}: {
  * @param {Array<string>} arrPath        组件列表嵌套路径
  * @returns 
  */
-function scanComJson (docPath: string, comAry: T_MybricksConfigCom[], arrPath: string[] = []) {
+function scanComJson (docPath: string, comAry: MybricksConfigCom[], arrPath: string[] = []) {
   let rst: string = '';
 
   for (const [index, com] of comAry.entries()) {
@@ -74,7 +75,7 @@ function scanComJson (docPath: string, comAry: T_MybricksConfigCom[], arrPath: s
     if (type === '[object String]') {
       const comJsonPath = path.join(docPath, com as string);
       const comPath = path.join(comJsonPath, '../');
-      const comJson = getJsonFile<T_ComConfig>(comJsonPath);
+      const comJson = getJsonFile<ComConfig>(comJsonPath);
 
       rst = rst + getComString(comJson, comPath, arrPath);
     } else if (type === '[object Object]') {
@@ -101,7 +102,7 @@ function scanComJson (docPath: string, comAry: T_MybricksConfigCom[], arrPath: s
  * @param {Array<string>} arrPath 组件列表嵌套路径
  * @returns 单组件拼接字符串
  */
-function getComString (com: T_ComConfig, comPath: string, arrPath: string[] = []): string {
+function getComString (com: ComConfig, comPath: string, arrPath: string[] = []): string {
   let comStr: string = '';
 
   const {
@@ -159,7 +160,7 @@ function getComString (com: T_ComConfig, comPath: string, arrPath: string[] = []
         const dataPath = path.join(comPath, data);
 
         if (fs.existsSync(dataPath)) {
-          comStr = comStr + `comDef.data = require('${dataPath}').default;\n`;
+          comStr = comStr + `comDef.data = require('${dataPath}');\n`;
         }
       } catch (e) {}
 
