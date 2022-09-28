@@ -7,10 +7,11 @@ class DebugStatus {
 
   initStatus(id: string, methods: any) {
     const envId = `${DebugStatusPrefix}${id}`;
+    const statusMap = this.statusMap;
     const timeId = setInterval(() => {
       const envMap = fes.readJSONSync(path.join(__dirname, './.temp/mybricks_env.json'));
       const status = envMap[envId].status;
-      const lastStatus = this.statusMap[envId].status;
+      const lastStatus = statusMap[envId].status;
 
       switch (status) {
         case 'build':
@@ -20,6 +21,7 @@ class DebugStatus {
         case 'done':
           if (lastStatus !== status) {
             console.log('构建好了');
+            statusMap[envId].status = status;
             methods.done(envMap[envId].url);
           }
           break;
@@ -32,11 +34,9 @@ class DebugStatus {
         default:
           break;
       }
-
-      this.statusMap[envId].status = status;
     }, 1000);
 
-    this.statusMap[envId] = {
+    statusMap[envId] = {
       status: 'build',
       timeId
     };
