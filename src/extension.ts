@@ -6,13 +6,12 @@
  * CheMingjun @2019
  * mybricks@126.com
  */
-
-import * as vscode from "vscode";
+import * as vscode from 'vscode';
+import commonds from './commonds';
+import { WelcomePanelProvider } from './panels/welcome';
+import { DebuggerPanelProvider } from './panels/debugger';
 import { createStatusBar, showStatusBar } from './statusBar';
-import { WelcomePanelProvider } from "./panels/welcome";
-import { DebuggerPanelProvider } from "./panels/debugger";
-import { logger, registerCommand, autoSetContextByProject, checkIsMybricksProject } from "./utils";
-import commonds from "./commonds";
+import { logger, autoSetContextByProject, checkIsMybricksProject } from "./utils";
 
 export function activate(context: vscode.ExtensionContext) {
   logger('Congratulations, your extension "mybricks" is now active!');
