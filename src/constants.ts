@@ -1,7 +1,3 @@
-import { NodeDepTypes } from './types';
-
-export const nodeDepTypes: NodeDepTypes[] = ['dependencies', 'devDependencies'];
-
 export const showExtensionsQuickPickCommandId = 'mybricks.helloworld';
 
 export const editorTitleRunDebugCommandId = 'npmScripts-editor-title-run-dev';

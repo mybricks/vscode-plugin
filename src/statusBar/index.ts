@@ -50,5 +50,5 @@ export function updateStatusBar(workspaceStatus?: string) {
 
   mainStatusBarItem.text = text;
   mainStatusBarItem.command = command;
-  setStatusBarBackground(background);
+  // setStatusBarBackground(background);
 }
