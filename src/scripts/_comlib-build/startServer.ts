@@ -23,15 +23,21 @@ export function startServer(comlibPath: string): void {
     updateStatusBar();
   });
 
+  const envMap = fse.readJSONSync(path.join(__dirname, './.temp/mybricks_env.json'));
+
+  envMap[`MYBRICKS_BUILD_ID_${terminal.name}`] = { status: 'build' };
+  fse.writeJSONSync(path.join(__dirname, './.temp/mybricks_env.json'), envMap);
 
   debugStatus.initStatus(terminal.name, {
     build: () => {
+      // @ts-ignore
       updateStatusBar(WORKSPACE_STATUS.BUILD);
     },
     done: (url: string) => {
       console.log('加载好了');
       vscode.env.openExternal(vscode.Uri.parse(`mybricks://app=pc-ms&debug=1&comlib-url=${url}`));
       updateStatusBar(WORKSPACE_STATUS.DEBUG);
+      // @ts-ignore
       vscode.postMessage({ action: 'debug' });
     },
     close: () => {
@@ -39,11 +45,6 @@ export function startServer(comlibPath: string): void {
       updateStatusBar(WORKSPACE_STATUS.DEV);
     }
   });
-
-  const envMap = fse.readJSONSync(path.join(__dirname, './.temp/mybricks_env.json'));
-
-  envMap[`MYBRICKS_BUILD_ID_${terminal.name}`] = { status: 'build' };
-  fse.writeJSONSync(path.join(__dirname, './.temp/mybricks_env.json'), envMap);
 
   terminal.sendText(`export entry=${comlibPath} entryId=${terminal.name} && npm run --prefix ${path.join(__dirname, '../')} dev:comlib`);
   terminal.show();
