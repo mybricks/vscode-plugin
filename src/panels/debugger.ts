@@ -7,10 +7,12 @@
  * mybricks@126.com
  */
 
-import * as vscode from "vscode";
+import * as vscode from 'vscode';
 
 import * as path from 'path'
 import * as fse from 'fs-extra';
+
+import { build, tempPath, startServer } from '../scripts/_comlib-build';
 
 export class DebuggerPanelProvider implements vscode.WebviewViewProvider {
   private _view?: vscode.WebviewView;
@@ -37,32 +39,20 @@ export class DebuggerPanelProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.onDidReceiveMessage(async (data) => {
       switch (data.type) {
-        case "debug": {
-          debugger
-          return
+        case 'debug': {
+          // 当前选中的文件路径
+          const wsFolders = vscode.workspace.workspaceFolders;
 
-          // console.log("debug");
-          const saveRtn = await vscode.window.showSaveDialog({
-            title: "请选择项目要保存的文件夹",
+          if (wsFolders) {
+            const docPath = wsFolders[0].uri.fsPath;
+            const configName = 'mybricks.json';
+            const { id, editJS } = build(docPath, configName);
+            const editJSPath = path.join(tempPath, `${id.replace(/@|\//gi, '_')}.js`);
 
-            //canSelectFolders: true,
-            //canSelectFiles: false,
-            //canSelectMany: false,
-          });
+            fse.writeFileSync(editJSPath, editJS);
 
-          const projectDir = saveRtn?.fsPath
-          if(projectDir){
-            const tptDirPath = vscode.Uri.joinPath(this._extensionUri, "_templates/comlib-pc").fsPath;
-
-            console.log(projectDir,tptDirPath);
-
-
-            fse.copySync(tptDirPath,projectDir);
-  
-            const newUrl = vscode.Uri.parse(projectDir);
-            vscode.commands.executeCommand(`vscode.openFolder`, newUrl,true);
+            await startServer(editJSPath);
           }
-          break;
         }
       }
     });
@@ -71,23 +61,23 @@ export class DebuggerPanelProvider implements vscode.WebviewViewProvider {
   public addColor() {
     if (this._view) {
       this._view.show?.(true); // `show` is not implemented in 1.49 but is for 1.50 insiders
-      this._view.webview.postMessage({ type: "addColor" });
+      this._view.webview.postMessage({ type: 'addColor' });
     }
   }
 
   public clearColors() {
     if (this._view) {
-      this._view.webview.postMessage({ type: "clearColors" });
+      this._view.webview.postMessage({ type: 'clearColors' });
     }
   }
 
   private _getHtmlForWebview(webview: vscode.Webview) {
     const scriptUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, "_assets", "panel-debugger.js")
+      vscode.Uri.joinPath(this._extensionUri, '_assets', 'panel-debugger.js')
     );
 
     const styleViewUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, "_assets", "view.css")
+      vscode.Uri.joinPath(this._extensionUri, '_assets', 'view.css')
     );
 
     // Use a nonce to only allow a specific script to be run.
@@ -110,9 +100,9 @@ export class DebuggerPanelProvider implements vscode.WebviewViewProvider {
 }
 
 function getNonce() {
-  let text = "";
+  let text = '';
   const possible =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   for (let i = 0; i < 32; i++) {
     text += possible.charAt(Math.floor(Math.random() * possible.length));
   }
