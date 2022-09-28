@@ -10,44 +10,44 @@
     /** @type {Array<{ value: string }>} */
     let colors = oldState.colors;
 
-    document.querySelector(`[data-type='debug']`).addEventListener('click', () => {
-       vscode.postMessage({ type: 'debug' });
+    document.querySelector(`[data-type='dev']`)?.addEventListener('click', () => {
+        vscode.postMessage({ type: 'debug' });
     });
+
+    document.querySelector(`[data-type='complie']`)?.addEventListener('click', () => {
+        vscode.postMessage({ type: 'complie' });
+    });
+
+    document.querySelector(`[data-type='debug']`)?.addEventListener('click', () => {
+        vscode.postMessage({ type: 'dev' });
+    });
+
 
     // Handle messages sent from the extension to the webview
     window.addEventListener('message', event => {
         const message = event.data; // The json data that the extension sent
         switch (message.type) {
-            case 'addColor':
-                {
-                    //addColor();
-                    break;
-                }
-            case 'clearColors':
-                {
-                    colors = [];
-                    //updateColorList(colors);
-                    break;
-                }
-
+            case 'debug': {
+                document.querySelector(`[data-type='dev']`).style.display = 'block';
+                document.querySelector(`[data-type='complie']`).style.display = 'none';
+                document.querySelector(`[data-type='debug']`).style.display = 'none';
+                break;
+            }
+            case 'complie': {
+                document.querySelector(`[data-type='dev']`).style.display = 'none';
+                document.querySelector(`[data-type='complie']`).style.display = 'block';
+                document.querySelector(`[data-type='debug']`).style.display = 'none';
+                break;
+            }
+            case 'dev': {
+                document.querySelector(`[data-type='dev']`).style.display = 'none';
+                document.querySelector(`[data-type='complie']`).style.display = 'none';
+                document.querySelector(`[data-type='debug']`).style.display = 'block';
+                break;
+            }
         }
     });
 
-
-    /** 
-     * @param {string} color 
-     */
-    function onColorClicked(color) {
-        vscode.postMessage({ type: 'colorSelected', value: color });
-    }
-
-    /**
-     * @returns string
-     */
-    function getNewCalicoColor() {
-        const colors = ['020202', 'f1eeee', 'a85b20', 'daab70', 'efcb99'];
-        return colors[Math.floor(Math.random() * colors.length)];
-    }
 }());
 
 
