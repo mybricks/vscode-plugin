@@ -28,7 +28,7 @@ export function startServer(comlibPath: string): void {
   envMap[`MYBRICKS_BUILD_ID_${terminal.name}`] = { status: 'build' };
   fse.writeJSONSync(path.join(__dirname, './.temp/mybricks_env.json'), envMap);
 
-  debugStatus.initStatus(terminal.name, {
+  debugStatus.initStatus(terminal, {
     build: () => {
       // @ts-ignore
       updateStatusBar(WORKSPACE_STATUS.BUILD);

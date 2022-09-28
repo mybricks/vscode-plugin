@@ -13,5 +13,7 @@ export default function () {
 
   //执行结束调试
 
+  debugStatus.close('mybricks')
+
 
 }
