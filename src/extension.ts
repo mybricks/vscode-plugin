@@ -13,6 +13,7 @@ import { WelcomePanelProvider } from './panels/welcome';
 import { DebuggerPanelProvider } from './panels/debugger';
 import { createStatusBar, showStatusBar, updateStatusBar } from './statusBar';
 import { logger, autoSetContextByProject, checkIsMybricksProject } from "./utils";
+import { completionProvider, dispose } from './editor'
 
 export function activate(context: vscode.ExtensionContext) {
   logger('Congratulations, your extension "mybricks" is now active!');
@@ -59,9 +60,13 @@ export function activate(context: vscode.ExtensionContext) {
 
   //注册所有命令
   subscriptions.push(...commonds);
+
+  //注册editor provider
+  subscriptions.push(completionProvider())
 }
 
 // this method is called when your extension is deactivated
 export function deactivate() {
   updateStatusBar(WORKSPACE_STATUS.DEV);
+  dispose()
 }
