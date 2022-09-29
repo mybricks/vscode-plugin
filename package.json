@@ -53,7 +53,17 @@
           "when": "mybricks:isComlib"
         }
       ]
-    }
+    },
+    "snippets": [
+      {
+        "language": "typescriptreact",
+        "path": "./snippets/editor.json"
+      },
+      {
+        "language": "typescript",
+        "path": "./snippets/editor.json"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
