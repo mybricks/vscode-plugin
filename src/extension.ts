@@ -43,10 +43,12 @@ export function activate(context: vscode.ExtensionContext) {
   const debuggerPanel = new DebuggerPanelProvider(context.extensionUri);
 
   subscriptions.push(vscode.commands.registerCommand("mybricks.buttonUi.dev", () => {
+    // @ts-ignore
     debuggerPanel.getWebview().webview.postMessage({ action: "dev" });
   }));
 
   subscriptions.push(vscode.commands.registerCommand("mybricks.buttonUi.debug", () => {
+    // @ts-ignore
     debuggerPanel.getWebview().webview.postMessage({ action: "debug" });
   }));
 

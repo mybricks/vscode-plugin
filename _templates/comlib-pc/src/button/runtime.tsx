@@ -15,8 +15,9 @@ export default function ({ env, data, outputs }) {
   }, []);
 
   return (
-    <div className={css.button}
-      style={...data.style}
+    <div
+      className={css.button}
+      style={data.style}
       onClick={onClick}
       onDoubleClick={onDoubleClick}>
       {data.text}

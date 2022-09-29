@@ -13,5 +13,5 @@ export default function () {
   vscode.commands.executeCommand("mybricks.buttonUi.dev");
 
   //执行结束调试
-  debugStatus.close("mybricks");
+  debugStatus.close();
 }

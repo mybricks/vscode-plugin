@@ -43,4 +43,4 @@ module.exports =  class Testplugin {
       fse.writeJSONSync(mybricksEnvPath, env);
     });
   }
-}
+};
