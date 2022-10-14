@@ -6,67 +6,32 @@
  * CheMingjun @2019
  * mybricks@126.com
  */
-import * as vscode from 'vscode';
-import commonds from './commonds';
-import { WORKSPACE_STATUS } from './constants';
-import { WelcomePanelProvider } from './panels/welcome';
-import { DebuggerPanelProvider } from './panels/debugger';
-import { createStatusBar, showStatusBar, updateStatusBar } from './statusBar';
-import { logger, autoSetContextByProject, checkIsMybricksProject } from "./utils";
-import { completionProvider, dispose } from './editor'
+import * as vscode from "vscode";
+import { envStatus } from "./env";
+import { initViews } from "./views";
+import { initCommands } from "./commands";
+import { initListener } from "./listener";
+import { initSnippets, disposeSnippets } from "./snippets";
 
 export function activate(context: vscode.ExtensionContext) {
-  logger('Congratulations, your extension "mybricks" is now active!');
+  const regist = () => {
+    // 注册代码片段
+    initSnippets(context);
 
-  const { subscriptions, extensionPath } = context;
+    // 注册视图模块
+    initViews(context);
 
-  autoSetContextByProject();
+    //注册所有命令
+    initCommands(context);
 
-  subscriptions.push(createStatusBar());
-  if (checkIsMybricksProject()) {
-    showStatusBar(true);
-  } else {
-    showStatusBar(false);
-  }
-
-  vscode.window.onDidChangeActiveTextEditor((editor) => {
-    autoSetContextByProject();
-    if (checkIsMybricksProject()) {
-      showStatusBar(true);
-    } else {
-      showStatusBar(false);
-    }
-  });
-
-
-  //注册 UI
-  const welcomePanel = new WelcomePanelProvider(context.extensionUri);
-  const debuggerPanel = new DebuggerPanelProvider(context.extensionUri);
-
-  subscriptions.push(vscode.commands.registerCommand("mybricks.buttonUi.dev", () => {
-    // @ts-ignore
-    debuggerPanel.getWebview().webview.postMessage({ action: "dev" });
-  }));
-
-  subscriptions.push(vscode.commands.registerCommand("mybricks.buttonUi.debug", () => {
-    // @ts-ignore
-    debuggerPanel.getWebview().webview.postMessage({ action: "debug" });
-  }));
-
-  subscriptions.push(
-    vscode.window.registerWebviewViewProvider("mybricks_welcome", welcomePanel),
-    vscode.window.registerWebviewViewProvider("mybricks_debugger", debuggerPanel)
-  );
-
-  //注册所有命令
-  subscriptions.push(...commonds);
-
-  //注册editor provider
-  subscriptions.push(completionProvider())
+    // 注册全局监听事件
+    initListener(context);
+  };
+  
+  envStatus.initReadyCb(regist);
 }
 
 // this method is called when your extension is deactivated
 export function deactivate() {
-  updateStatusBar(WORKSPACE_STATUS.DEV);
-  dispose()
+  disposeSnippets();
 }

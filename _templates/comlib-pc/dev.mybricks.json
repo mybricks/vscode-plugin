@@ -1,0 +1,10 @@
+{
+  "comAry": {
+    "test": [
+      "./src/button/com.json"
+    ],
+    "publish": [
+      "./src/button/com.json"
+    ]
+  }
+}

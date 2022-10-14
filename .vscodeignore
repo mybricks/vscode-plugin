@@ -3,11 +3,15 @@
 out/**
 node_modules/**
 src/**
+views/**
 .gitignore
 .yarnrc
 webpack.config.js
 vsc-extension-quickstart.md
-**/tsconfig.json
+tsconfig.json
 **/.eslintrc.json
 **/*.map
 **/*.ts
+_views
+.npmignore
+_scripts/.temp

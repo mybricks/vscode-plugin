@@ -8,3 +8,5 @@ tags/*
 .tmp/
 package-lock.json
 dist/
+*.vsix
+_scripts/.temp

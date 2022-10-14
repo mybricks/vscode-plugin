@@ -1,0 +1,43 @@
+.developContainer {
+	[data-mybricks-btn] {
+		margin: var(--dom-margin-vertical) var(--dom-margin-horizontal);
+		width: 100%;
+		text-align: center;
+		outline: 1px solid transparent;
+		outline-offset: 2px !important;
+		color: var(--vscode-button-foreground);
+		background: var(--vscode-button-background);
+
+		&:hover {
+			cursor: pointer;
+
+			div {
+				background: var(--vscode-button-hoverBackground);
+			}
+		}
+
+		div {
+			padding: var(--dom-padding-vertical) var(--dom-padding-horizontal);
+		}
+	}
+	
+	[data-mybricks-btn="check"],
+	[data-mybricks-btn="debug"] {
+		color: var(--vscode-statusBar-debuggingForeground);
+		background: var(--vscode-statusBar-debuggingBackground);
+
+		&:hover {
+			div {
+				background: rgba(255, 255, 255, 0.12);
+			}
+		}
+	}
+
+	[data-mybriks-divider] {
+		border-top: 1px solid rgba(97, 97, 97, 0.19);
+	}
+
+	.publish {
+		
+	}
+}

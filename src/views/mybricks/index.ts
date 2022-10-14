@@ -1,0 +1,1 @@
+export { welcomeMybricks } from "./welcome";

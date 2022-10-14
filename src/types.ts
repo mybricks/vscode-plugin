@@ -27,3 +27,13 @@ export interface ComConfig {
   inputs: any[];
   slots: any[];
 };
+
+export interface LaunchJson {
+  version: string;
+  configurations: Array<{
+    type: string;
+    request: string;
+    name: string;
+    program: string;
+  }>
+}

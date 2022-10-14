@@ -1,6 +1,6 @@
-const myplugin = require('./myplugin');
-const ignoreWarningPlugin = require('./ignoreWarningPlugin');
-const portFinderSync = require('portfinder-sync');
+const myplugin = require("./myplugin");
+const ignoreWarningPlugin = require("./ignoreWarningPlugin");
+const portFinderSync = require("portfinder-sync");
 
 const basePort = 8000;
 const openPort = portFinderSync.getPort(basePort);
@@ -10,58 +10,58 @@ if (basePort !== openPort) {
 }
 
 module.exports = {
-  mode: 'development',
+  mode: "development",
   entry: process.env.entry,
   output: {
-    filename: 'bundle.js',
-    libraryTarget: 'umd',
-    library: '[name]'
+    filename: "bundle.js",
+    libraryTarget: "umd",
+    library: "[name]"
   },
   cache: {
-    type: 'filesystem',
+    type: "filesystem",
     allowCollectingMemory: true,
   },
   resolve: {
     alias: {},
-    extensions: ['.js', '.jsx', '.ts', '.tsx'],
+    extensions: [".js", ".jsx", ".ts", ".tsx"],
   },
   externals: [{
-    'react': {
+    "react": {
       commonjs: "react",
       commonjs2: "react",
       amd: "react",
       root: "React"
     },
-    'react-dom': {
+    "react-dom": {
       commonjs: "react-dom",
       commonjs2: "react-dom",
       amd: "react-dom",
       root: "ReactDOM"
     }
   }],
-  devtool: 'cheap-source-map',
+  devtool: "cheap-source-map",
   devServer: {
-    allowedHosts: 'all',
+    allowedHosts: "all",
     static: {
       // directory: outputPath,
     },
     // port: devPort,
     port: openPort,
-    host: '0.0.0.0',
+    host: "0.0.0.0",
     client: {
-      logging: 'warn'
+      logging: "warn"
     },
     headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods':
-          'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-      'Access-Control-Allow-Headers':
-          'X-Requested-With, content-type, Authorization',
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods":
+          "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+      "Access-Control-Allow-Headers":
+          "X-Requested-With, content-type, Authorization",
     },
     proxy: []
   },
   resolve: {
-    extensions: ['.js', '.jsx', '.ts', '.tsx'],
+    extensions: [".js", ".jsx", ".ts", ".tsx"],
   },
   module: {
     rules: [
@@ -69,13 +69,13 @@ module.exports = {
         test: /\.jsx?$/,
         use: [
           {
-            loader: 'babel-loader',
+            loader: "babel-loader",
             options: {
               presets: [
-                '@babel/preset-react'
+                "@babel/preset-react"
               ],
               plugins: [
-                ['@babel/plugin-proposal-class-properties', {'loose': true}]
+                ["@babel/plugin-proposal-class-properties", {"loose": true}]
               ],
               cacheDirectory: true
             }
@@ -86,19 +86,19 @@ module.exports = {
         test: /\.tsx?$/,
         use: [
           {
-            loader: 'babel-loader',
+            loader: "babel-loader",
             options: {
               presets: [
-                '@babel/preset-react'
+                "@babel/preset-react"
               ],
               plugins: [
-                ['@babel/plugin-proposal-class-properties', {'loose': true}]
+                ["@babel/plugin-proposal-class-properties", {"loose": true}]
               ],
               cacheDirectory: true
             }
           },
           {
-            loader: 'ts-loader',
+            loader: "ts-loader",
             options: {
                 silent: true,
                 transpileOnly: true,
@@ -108,36 +108,36 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader']
+        use: ["style-loader", "css-loader"]
       },
       {
         test: /\.less$/i,
         use: [
           {
-            loader: 'style-loader',
-            options: {attributes: {title: 'less'}}
+            loader: "style-loader",
+            options: {attributes: {title: "less"}}
           },
           {
-            loader: 'css-loader',
+            loader: "css-loader",
             options: {
               modules: {
-                localIdentName: '[local]-[hash:5]'
+                localIdentName: "[local]-[hash:5]"
               }
             }
           },
-          'less-loader'
+          "less-loader"
         ]
       },
       {
         test: /\.d.ts$/i,
         use: [
-          {loader: 'raw-loader'}
+          {loader: "raw-loader"}
         ]
       },
       {
         test: /\.(xml|txt|html|cjs|theme)$/i,
         use: [
-          {loader: 'raw-loader'}
+          {loader: "raw-loader"}
         ]
       }
     ]
