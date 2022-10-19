@@ -22,34 +22,6 @@ const typeToInfoMap = {
 };
 
 function App (): JSX.Element {
-  // const [status, setStatus] = useState<DebuggerStatus>(vscode.getState().debuggerStatus || "dev");
-
-  // useEffect(() => {
-  //   function messageEvent (event: MessageEvent<any>) {
-  //     const action = event.data.action;
-  
-  //     switch (action) {
-  //       case "dev":
-  //       case "check":
-  //       case "debug":
-  //         setStatus(action);
-  //         break;
-  //       default:
-  //         setStatus("dev");
-  //         break;
-  //     }
-  //   };
-
-  //   window.addEventListener("message", messageEvent);
-
-  //   return () => {
-  //     window.removeEventListener("message", messageEvent);
-  //   };
-  // }, []);
-
-  // const onClick: () => void = useCallback(() => {
-  //   vscode.postMessage({action: typeToInfoMap[status].action});
-  // }, [status]);
 
   return (
     <div className={css.developContainer}>

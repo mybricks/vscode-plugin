@@ -151,6 +151,6 @@ module.exports = {
   },
   plugins: [
     new ignoreWarningPlugin(),
-    new myplugin(process.env.entry)
+    new myplugin({entry: process.env.entry, docPath: process.env.docPath, configName: process.env.configName})
   ]
 };

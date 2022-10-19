@@ -94,6 +94,7 @@
     "package:extension": "webpack --mode production --config ./webpack.config.js --devtool hidden-source-map",
     "package:views": "webpack --mode production --config ./webpack.views.config.js --devtool hidden-source-map",
     "dev:comlib": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js --config ./_build/webpack.dev.js",
+    "rebuild:comlib": "node ./_scripts/rebuild-comlib-dev.js",
     "publish:comlib": "./node_modules/webpack/bin/webpack.js --config ./_build/webpack.build.js",
     "mybricks": "mybricks"
   },

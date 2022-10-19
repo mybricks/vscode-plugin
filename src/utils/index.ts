@@ -1,4 +1,3 @@
-import * as path from "path";
 import * as fse from "fs-extra";
 import * as vscode from "vscode";
 
@@ -17,25 +16,6 @@ export function registerCommand(command: string, commandHandler: (...args: any[]
     commandHandler(...args);
   });
 }
-
-
-export function setStatusBarBackground(color: string) {
-  const workbenchConfiguration = vscode.workspace.getConfiguration("workbench");
-  let colorCustomizations = workbenchConfiguration.get("colorCustomizations") as any;
-
-  if (color) {
-    colorCustomizations["statusBar.background"] = color;
-  } else {
-    colorCustomizations["statusBar.background"] = null;
-  }
-
-  workbenchConfiguration.update("colorCustomizations", colorCustomizations);
-}
-
-// 自动设置全局变量
-// export function autoSetContextByProject() {
-//   vscode.commands.executeCommand("setContext", "mybricks:isComlib", checkIsMybricksProject());
-// }
 
 
 /**

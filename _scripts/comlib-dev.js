@@ -57,5 +57,5 @@ if (!fse.existsSync(nodeModulesPath)) {
 
   fse.writeFileSync(editJSPath, editJS);
 
-  cp.exec(`export entry=${editJSPath} && npm run --prefix ${path.join(__dirname, "../")} dev:comlib`);
+  cp.exec(`export entry=${editJSPath} docPath=${docPath} configName=${configName} && npm run --prefix ${path.join(__dirname, "../")} dev:comlib`);
 }

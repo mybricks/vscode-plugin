@@ -1,9 +1,12 @@
 const cp = require("child_process");
 
 module.exports =  class MyPlugin {
-  constructor () {}
+  constructor (props) {
+    // this._props = props;
+  }
 
   apply (compiler) {
+    // const that = this;
     compiler.hooks.done.tap('Done', () => {
       const devServer = compiler.options.devServer;
 
