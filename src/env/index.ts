@@ -56,8 +56,7 @@ if (!fse.existsSync(node_modules)) {
     "webpack": "^5.74.0",
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^4.9.3",
-    "fs-extra": "^10.1.0",
-    "@fangzhou/stark": "1.0.57-beta1"
+    "fs-extra": "^10.1.0"
   };
   pkg.dependencies = {};
 

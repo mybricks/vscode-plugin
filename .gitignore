@@ -10,3 +10,4 @@ package-lock.json
 dist/
 *.vsix
 _scripts/.temp
+_scripts/.temp-pub

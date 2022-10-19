@@ -94,6 +94,7 @@
     "package:extension": "webpack --mode production --config ./webpack.config.js --devtool hidden-source-map",
     "package:views": "webpack --mode production --config ./webpack.views.config.js --devtool hidden-source-map",
     "dev:comlib": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js --config ./_build/webpack.dev.js",
+    "publish:comlib": "./node_modules/webpack/bin/webpack.js --config ./_build/webpack.build.js",
     "mybricks": "mybricks"
   },
   "devDependencies": {
@@ -123,7 +124,6 @@
     "webpack": "^5.74.0",
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^4.9.3",
-    "@fangzhou/stark": "1.0.57-beta1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

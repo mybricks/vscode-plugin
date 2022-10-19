@@ -123,3 +123,34 @@ export function readJSONSync<T extends object>(filePath: string): T {
 
   return rst;
 }
+
+/**
+ * 普通消息提示
+ * @param {string} title 提示内容
+ * @param {number} duration 停留时间
+ */
+export function showInformationMessage (title: string, duration = 5000) {
+  vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title,
+      cancellable: false,
+    },
+    async (progress, _token) => {
+      return new Promise((resolve) => {
+        const seconds = duration / (1 * 1000);
+        const increment = 100 / seconds;
+
+        for (let i = 0; i < seconds; i++) {
+          setTimeout(() => {
+            progress.report({ increment });
+
+            if (i === seconds - 1) {
+              resolve(true);
+            }
+          }, i * 1000);
+        }
+      });
+    }
+  );
+}

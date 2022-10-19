@@ -15,3 +15,4 @@ tsconfig.json
 _views
 .npmignore
 _scripts/.temp
+_scripts/.temp-pub

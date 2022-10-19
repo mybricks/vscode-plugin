@@ -1,5 +1,4 @@
 .vscode
-.temp
-.temp-pub
+dist
 node_modules
 package-lock.json

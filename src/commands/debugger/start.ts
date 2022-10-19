@@ -44,7 +44,9 @@ export async function initLaunchJson (init = false) {
       }
     } else if (mybricksJsonFiles) {
       if (mybricksJsonFiles.length > 1) {
-        const selectMybricksJsonName = await vscode.window.showQuickPick(mybricksJsonFiles);
+        const selectMybricksJsonName = await vscode.window.showQuickPick(mybricksJsonFiles, {
+          placeHolder: "请选择配置文件"
+        });
 
         mybricksJsonName = selectMybricksJsonName;
       } else {

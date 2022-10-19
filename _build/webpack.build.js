@@ -1,29 +1,24 @@
-const myplugin = require("./myplugin");
-const ignoreWarningPlugin = require("./ignoreWarningPlugin");
-const portFinderSync = require("portfinder-sync");
+const path = require("path");
+const fse = require("fs-extra");
 
-const basePort = 8000;
-const openPort = portFinderSync.getPort(basePort);
+const entry = process.env.entry;
+const entryFileNames = fse.readdirSync(entry);
+const entryMap= {};
 
-if (basePort !== openPort) {
-  console.log(`${basePort} 端口被占用，开启新端口 ${openPort}`.blue);
-}
+entryFileNames.forEach(entryFileName => {
+  entryMap[entryFileName.replace(/(\.js)$/, "")] = path.join(entry, `/${entryFileName}`);
+});
 
 module.exports = {
-  mode: "development",
-  entry: process.env.entry,
+  mode: "production",
+  entry: {
+    ...entryMap
+  },
   output: {
-    filename: "bundle.js",
+    path: entry,
+    filename: "[name].js",
     libraryTarget: "umd",
-    library: "[name]"
-  },
-  cache: {
-    type: "filesystem",
-    allowCollectingMemory: true,
-  },
-  stats: {
-    colors: true,
-    preset: 'normal'
+    library: "fangzhouComDef"
   },
   resolve: {
     alias: {},
@@ -43,30 +38,6 @@ module.exports = {
       root: "ReactDOM"
     }
   }],
-  devtool: "cheap-source-map",
-  devServer: {
-    allowedHosts: "all",
-    static: {
-      // directory: outputPath,
-    },
-    // port: devPort,
-    port: openPort,
-    host: "0.0.0.0",
-    client: {
-      logging: "warn"
-    },
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods":
-          "GET, POST, PUT, DELETE, PATCH, OPTIONS",
-      "Access-Control-Allow-Headers":
-          "X-Requested-With, content-type, Authorization",
-    },
-    proxy: []
-  },
-  resolve: {
-    extensions: [".js", ".jsx", ".ts", ".tsx"],
-  },
   module: {
     rules: [
       {
@@ -145,12 +116,5 @@ module.exports = {
         ]
       }
     ]
-  },
-  optimization: {
-    concatenateModules: false
-  },
-  plugins: [
-    new ignoreWarningPlugin(),
-    new myplugin(process.env.entry)
-  ]
+  }
 };
