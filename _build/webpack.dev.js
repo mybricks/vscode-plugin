@@ -1,6 +1,6 @@
 const myplugin = require("./myplugin");
-const ignoreWarningPlugin = require("./ignoreWarningPlugin");
 const portFinderSync = require("portfinder-sync");
+const ignoreWarningPlugin = require("./ignoreWarningPlugin");
 
 const basePort = 8000;
 const openPort = portFinderSync.getPort(basePort);

@@ -1,5 +1,7 @@
 import * as vscode from "vscode";
-import { registerCommand } from "../../utils";
+
+import * as fse from "fs-extra";
+import { readJSONSync, registerCommand } from "../../utils";
 import { start, initLaunchJson } from "./start";
 
 export { initLaunchJson };
@@ -51,7 +53,18 @@ export class DebuggerCommands {
   stopStatus () {
     this.status = 'dev';
     this.mybricksComlibSession = undefined;
+    vscode.commands.executeCommand("workbench.debug.panel.action.clearReplAction");
     vscode.commands.executeCommand("mybricks.debugger.dev");
     vscode.window.showInformationMessage("结束调试");
+
+    const messageJsonPath = vscode.Uri.joinPath(this._context.extensionUri, "_build", "message.json").path;
+    const messageJson = readJSONSync(messageJsonPath);
+    const { code, message } = messageJson;
+
+    if (code === -1 && message) {
+      vscode.window.showInformationMessage(message);
+
+      fse.unlinkSync(messageJsonPath);
+    }
   }
 }

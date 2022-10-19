@@ -94,7 +94,7 @@ export const opIsArray = Array.isArray;
  * @param {string} filePath json文件绝对路径
  * @returns 若路径错误或json内容有误，返回空对象
  */
-export function readJSONSync<T extends object>(filePath: string): T {
+export function readJSONSync<T extends {[key: string]: any}>(filePath: string): T {
   let rst = {} as T;
 
   try {
