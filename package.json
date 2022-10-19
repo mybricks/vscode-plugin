@@ -1,7 +1,7 @@
 {
   "name": "Mybricks",
   "description": "vscode plugin for mybricks",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "icon": "images/mybricks.png",
   "engines": {
     "vscode": "^1.71.0"

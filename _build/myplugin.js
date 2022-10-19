@@ -11,7 +11,7 @@ module.exports =  class MyPlugin {
     // const that = this;
     compiler.hooks.done.tap("Done", () => {
       const devServer = compiler.options.devServer;
-      const child = cp.spawn("open", [`mybricks123://app=pc-ms&debug=1&comlib-url=http://${devServer.host}:${devServer.port}/bundle.js`]);
+      const child = cp.spawn("open", [`mybricks://app=pc-ms&debug=1&comlib-url=http://${devServer.host}:${devServer.port}/bundle.js`]);
 
       child.stderr.on("data", () => {
         fse.writeJSONSync(path.join(__dirname, 'message.json'), {
