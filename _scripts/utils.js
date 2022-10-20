@@ -278,7 +278,7 @@ function scanComJson (docPath, comAry, arrPath = [], singleComs = []) {
       } = com;
 
       editJS = editJS + `comAray${arrPath.join("")}.push({icon:"${icon}",title:"${title}",comAray:[],type:"${type}",visible:${visible === false ? false : true}});`;
-      editJS = editJS + scanComJson(docPath, comAry, [...arrPath, `[${index}].comAray`], singleComs);
+      editJS = editJS + scanComJson(docPath, comAry, [...arrPath, `[${index}].comAray`], singleComs).editJS;
     }
   }
 
