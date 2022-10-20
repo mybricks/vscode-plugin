@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 
+import Divider from "../../components/divider";
+
 import "../../index.css";
 import css from "./index.less";
 
@@ -72,10 +74,6 @@ function Debugger (): JSX.Element {
   );
 }
 
-function Divider (): JSX.Element {
-  return <div data-mybriks-divider></div>;
-}
-
 function Publish (): JSX.Element {
   const onClick: () => void = useCallback(() => {
     vscode.postMessage({action: 'publish'});
@@ -90,6 +88,32 @@ function Publish (): JSX.Element {
     
   );
 }
+
+// TODO 发布配置
+// function Publish (): JSX.Element {
+//   const onClick: () => void = useCallback(() => {
+//     vscode.postMessage({action: 'publish'});
+//   }, []);
+
+//   return (
+//     <>
+//       <div data-mybricks-btn onClick={onClick}>
+//         <div>发布</div>
+//       </div>
+//       <div className={css.publishConfig}>
+//         <div className={css.configItem}>
+//           <div>接口地址</div>
+//           <input placeholder="若未填写，发布仅将产物保存至本地文件" data-mybricks-input></input>
+//         </div>
+//         <div className={css.configItem}>
+//           <div>鉴权信息</div>
+//           <input></input>
+//         </div>
+//       </div>
+      
+//     </>
+//   );
+// }
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 

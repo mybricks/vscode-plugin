@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 
 import * as fse from "fs-extra";
-import { uuid } from "../../../utils";
+import { uuid, getWorkspaceFsPath } from "../../../utils";
 
 export default class Provider implements vscode.WebviewViewProvider {
   private _view?: vscode.WebviewView;
@@ -22,25 +22,30 @@ export default class Provider implements vscode.WebviewViewProvider {
 
     webviewView.webview.onDidReceiveMessage(async (data) => {
       switch (data.action) {
-        case "create": {
+        case "create":
           const saveRtn = await vscode.window.showSaveDialog({
-            title: "请选择项目要保存的文件夹",
-            //canSelectFolders: true,
-            //canSelectFiles: false,
-            //canSelectMany: false,
+            title: "请选择项目要保存的文件夹"
           });
 
           const projectDir = saveRtn?.fsPath;
 
           if (projectDir) {
             const tptDirPath = vscode.Uri.joinPath(this._context.extensionUri, "_templates/comlib-pc").fsPath;
-            console.log(projectDir, tptDirPath);
+
             fse.copySync(tptDirPath, projectDir);
-            const newUrl = vscode.Uri.parse(projectDir);
-            vscode.commands.executeCommand(`vscode.openFolder`, newUrl, true);
+
+            openFolder(projectDir);
           }
           break;
-        }
+        case "openDir": 
+          const { value } = data;
+
+          if (!openFolder(value)) {
+            vscode.commands.executeCommand("mybricks.welcome.invalidAddress", value);
+          }
+          break;
+        default:
+          break;
       }
     }, null, subscriptions);
 
@@ -64,7 +69,11 @@ export default class Provider implements vscode.WebviewViewProvider {
       vscode.Uri.joinPath(this._context.extensionUri, "dist", "views/mybricksWelcome.js")
     );
     const nonce = uuid();
-
+    const wsFsPath = getWorkspaceFsPath();
+    const mybricksConfig = vscode.workspace.getConfiguration("mybricks");
+    // 过滤当前打卡目录
+    const recentProjectPaths = JSON.stringify(((mybricksConfig.inspect("recentProjectPaths")?.globalValue || []) as string[]).filter(recentProjectPath => recentProjectPath !== wsFsPath));
+    
     return `<!DOCTYPE html>
       <html lang="en">
       <head>
@@ -76,9 +85,28 @@ export default class Provider implements vscode.WebviewViewProvider {
             <div id="root"></div>
             <script nonce="${nonce}">
               const vscode = acquireVsCodeApi();
+              vscode.setState({recentProjectPaths: ${recentProjectPaths}});
             </script>
             <script nonce="${nonce}" src="${scriptUri}"></script>
         </body>
 	    </html>`;
   }
+}
+
+/**
+ * 打开文件夹
+ * @param {string} dirPath 文件夹地址
+ */
+function openFolder (dirPath: string): boolean {
+  if (fse.existsSync(dirPath)) {
+    const url = vscode.Uri.parse(dirPath);
+
+    vscode.commands.executeCommand(`vscode.openFolder`, url, true);
+
+    return true;
+  }
+  
+  vscode.window.showWarningMessage(`打开文件目录(${dirPath})失败`);
+
+  return false;
 }

@@ -40,6 +40,9 @@ class Welcome {
     const welcomePanel = new Provider(context);
 
     subscriptions.push(
+      vscode.commands.registerCommand("mybricks.welcome.invalidAddress", (dirName) => {
+        welcomePanel.webview.postMessage({ action: "invalidAddress", value: dirName });
+      }),
       vscode.window.registerWebviewViewProvider("mybricks_welcome", welcomePanel, {
         webviewOptions: {
           retainContextWhenHidden: true

@@ -71,13 +71,20 @@
       "type": "object",
       "title": "Plugin mybricks config. mybricks 插件配置",
       "properties": {
-        "mybricks.publishConfig": {
+        "mybricks.components.publishConfig": {
           "type": "object",
           "default": {
-            "userId": "",
-            "api": ""
+            "token": ""
           },
-          "markdownDescription": "userId 用于向接口传递的用户ID\n\napi 发布接口地址"
+          "markdownDescription": "token 鉴权信息"
+        },
+        "mybricks.recentProjectPaths": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "markdownDescription": "最近打开过的Mybricks项目地址"
         }
       }
     }

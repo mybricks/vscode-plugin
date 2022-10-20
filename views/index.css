@@ -5,3 +5,7 @@
 	--dom-margin-horizontal: 0;
 }
 
+*:focus {
+	outline-color: var(--vscode-focusBorder) !important;
+}
+

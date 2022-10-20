@@ -36,20 +36,11 @@ export function getWorkspaceFsPath () {
 
 /**
  * 判断是否为mybricks项目
- * 有“*.mybricks.json”文件即可
+ * 有“*mybricks.json”文件即可
+ * @param {string} wsFsPath 检查的文件目录路径
  * @returns 
  */
-export function checkIsMybricksProject() {
-  // const wsFolders = vscode.workspace.workspaceFolders;
-
-  // if (!wsFolders) {
-  //   return false;
-  // }
-
-  const wsFsPath = getWorkspaceFsPath();
-
-  // const wsFsPath = wsFolders[0].uri.fsPath;
-
+export function checkIsMybricksProject(wsFsPath = getWorkspaceFsPath()) {
   if (!wsFsPath) {
     return false;
   }
@@ -63,14 +54,6 @@ export function checkIsMybricksProject() {
   }
 
   return mybricksFiles;
-
-  // const mybricksFilePath = path.join(wsFsPath, "/mybricks.json");
-
-  // if (fse.existsSync(mybricksFilePath)) {
-  //   return true;
-  // } else {
-  //   return false;
-  // }
 }
 
 export function uuid (): string {
