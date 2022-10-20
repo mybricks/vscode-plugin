@@ -267,7 +267,7 @@ function scanComJson (docPath, comAry, arrPath = [], singleComs = []) {
       const comPath = path.join(comJsonPath, "../");
       const comJson = readJSONSync(comJsonPath);
 
-      editJS = editJS + getComString(comJson, comPath, arrPath, singleComs);
+      editJS = editJS + getComString(comJson, comPath, comJsonPath, arrPath, singleComs);
     } else if (type === "[object Object]") {
       const {
         icon,
@@ -295,16 +295,13 @@ function scanComJson (docPath, comAry, arrPath = [], singleComs = []) {
  * @param {Array<string>} arrPath 组件列表嵌套路径
  * @returns 单组件拼接字符串
  */
-function getComString (com, comPath, arrPath = [], singleComs = []) {
-  let comStr = "";
-
+function getComString (com, comPath, comJsonPath, arrPath = [], singleComs = []) {
   let editStr = "";
   let runtimeStr = "";
 
   const {
     icon,
     data,
-    title,
     upgrade,
     editors,
     preview,
@@ -385,7 +382,7 @@ function getComString (com, comPath, arrPath = [], singleComs = []) {
         editStr = editStr + `comDef.preview = "${preview}";\n`;
       }
 
-      singleComs.push({id: namespace, editCode: `let comDef;${editStr}export default comDef;`, runtimeCode: runtimeStr});
+      singleComs.push({id: namespace, comJsonPath, editCode: `let comDef;${editStr}export default comDef;`, runtimeCode: runtimeStr});
 
       editStr = editStr + `comAray${arrPath.join("")}.push(comDef);\n`;
     }

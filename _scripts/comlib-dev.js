@@ -44,7 +44,7 @@ if (!fse.existsSync(nodeModulesPath)) {
 
   const { docPath, configName } = config;
 
-  const { id, editJS, comlibPath } = build(docPath, configName);
+  const { id, editJS, comlibPath, singleComs } = build(docPath, configName);
 
   if (!editJS || !id) {
     console.error(mybricksJsonTips(configName));
@@ -57,5 +57,7 @@ if (!fse.existsSync(nodeModulesPath)) {
 
   fse.writeFileSync(editJSPath, editJS);
 
-  cp.exec(`export entry=${editJSPath} docPath=${docPath} configName=${configName} && npm run --prefix ${path.join(__dirname, "../")} dev:comlib`);
+  const extraWatchFiles = encodeURIComponent(JSON.stringify(singleComs.map(({comJsonPath}) => comJsonPath)));
+
+  cp.exec(`export entry=${editJSPath} docPath=${docPath} configName=${configName} extraWatchFiles=${extraWatchFiles} && npm run --prefix ${path.join(__dirname, "../")} dev:comlib`);
 }

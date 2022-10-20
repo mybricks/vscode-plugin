@@ -1,6 +1,7 @@
 const myplugin = require("./myplugin");
 const portFinderSync = require("portfinder-sync");
 const ignoreWarningPlugin = require("./ignoreWarningPlugin");
+const ExtraWatchWebpackPlugin = require('extra-watch-webpack-plugin');
 
 const basePort = 8000;
 const openPort = portFinderSync.getPort(basePort);
@@ -9,9 +10,12 @@ if (basePort !== openPort) {
   console.log(`${basePort} 端口被占用，开启新端口 ${openPort}`.blue);
 }
 
+const { entry, docPath, configName, extraWatchFiles } = process.env;
+const watchFiles = JSON.parse(decodeURIComponent(extraWatchFiles));
+
 module.exports = {
   mode: "development",
-  entry: process.env.entry,
+  entry,
   output: {
     filename: "bundle.js",
     libraryTarget: "umd",
@@ -151,6 +155,9 @@ module.exports = {
   },
   plugins: [
     new ignoreWarningPlugin(),
-    new myplugin({entry: process.env.entry, docPath: process.env.docPath, configName: process.env.configName})
+    new myplugin({entry, docPath, configName, watchFiles}),
+    new ExtraWatchWebpackPlugin({
+      files: watchFiles
+    })
   ]
 };

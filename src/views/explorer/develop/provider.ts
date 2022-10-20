@@ -57,7 +57,8 @@ export default class Provider implements vscode.WebviewViewProvider {
       vscode.Uri.joinPath(this._context.extensionUri, "dist", "views/explorerDevelop.js")
     );
     const nonce = uuid();
-    const debuggerStatus = this._context.globalState.get('debuggerStatus') || "dev";
+    // TODO 刷新vscode窗口，webpack进程未断开，且globalState保留了状态
+    const debuggerStatus = vscode.debug.activeDebugSession ? (this._context.globalState.get('debuggerStatus') || "dev") : "dev";
 
     return `<!DOCTYPE html>
       <html lang="en">

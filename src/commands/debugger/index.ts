@@ -20,7 +20,9 @@ export class DebuggerCommands {
       vscode.debug.onDidChangeActiveDebugSession((e) => {
         // TODO 目前只有组件库调试
         if (!e) {
-          this.stopStatus();
+          if (this.mybricksComlibSession) {
+            this.stopStatus();
+          }
         } else if (e.name === 'Mybrick Comlib' && !this.mybricksComlibSession) {
           vscode.commands.executeCommand("mybricks.debugger.debug");
           vscode.window.showInformationMessage("开始调试");

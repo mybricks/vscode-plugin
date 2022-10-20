@@ -1,5 +1,7 @@
+const path = require("path");
 const fse = require("fs-extra");
 const { build } = require("./utils");
+const { tempPath } = require("./const");
 
 const argv = process.argv.slice(2);
 const config = {};
@@ -9,8 +11,6 @@ argv.forEach(str => {
 
   config[key] = value;
 });
-
-console.log(config, 'config')
 
 const { id, editJS } = build(config.docPath, config.configName);
 
