@@ -10,22 +10,11 @@ const nodeModulesPath = path.join(__dirname, "../node_modules");
 function mybricksJsonTips (configName) {
   return `
 请正确配置${configName}内comAry信息
-例1:
+例:
 {
   "comAry": [
     "./src/button/com.json"
   ]
-}
-例2: 如何开发阶段区分test和publish，发布只会取publish
-{
-  "comAry": {
-    "test": [
-      "./src/button/com.json"
-    ],
-    "publish": [
-      "./src/button/com.json"
-    ]
-  }
 }`;
 }
 
