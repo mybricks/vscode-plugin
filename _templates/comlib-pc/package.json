@@ -1,7 +1,7 @@
 {
   "name": "@your-team/pc-lib0",
   "version": "1.0.0-main.0",
-  "description": "Webbricks PC组件库",
+  "description": "Mybricks PC组件库",
   "main": "index.js",
   "scripts": {},
   "license": "ISC",

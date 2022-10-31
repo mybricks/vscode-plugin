@@ -21,6 +21,18 @@
 		}
 	}
 
+	[data-mybricks-btn="debug"] {
+		color: var(--vscode-statusBar-debuggingForeground);
+		background: var(--vscode-statusBar-debuggingBackground);
+
+		&:hover {
+			cursor: not-allowed;
+			div {
+				background: rgba(255, 255, 255, 0.12);
+			}
+		}
+	}
+
 	[data-mybricks-text] {
 		color: var(--vscode-foreground);
 		height: 22px;

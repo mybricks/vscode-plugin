@@ -55,7 +55,7 @@ module.exports = {
     },
     // port: devPort,
     port: openPort,
-    host: "0.0.0.0",
+    host: "127.0.0.1",
     client: {
       logging: "warn"
     },

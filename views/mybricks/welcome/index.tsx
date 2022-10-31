@@ -1,4 +1,6 @@
 import React, {
+  // useRef,
+  // useMemo,
   useState,
   useEffect,
   useCallback
@@ -45,7 +47,9 @@ function CreateProject (): JSX.Element {
  * @returns 
  */
 function QuickStart (): JSX.Element {
-  const [recentProjectPaths, setRecentProjectPaths] = useState<string[]>(vscode.getState().recentProjectPaths || []);
+  const [vscodeState] = useState(vscode.getState());
+  const [currentProjectPath] = useState<string>(vscodeState.currentProjectPath);
+  const [recentProjectPaths, setRecentProjectPaths] = useState<string[]>(vscodeState.recentProjectPaths || []);
 
   useEffect(() => {
     function messageEvent (event: MessageEvent<any>) {
@@ -80,20 +84,50 @@ function QuickStart (): JSX.Element {
       <div data-mybricks-text>最近打开</div>
       {recentProjectPaths.map(recentProjectPath => {
         const dirName = recentProjectPath.split('/').pop();
+        const isCurrent = currentProjectPath === recentProjectPath;
 
         return dirName && (
           <div
-            data-mybricks-btn
+            data-mybricks-btn={isCurrent ? "debug" : true}
             key={recentProjectPath}
             onClick={() => onClick(recentProjectPath)}
           >
-            <div>{dirName}</div>
+            {/* <Tooltip title={recentProjectPath}> */}
+              <div>{isCurrent ? "(当前)" : ""}{dirName}</div>
+            {/* </Tooltip> */}
           </div>
         );
       })}
     </>
   ) : <></>;
 }
+
+// function Tooltip (props: React.PropsWithChildren<{title: string}>) {
+//   const ref = useRef(null);
+
+//   useEffect(() => {
+//     console.log(props, 'props');
+//     console.log(React.isValidElement(props.children));
+//     console.log(props.children, props.children instanceof React.Component, 'children');
+
+//     console.log(ref, 'ref');
+//   }, []);
+
+//   const RenderTool = useMemo(() => {
+//     const { children } = props;
+
+//     let renderDom = React.isValidElement(children) ? children : <span>{children}</span>;
+
+//     renderDom = React.cloneElement(
+//       renderDom,
+//       { ref }
+//     );
+
+//     return renderDom;
+//   }, []);
+
+//   return RenderTool;
+// }
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 

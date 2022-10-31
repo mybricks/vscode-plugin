@@ -30,6 +30,9 @@ export function activate(context: vscode.ExtensionContext) {
   
   // envStatus.initReadyCb(regist);
 
+  // 注册全局监听事件
+  initListener(context);
+
   // 注册代码片段
   initSnippets(context);
 
@@ -38,9 +41,6 @@ export function activate(context: vscode.ExtensionContext) {
 
   //注册所有命令
   initCommands(context);
-
-  // 注册全局监听事件
-  initListener(context);
 }
 
 // this method is called when your extension is deactivated

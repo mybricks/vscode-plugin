@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 
 import * as fse from "fs-extra";
-import { uuid, getWorkspaceFsPath } from "../../../utils";
+import { uuid, getWorkspaceFsPath, checkIsMybricksProject } from "../../../utils";
 
 export default class Provider implements vscode.WebviewViewProvider {
   private _view?: vscode.WebviewView;
@@ -69,10 +69,45 @@ export default class Provider implements vscode.WebviewViewProvider {
       vscode.Uri.joinPath(this._context.extensionUri, "dist", "views/mybricksWelcome.js")
     );
     const nonce = uuid();
+    // const wsFsPath = getWorkspaceFsPath();
+    // const mybricksConfig = vscode.workspace.getConfiguration("mybricks");
+    // const recentProjectPaths = JSON.stringify(mybricksConfig.inspect("recentProjectPaths")?.globalValue || []);
+
     const wsFsPath = getWorkspaceFsPath();
-    const mybricksConfig = vscode.workspace.getConfiguration("mybricks");
-    // 过滤当前打卡目录
-    const recentProjectPaths = JSON.stringify(((mybricksConfig.inspect("recentProjectPaths")?.globalValue || []) as string[]).filter(recentProjectPath => recentProjectPath !== wsFsPath));
+    const switchBool = checkIsMybricksProject(wsFsPath);
+    
+    let recentProjectPaths: string[] | string = [];
+
+    if (wsFsPath) {
+      // 表示进入了mybricks项目，记录global settings.json
+      const mybricksConfig = vscode.workspace.getConfiguration("mybricks");
+
+      recentProjectPaths = (mybricksConfig.inspect("recentProjectPaths")?.globalValue || []) as string[];
+
+      if (switchBool) {
+        const wsFsPathIndex = recentProjectPaths.findIndex(recentProject => recentProject === wsFsPath);
+
+        if (wsFsPathIndex === -1) {
+          // 取最近的十个
+          if (recentProjectPaths.length > 9) {
+            recentProjectPaths.pop();
+          }
+        } else {
+          recentProjectPaths.splice(wsFsPathIndex, 1);
+        }
+
+        recentProjectPaths.unshift(wsFsPath);
+      }
+
+      // 过滤失效的地址（移动了位置、修改了名字）
+      recentProjectPaths = recentProjectPaths.filter(recentProjectPath => {
+        return checkIsMybricksProject(recentProjectPath);
+      });
+
+      mybricksConfig.update("recentProjectPaths", recentProjectPaths, vscode.ConfigurationTarget.Global);
+    }
+
+    recentProjectPaths = JSON.stringify(recentProjectPaths);
     
     return `<!DOCTYPE html>
       <html lang="en">
@@ -85,7 +120,10 @@ export default class Provider implements vscode.WebviewViewProvider {
             <div id="root"></div>
             <script nonce="${nonce}">
               const vscode = acquireVsCodeApi();
-              vscode.setState({recentProjectPaths: ${recentProjectPaths}});
+              vscode.setState({
+                recentProjectPaths: ${recentProjectPaths},
+                currentProjectPath: "${wsFsPath}"
+              });
             </script>
             <script nonce="${nonce}" src="${scriptUri}"></script>
         </body>

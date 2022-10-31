@@ -41,7 +41,7 @@ export function getWorkspaceFsPath () {
  * @returns 
  */
 export function checkIsMybricksProject(wsFsPath = getWorkspaceFsPath()) {
-  if (!wsFsPath) {
+  if (!wsFsPath || !fse.existsSync(wsFsPath)) {
     return false;
   }
 
