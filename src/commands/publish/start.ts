@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 
-import {  getWorkspaceFsPath, checkIsMybricksProject } from "../../utils";
+import { getMybricksConfigJson, getWorkspaceFsPath, checkIsMybricksProject } from "../../utils";
 
 export default async function start () {
   const mybricksJsonFiles = checkIsMybricksProject();
@@ -27,7 +27,14 @@ export default async function start () {
     return false;
   }
 
+  // const mybricksConfig = vscode.workspace.getConfiguration("mybricks");
+  // const componentsPublishConfig: any = mybricksConfig.inspect("components.publishConfig")?.globalValue || {};
+
+  const componentsPublishConfig = getMybricksConfigJson();
+  const token = componentsPublishConfig[mybricksJsonName]?.token || {};
+
   return {
+    token,
     docPath,
     configName: mybricksJsonName
   };

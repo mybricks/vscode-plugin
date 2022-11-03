@@ -84,36 +84,15 @@ function Publish (): JSX.Element {
       <div data-mybricks-btn onClick={onClick}>
         <div>发布</div>
       </div>
+      <div data-mybricks-btn onClick={() => {
+        vscode.postMessage({action: 'settings'});
+      }}>
+        <div>配置发布信息</div>
+      </div>
     </div>
     
   );
 }
-
-// TODO 发布配置
-// function Publish (): JSX.Element {
-//   const onClick: () => void = useCallback(() => {
-//     vscode.postMessage({action: 'publish'});
-//   }, []);
-
-//   return (
-//     <>
-//       <div data-mybricks-btn onClick={onClick}>
-//         <div>发布</div>
-//       </div>
-//       <div className={css.publishConfig}>
-//         <div className={css.configItem}>
-//           <div>接口地址</div>
-//           <input placeholder="若未填写，发布仅将产物保存至本地文件" data-mybricks-input></input>
-//         </div>
-//         <div className={css.configItem}>
-//           <div>鉴权信息</div>
-//           <input></input>
-//         </div>
-//       </div>
-      
-//     </>
-//   );
-// }
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 

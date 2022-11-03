@@ -1,3 +1,4 @@
+// @ts-check
 const path = require("path");
 const fse = require("fs-extra");
 
@@ -179,16 +180,20 @@ function build (docPath, configName, useTest = true) {
   }
 
   let editJS = initEditJS(entryCfg);
+  let rtJS = initRuntimeJS(entryCfg);
 
-  const { editJS: jsContent, singleComs } = scanComJson(docPath, comAry);
+  const { editJS: comEditJS, singleComs, rtJS: comRtJS } = scanComJson(docPath, comAry);
 
-  editJS = editJS + jsContent;
+  editJS = editJS + comEditJS;
+  rtJS = rtJS + comRtJS;
 
   return {
+    rtJS,
     editJS,
     comlibPath,
     singleComs,
-    id: entryCfg.libName
+    id: entryCfg.libName,
+    entryCfg
   };
 }
 
@@ -225,12 +230,13 @@ function getEntryCfg (docPath, configPath) {
 /**
  * 初始化组件库edit.js
  * @param {Object} param0 
- * @param {string} param0.libName     组件库名称
- * @param {string} param0.libVersion  组件库版本号
- * @param {string} param0.description 组件库描述
+ * @param {string} param0.libName        组件库名称
+ * @param {string} param0.libVersion     组件库版本号
+ * @param {string} param0.description    组件库描述
+ * @param {string[]} param0.dependencies 依赖cdn数组
  * @returns 组件库edit.js初始化字符串
  */
-function initEditJS ({libName, libVersion, description}) {
+function initEditJS ({libName, libVersion, description, dependencies}) {
   const editJS = `
     let comlibEdt = window["__comlibs_edit_"];
     if(!comlibEdt){
@@ -241,12 +247,40 @@ function initEditJS ({libName, libVersion, description}) {
       id: "${libName}",
       title: "${description}",
       version: "${libVersion}",
+      dependencies: ${JSON.stringify(dependencies || [])},
       comAray
     })
     let comDef;
   `;
 
   return editJS;
+}
+
+/**
+ * 初始化组件库rt.js
+ * @param {Object} param0 
+ * @param {string} param0.libName     组件库名称
+ * @param {string} param0.libVersion  组件库版本号
+ * @param {string} param0.description 组件库描述
+ * @returns 组件库rt.js初始化字符串
+ */
+function initRuntimeJS ({libName, libVersion, description}) {
+  let rtJS = `
+    let comlibRT = window['__comlibs_rt_'];
+    if(!comlibRT){
+      comlibRT = window['__comlibs_rt_'] = [];
+    }
+    const comAray = [];
+    comlibRT.push({
+      id: "${libName}",
+      title: "${description}",
+      version: "${libVersion}",
+      comAray
+    });
+    let comDef;
+  `;
+
+  return rtJS;
 }
 
 /**
@@ -258,6 +292,7 @@ function initEditJS ({libName, libVersion, description}) {
  */
 function scanComJson (docPath, comAry, arrPath = [], singleComs = []) {
   let editJS = "";
+  let rtJS = "";
 
   for (const [index, com] of comAry.entries()) {
     const type = opToString.call(com);
@@ -267,7 +302,12 @@ function scanComJson (docPath, comAry, arrPath = [], singleComs = []) {
       const comPath = path.join(comJsonPath, "../");
       const comJson = readJSONSync(comJsonPath);
 
-      editJS = editJS + getComString(comJson, comPath, comJsonPath, arrPath, singleComs);
+      const { rtJS: comRtJS, editJS: comEditJS } = getComString(comJson, comPath, comJsonPath, arrPath, singleComs);
+
+      editJS = editJS + comEditJS;
+      rtJS = rtJS + comRtJS;
+
+      // editJS = editJS + getComString(comJson, comPath, comJsonPath, arrPath, singleComs);
     } else if (type === "[object Object]") {
       const {
         icon,
@@ -277,12 +317,20 @@ function scanComJson (docPath, comAry, arrPath = [], singleComs = []) {
         visible
       } = com;
 
+      const { rtJS: comRtJS, editJS: comEditJS } = scanComJson(docPath, comAry, [...arrPath, `[${index}].comAray`], singleComs);
+
+
+      // TODO rtJS
       editJS = editJS + `comAray${arrPath.join("")}.push({icon:"${icon}",title:"${title}",comAray:[],type:"${type}",visible:${visible === false ? false : true}});`;
-      editJS = editJS + scanComJson(docPath, comAry, [...arrPath, `[${index}].comAray`], singleComs).editJS;
+      editJS = editJS + comEditJS;
+
+      rtJS = rtJS + `comAray${arrPath.join("")}.push({icon:"${icon}",title:"${title}",comAray:[],type:"${type}",visible:${visible === false ? false : true}});`;
+      rtJS = rtJS + comRtJS;
     }
   }
 
   return {
+    rtJS,
     editJS,
     singleComs
   };
@@ -297,11 +345,12 @@ function scanComJson (docPath, comAry, arrPath = [], singleComs = []) {
  */
 function getComString (com, comPath, comJsonPath, arrPath = [], singleComs = []) {
   let editStr = "";
-  let runtimeStr = "";
+  let rtStr = "";
 
   const {
     icon,
     data,
+    version,
     upgrade,
     editors,
     preview,
@@ -341,8 +390,12 @@ function getComString (com, comPath, comJsonPath, arrPath = [], singleComs = [])
       editStr = editStr + 
         `comDef = ${JSON.stringify(com)};\n` +
         `comDef.runtime = require("${runtimePath}").default;\n`;
-      runtimeStr = runtimeStr + `
-        export default runtime = require("${runtimePath}").default;
+      rtStr = rtStr + `
+        comDef = {
+          namespace: "${namespace}",
+          version: "${version}",
+          runtime: require("${runtimePath}").default
+        };\n
       `;
 
       try {
@@ -382,11 +435,12 @@ function getComString (com, comPath, comJsonPath, arrPath = [], singleComs = [])
         editStr = editStr + `comDef.preview = "${preview}";\n`;
       }
 
-      singleComs.push({id: namespace, comJsonPath, editCode: `let comDef;${editStr}export default comDef;`, runtimeCode: runtimeStr});
+      singleComs.push({id: namespace, comJsonPath, editCode: `let comDef;${editStr}export default comDef;`, runtimeCode: `let comDef;${editStr}export default comDef;`});
 
       editStr = editStr + `comAray${arrPath.join("")}.push(comDef);\n`;
+      rtStr = rtStr + `comAray${arrPath.join("")}.push(comDef);\n`;
     }
   }
 
-  return editStr;
+  return { rtJS: rtStr, editJS: editStr };
 }

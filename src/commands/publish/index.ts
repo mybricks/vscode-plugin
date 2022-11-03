@@ -27,14 +27,18 @@ export class PublishCommands {
     const config = await start();
 
     if (config) {
-      const { docPath, configName } = config;
+      const {
+        token: configToken,
+        docPath,
+        configName
+      } = config;
 
       vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: `组件库发布(${configName})`,
         cancellable: true
       }, (progress, token) => {
-        const child = cp.fork(vscode.Uri.joinPath(this._context.extensionUri, "_scripts", "comlib-publish.js").path, [docPath, configName], {
+        const child = cp.fork(vscode.Uri.joinPath(this._context.extensionUri, "_scripts", "comlib-publish.js").path, [docPath, configName, JSON.stringify(configToken)], {
           silent: true
         });
 
@@ -67,9 +71,9 @@ export class PublishCommands {
               case 1:
                 // success
                 vscode.window.showInformationMessage(message);
-                vscode.workspace.openTextDocument(vscode.Uri.joinPath(vscode.Uri.file(path.join(docPath, relativePath)))).then((document) => {
-                  vscode.window.showTextDocument(document);
-                });
+                // vscode.workspace.openTextDocument(vscode.Uri.joinPath(vscode.Uri.file(path.join(docPath, relativePath)))).then((document) => {
+                //   vscode.window.showTextDocument(document);
+                // });
                 this.stop();
                 break;
               default:

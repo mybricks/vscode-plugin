@@ -1,6 +1,6 @@
+import * as path from "path";
 import * as fse from "fs-extra";
 import * as vscode from "vscode";
-
 
 export function logger(...args: any) {
   console.log("======");
@@ -116,4 +116,30 @@ export function showInformationMessage (title: string, duration = 5000) {
       });
     }
   );
+}
+
+export function getMybricksConfigJson () {
+  const ws = getWorkspaceFsPath() as string;
+  const vscodeConfigPath = path.join(ws, ".vscode");
+
+  if (!fse.existsSync(vscodeConfigPath)) {
+    fse.mkdirSync(vscodeConfigPath);
+  }
+
+  const configPath = path.join(vscodeConfigPath, 'mybricks.config.json');
+
+  return readJSONSync(configPath);
+}
+
+export function setMybricksConfigJson (json: {[key: string]: any}) {
+  const ws = getWorkspaceFsPath() as string;
+  const vscodeConfigPath = path.join(ws, ".vscode");
+
+  if (!fse.existsSync(vscodeConfigPath)) {
+    fse.mkdirSync(vscodeConfigPath);
+  }
+
+  const configPath = path.join(vscodeConfigPath, "mybricks.config.json");
+
+  fse.writeJSONSync(configPath, json, {spaces: 2});
 }

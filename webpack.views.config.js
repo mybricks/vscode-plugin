@@ -5,6 +5,7 @@ const viewsPath = path.join(__dirname, "views");
 module.exports = {
   entry: {
     explorerDevelop: path.join(viewsPath, "explorer/develop/index.tsx"),
+    explorerSettings: path.join(viewsPath, "explorer/settings/index.tsx"),
     mybricksWelcome: path.join(viewsPath, "mybricks/welcome/index.tsx")
   },
   resolve: {

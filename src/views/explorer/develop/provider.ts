@@ -32,6 +32,11 @@ export default class Provider implements vscode.WebviewViewProvider {
         // 发布
         case 'publish': 
           vscode.commands.executeCommand("mybricks.publish.start");
+          break;
+        // 配置
+        case 'settings':
+          vscode.commands.executeCommand("mybricks.publish.settings.open");
+          break;
         default:
           break;
       }
