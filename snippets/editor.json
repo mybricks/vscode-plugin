@@ -13,141 +13,9 @@
     ],
     "description": "Code snippet for 'editor item'"
   },
-  "select": {
-    "prefix": "'select'",
-    "body": ["'select"]
-  },
-  "button": {
-    "prefix": "button'",
-    "body": ["'button"]
-  },
-  "switch": {
-    "prefix": "'switch'",
-    "body": ["'switch"]
-  },
-  "text": {
-    "prefix": "'text'",
-    "body": ["'text"]
-  },
-  "radio": {
-    "prefix": "'radio'",
-    "body": ["'radio"]
-  },
-  "textArea": {
-    "prefix": "'textArea'",
-    "body": ["'textArea"]
-  },
-  "inputNumber": {
-    "prefix": "'inputNumber'",
-    "body": ["'inputNumber"]
-  },
-  "style": {
-    "prefix": "'style'",
-    "body": ["'style"]
-  },
-  "map": {
-    "prefix": "'map'",
-    "body": ["'map"]
-  },
-  "icon": {
-    "prefix": "'icon'",
-    "body": ["'icon"]
-  },
-  "code": {
-    "prefix": "'code'",
-    "body": ["'code"]
-  },
-  "array": {
-    "prefix": "'array'",
-    "body": ["'array"]
-  },
-  "list": {
-    "prefix": "'list'",
-    "body": ["'list"]
-  },
-  "richText": {
-    "prefix": "'richText'",
-    "body": ["'richText"]
-  },
-  "layout": {
-    "prefix": "'layout'",
-    "body": ["'layout"]
-  },
-  "slider": {
-    "prefix": "'slider'",
-    "body": ["'slider"]
-  },
-  "datePicker": {
-    "prefix": "'datePicker'",
-    "body": ["'datePicker"]
-  },
-  "treeSelect": {
-    "prefix": "'treeSelect'",
-    "body": ["'treeSelect"]
-  },
-  "dateRangePicker": {
-    "prefix": "'dateRangePicker'",
-    "body": ["'dateRangePicker"]
-  },
-  "iconRadio": {
-    "prefix": "'iconRadio'",
-    "body": ["'iconRadio"]
-  },
-  "fontFace": {
-    "prefix": "'fontFace'",
-    "body": ["'fontFace"]
-  },
-  "excel": {
-    "prefix": "'excel'",
-    "body": ["'excel"]
-  },
-  "service": {
-    "prefix": "'service'",
-    "body": ["'service"]
-  },
-  "definedSelector": {
-    "prefix": "'definedSelector'",
-    "body": ["'definedSelector"]
-  },
-  "editorBackground": {
-    "prefix": "'editorBackground'",
-    "body": ["'editorBackground"]
-  },
-  "reserve": {
-    "prefix": "'reserve'",
-    "body": ["'reserve"]
-  },
-  "share": {
-    "prefix": "'share'",
-    "body": ["'share"]
-  },
-  "imageSelector": {
-    "prefix": "'imageSelector'",
-    "body": ["'imageSelector"]
-  },
-  "insideService": {
-    "prefix": "'insideService'",
-    "body": ["'insideService"]
-  },
-  "character": {
-    "prefix": "'character'",
-    "body": ["'character"]
-  },
-  "dragList": {
-    "prefix": "'dragList'",
-    "body": ["'dragList"]
-  },
-  "colorPicker": {
-    "prefix": "'colorPicker'",
-    "body": ["'colorPicker"]
-  },
-  "expression": {
-    "prefix": "'expression'",
-    "body": ["'expression"]
-  },
-  "_Event": {
-    "prefix": "'_Event'",
-    "body": ["'_Event"]
+  "ifVisible": {
+    "prefix": "ifVisible",
+    "body": ["ifVisible({ data }: EditorResult<Data>) {\n  return data;\n},"]
   },
   "@init": {
     "prefix": "@init",
@@ -174,9 +42,5 @@
     "body": [
       "'@inputDisConnected': ({ data, input, output }, fromPin, toPin) => {\n\t/**\n\t* fromPin: 上一个连接点信息 { id, schema, title }\n\t* toPin: 当前连接点信息 { id, schema, title }\n\t*/\n},"
     ]
-  },
-  "ifVisible": {
-    "prefix": "ifVisible",
-    "body": ["ifVisible({ data }: EditorResult<Data>) {\n  return data;\n},"]
   }
 }

@@ -40,4 +40,5 @@ export const LANGUAGES = [
   "typescript",
   "javascript",
   "javascriptreact",
+  "json"
 ];
