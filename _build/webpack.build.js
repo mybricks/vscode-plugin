@@ -18,7 +18,7 @@ module.exports = {
     path: entry,
     filename: "[name].js",
     libraryTarget: "umd",
-    library: "fangzhouComDef"
+    library: "MybricksComDef"
   },
   resolve: {
     alias: {},
