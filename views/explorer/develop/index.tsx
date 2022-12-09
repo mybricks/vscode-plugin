@@ -29,7 +29,7 @@ function App (): JSX.Element {
     <div className={css.developContainer}>
       <Debugger />
       <Divider />
-      <Publish />
+      {/* <Publish /> */}
     </div>
   );
 }
