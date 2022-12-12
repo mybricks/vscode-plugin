@@ -14,6 +14,7 @@ export class DebuggerCommands {
 
   status: "dev" | "check" | "debug" = "dev";
   devTerminal: vscode.Terminal | undefined = undefined;
+  // timer: NodeJS.Timer | null = null;
   
   constructor (private readonly _context: vscode.ExtensionContext) {
     const { subscriptions } = this._context;
@@ -25,7 +26,24 @@ export class DebuggerCommands {
         }
       }),
       // vscode.window.onDidOpenTerminal((e: vscode.Terminal) => {
-      //   console.log(e, 'onDidOpenTerminal leon');
+      //   if (e?.name === terminalName) {
+      //     setTimeout(() => {
+      //       e.processId.then((pid) => {
+      //         if (pid) {
+      //           watchPid(pid, {
+      //             success: () => {
+      //               this.status = "debug";
+      //               vscode.commands.executeCommand("mybricks.debugger.debug");
+      //             },
+      //             error: () => {
+      //               console.log('触发了 error leon')
+      //               this.stop.call(this);
+      //             }
+      //           }, "start");
+      //         }
+      //       });
+      //     });
+      //   }
       // }),
       // vscode.window.onDidChangeTerminalState((e: vscode.Terminal) => {
       //   console.log(e, 'onDidChangeTerminalState leon');
@@ -50,8 +68,9 @@ export class DebuggerCommands {
       registerCommand("mybricks.debugger.start", () => {
         if (this.status === "dev") {
           start().then((res) => {
-            this.status = "debug";
-            vscode.commands.executeCommand("mybricks.debugger.debug");
+            this.status = "check";
+            vscode.commands.executeCommand("mybricks.debugger.check");
+            // vscode.commands.executeCommand("mybricks.debugger.debug");
 
             const terminals = vscode.window.terminals;
   
@@ -74,13 +93,33 @@ export class DebuggerCommands {
             devTerminal.show();
             devTerminal.processId.then((pid) => {
               if (pid) {
-                watchPid(pid, () => {
-                  this.devTerminal?.processId.then((curPid) => {
-                    if (curPid === pid) {
-                      this.stop.call(this);
-                    }
-                  });
-                });
+                watchPid(pid, {
+                  success: () => {
+                    this.status = "debug";
+                    vscode.commands.executeCommand("mybricks.debugger.debug");
+                  },
+                  error: () => {
+                    this.stop.call(this);
+                  }
+                }, "start");
+                watchPid(pid, {
+                  success: () => {
+                    // this.devTerminal?.processId.then((curPid) => {
+                    //   if (curPid === pid) {
+                    //     this.stop.call(this);
+                    //   }
+                    // });
+                    this.stop.call(this);
+                  },
+                  error: () => {
+                    // this.devTerminal?.processId.then((curPid) => {
+                    //   if (curPid === pid) {
+                    //     this.stop.call(this);
+                    //   }
+                    // });
+                    this.stop.call(this);
+                  }
+                }, "end");
               }
             });
           });
@@ -105,7 +144,7 @@ export class DebuggerCommands {
   }
 
   stop () {
-    if (this.status === "debug") {
+    if (this.status !== "dev") {
       vscode.commands.executeCommand("mybricks.debugger.dev");
       this.status = "dev";
       this.devTerminal?.dispose();
@@ -164,19 +203,35 @@ function start (): Promise<{docPath: string, configName: string}> {
   });
 }
 
-/** 监听进程退出 */
-function watchPid (pid: number, cb: (pid: number) => void, delay = 10000) {
+/** 监听进程(开始/退出) */
+function watchPid (pid: number, { success, error }: {
+  success: (pid: number) => void,
+  error: (pid: number) => void
+}, type: "start" | "end", delay = 1000) {
   setTimeout(() => {
     pid_descendant(pid, (err: any, data: any[]) => {
       if (err) {
-        console.log(err);
-        cb(pid);
+        error(pid);
       } else {
-        const hasWebpackProcess = data.find(item => item.find((item: string) => item === "webpack"));
-        if (hasWebpackProcess) {
-          watchPid(pid, cb, 1000);
+        if (!data.length) {
+          error(pid);
         } else {
-          cb(pid);
+          const hasWebpackProcess = data.find(item => item.find((item: string) => item === "webpack"));
+          if (type === "start") {
+            // 开始          
+            if (hasWebpackProcess) {
+              success(pid);
+            } else {
+              watchPid(pid, { success, error }, type, delay);
+            }
+          } else {
+            // 结束
+            if (hasWebpackProcess) {
+              watchPid(pid, { success, error }, type, delay);
+            } else {
+              success(pid);
+            }
+          }
         }
       }
     });
