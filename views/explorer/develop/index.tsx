@@ -84,11 +84,11 @@ function Publish (): JSX.Element {
       <div data-mybricks-btn onClick={onClick}>
         <div>发布</div>
       </div>
-      <div data-mybricks-btn onClick={() => {
+      {/* <div data-mybricks-btn onClick={() => {
         vscode.postMessage({action: 'settings'});
       }}>
         <div>配置发布信息</div>
-      </div>
+      </div> */}
     </div>
     
   );

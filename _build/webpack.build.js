@@ -38,6 +38,7 @@ module.exports = {
       root: "ReactDOM"
     }
   }],
+  devtool: 'source-map',
   module: {
     rules: [
       {
@@ -104,16 +105,24 @@ module.exports = {
         ]
       },
       {
-        test: /\.d.ts$/i,
+        test: /\.(gif|png|jpe?g|webp|svg|woff|woff2|eot|ttf)$/i,
         use: [
-          {loader: "raw-loader"}
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 1024 * 2,
+              name: 'img_[name]_[contenthash:4].[ext]'
+            }
+          }
         ]
       },
       {
+        test: /\.d.ts$/i,
+        use: [{ loader: 'raw-loader' }]
+      },
+      {
         test: /\.(xml|txt|html|cjs|theme)$/i,
-        use: [
-          {loader: "raw-loader"}
-        ]
+        use: [{ loader: 'raw-loader' }]
       }
     ]
   }

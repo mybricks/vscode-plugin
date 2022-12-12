@@ -30,11 +30,11 @@ export default async function start () {
   // const mybricksConfig = vscode.workspace.getConfiguration("mybricks");
   // const componentsPublishConfig: any = mybricksConfig.inspect("components.publishConfig")?.globalValue || {};
 
-  const componentsPublishConfig = getMybricksConfigJson();
-  const token = componentsPublishConfig[mybricksJsonName]?.token || {};
+  // const componentsPublishConfig = getMybricksConfigJson();
+  // const token = componentsPublishConfig[mybricksJsonName]?.token || {};
 
   return {
-    token,
+    // token,
     docPath,
     configName: mybricksJsonName
   };
