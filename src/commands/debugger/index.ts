@@ -93,33 +93,37 @@ export class DebuggerCommands {
             devTerminal.show();
             devTerminal.processId.then((pid) => {
               if (pid) {
-                watchPid(pid, {
-                  success: () => {
-                    this.status = "debug";
-                    vscode.commands.executeCommand("mybricks.debugger.debug");
-                  },
-                  error: () => {
-                    this.stop.call(this);
-                  }
-                }, "start");
-                watchPid(pid, {
-                  success: () => {
-                    // this.devTerminal?.processId.then((curPid) => {
-                    //   if (curPid === pid) {
-                    //     this.stop.call(this);
-                    //   }
-                    // });
-                    this.stop.call(this);
-                  },
-                  error: () => {
-                    // this.devTerminal?.processId.then((curPid) => {
-                    //   if (curPid === pid) {
-                    //     this.stop.call(this);
-                    //   }
-                    // });
-                    this.stop.call(this);
-                  }
-                }, "end");
+                setTimeout(() => {
+                  watchPid(pid, {
+                    success: () => {
+                      if (this.status === 'check') {
+                        this.status = "debug";
+                        vscode.commands.executeCommand("mybricks.debugger.debug");
+                        watchPid(pid, {
+                          success: () => {
+                            // this.devTerminal?.processId.then((curPid) => {
+                            //   if (curPid === pid) {
+                            //     this.stop.call(this);
+                            //   }
+                            // });
+                            this.stop.call(this);
+                          },
+                          error: () => {
+                            // this.devTerminal?.processId.then((curPid) => {
+                            //   if (curPid === pid) {
+                            //     this.stop.call(this);
+                            //   }
+                            // });
+                            this.stop.call(this);
+                          }
+                        }, "end");
+                      }
+                    },
+                    error: () => {
+                      this.stop.call(this);
+                    }
+                  }, "start");
+                }, 2000);
               }
             });
           });
