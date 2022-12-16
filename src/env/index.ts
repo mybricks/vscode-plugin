@@ -76,3 +76,18 @@
 // } else {
 //   envStatus.setReady(true);
 // }
+
+import * as path from "path";
+import * as cp from "child_process";
+
+/** 需要保持最新的npm包 */
+const keepUpToDateNpm = [
+  "@mybricks/designer",
+  "@mybricks/render-web"
+];
+
+export function initNpm () {
+  cp.exec(`cd ${path.join(__dirname, '../')} && npm i ${keepUpToDateNpm.map((npmName) => {
+    return npmName + "@latest";
+  }).join(" ")}`);
+}

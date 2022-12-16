@@ -7,7 +7,7 @@
  * mybricks@126.com
  */
 import * as vscode from "vscode";
-// import { envStatus } from "./env";
+import { initNpm } from "./env";
 import { initViews } from "./views";
 import { initCommands } from "./commands";
 import { initListener } from "./listener";
@@ -29,6 +29,9 @@ export function activate(context: vscode.ExtensionContext) {
   // };
   
   // envStatus.initReadyCb(regist);
+
+  // npm包
+  initNpm();
 
   // 注册全局监听事件
   initListener(context);

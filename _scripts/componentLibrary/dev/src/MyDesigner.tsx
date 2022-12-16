@@ -34,7 +34,6 @@ export default function MyDesigner () {
   }, []);
 
   const getConfig = useCallback(({projectJson}: any) => {
-    console.log(projectJson, 'projectJson');
     return {
       comLibLoader() {
         return new Promise((resolve, reject) => {
