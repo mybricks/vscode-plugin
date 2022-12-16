@@ -20,23 +20,52 @@ const externalsMap = {
   "react-dom": "ReactDOM"
 };
 
+const defaultExternals = [
+  {
+    "name": "@ant-design/icons",
+    "library": "icons",
+    "urls": ["https://assets.mybricks.world/pkg/@ant-design/icons-4.7.0/index.umd.min.js"]
+  },
+  {
+    "name": "antd",
+    "library": "antd",
+    "urls": [
+      "https://assets.mybricks.world/pkg/antd-4.21.6/antd.min.css",
+      "https://assets.mybricks.world/pkg/moment-2.9.1/moment.min.js",
+      "https://assets.mybricks.world/pkg/antd-4.21.6/antd.min.js"
+    ]
+  }
+];
+
 let htmlLink = "";
 let htmlScript = "";
 
-if (Array.isArray(externals)) {
-  externals.forEach(({name, library, urls}) => {
-    if (name && library && Array.isArray(urls)) {
-      externalsMap[name] = library;
-      urls.forEach((url) => {
-        if (url.endsWith('.js')) {
-          htmlScript = htmlScript + `<script src="${url}"></script>\n`;
-        } else if (url.endsWith('.css')) {
-          htmlLink = htmlLink + `<link rel="stylesheet" href="${url}">\n`;
-        }
-      });
+function externalUrlsHandle (urls) {
+  urls.forEach((url) => {
+    if (url.endsWith('.js')) {
+      htmlScript = htmlScript + `<script src="${url}"></script>\n`;
+    } else if (url.endsWith('.css')) {
+      htmlLink = htmlLink + `<link rel="stylesheet" href="${url}">\n`;
     }
   });
 }
+
+if (Array.isArray(externals)) {
+  externals.forEach(({name, library, urls}) => {
+    if (name && library && Array.isArray(urls) && !externalsMap[name]) {
+      externalsMap[name] = library;
+      externalUrlsHandle(urls);
+    }
+  });
+}
+
+defaultExternals.forEach(({name, library, urls}) => {
+  if (!externalsMap[name]) {
+    externalsMap[name] = library;
+    externalUrlsHandle(urls);
+  }
+});
+
 
 module.exports = {
   mode: "development",

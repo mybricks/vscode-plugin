@@ -36,7 +36,7 @@ export function getWorkspaceFsPath () {
 
 /**
  * 判断是否为mybricks项目
- * 有“*mybricks.json”文件即可
+ * 有“*?.?mybricks.json”文件即可
  * @param {string} wsFsPath 检查的文件目录路径
  * @returns 
  */
@@ -46,7 +46,7 @@ export function checkIsMybricksProject(wsFsPath = getWorkspaceFsPath()) {
   }
 
   const mybricksFiles = fse.readdirSync(wsFsPath).filter((docName) => {
-    return docName.endsWith('mybricks.json');
+    return docName === "mybricks.json" || docName.endsWith(".mybricks.json");
   });
 
   if (!mybricksFiles.length) {

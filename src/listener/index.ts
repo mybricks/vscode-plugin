@@ -8,6 +8,25 @@ export function initListener (context: vscode.ExtensionContext) {
     autoSetContextByProject();
   });
 
+  // /** 创建文件 */
+  // vscode.workspace.onDidCreateFiles((e) => {
+  //   const config = e.files[0];
+  //   const { fsPath } = config;
+  //   if (typeof fsPath === "string" && fsPath.replace(`${workspacePath}/`, "").split("/").length === 1) {
+  //     autoSetContextByProject();
+  //   }
+  // });
+
+  // /** 删除文件 */
+  // vscode.workspace.onDidDeleteFiles((e) => {
+  //   console.log(e.files, 'onDidDeleteFiles leon');
+  // });
+
+  // /** 重命名文件 */
+  // vscode.workspace.onDidRenameFiles((e) => {
+  //   console.log(e.files, 'onDidRenameFiles leon');
+  // });
+
   // vscode.workspace.onDidRenameFiles((e) => {
   //   console.log(e, 'e onDidRenameFiles')
   // });
