@@ -71,6 +71,7 @@ module.exports = {
   mode: "development",
   entry: {
     bundle: path.resolve(__dirname, "../src/index.tsx"),
+    preview: path.resolve(__dirname, "../src/preview/index.tsx"),
     libEdt: entry
   },
   output: {
@@ -232,6 +233,16 @@ module.exports = {
         link: htmlLink,
         script: htmlScript + "<script src=\"./bundle.js\" defer></script>"
       }
-    })
+    }),
+    new HtmlWebpackPlugin({
+      inject: false,
+      filename: "preview.html",
+      template: path.resolve(__dirname, "../public/index.ejs"),
+      templateParameters: {
+        title: "MyBricks-设计器（SPA版）Demo",
+        link: htmlLink,
+        script: htmlScript + "<script src=\"./preview.js\" defer></script>"
+      }
+    }),
   ]
 };

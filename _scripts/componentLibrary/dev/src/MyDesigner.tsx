@@ -3,17 +3,19 @@ import React, {
   useState,
   useCallback,
   useLayoutEffect
-} from 'react';
+} from "react";
 import { message } from "antd";
 // @ts-ignore
 import Designer from '@mybricks/designer';
+import toolsPlugin from "@mybricks/plugin-tools";
+import servicePlugin, {call as callConnectorHttp} from "@mybricks/plugin-connector-http"; //连接器插件和运行时
 
 import css from "./MyDesigner.less";
 
-const localDataKey = '--mybricks--';
+const localDataKey = "--mybricks--";
 
 export default function MyDesigner () {
-  const designerRef = useRef<{ dump: () => any }>();
+  const designerRef = useRef<{ dump: () => any, toJSON: () => any }>();
   const [projectJson, setProjectJson] = useState();
 
   useLayoutEffect(() => {
@@ -25,7 +27,7 @@ export default function MyDesigner () {
     const json = designerRef.current?.dump();
 
     window.localStorage.setItem(localDataKey, JSON.stringify(json));
-    message.info(`保存完成`);
+    message.info("保存完成");
   }, []);
 
   const clear = useCallback(() => {
@@ -33,16 +35,30 @@ export default function MyDesigner () {
     window.location.reload();
   }, []);
 
+  const preview = useCallback(() => {
+    const json = designerRef.current?.toJSON();
+
+    window.localStorage.setItem("--preview--", JSON.stringify(json));
+
+    const win = window.open("", "preview");
+
+    if (win) {
+      if (win.location.href === "about:blank") {
+        window.open("/preview.html", "preview");
+      } else {
+        win.focus();
+      }
+    }
+  }, []);
+
   const getConfig = useCallback(({projectJson}: any) => {
     return {
+      plugins: [
+        toolsPlugin(),
+        servicePlugin()
+      ],
       comLibLoader() {
-        return new Promise((resolve, reject) => {
-          // scriptRequire(['./libEdt.js'], err => {
-          //   reject(err)
-          // }).then((styles) => {
-          //   window['__comlibs_edit_'][0]._styleAry = styles;
-          //   resolve(window['__comlibs_edit_'])
-          // });
+        return new Promise((resolve) => {
           resolve(['./libEdt.js']);
         });
       },
@@ -61,6 +77,20 @@ export default function MyDesigner () {
           i18n(title: any) {//多语言
             return title;
           },
+          callConnector(connector: any, params: any) {//调用连接器
+            if (connector.type === 'http') {//服务接口类型
+              return callConnectorHttp(connector, params, {
+                // 发送请求前的钩子函数
+                before(options) {
+                  return {
+                    ...options
+                  };
+                }
+              });
+            } else {
+              return Promise.reject('错误的连接器类型.');
+            }
+          },
         },
       },
     };
@@ -76,6 +106,7 @@ export default function MyDesigner () {
           </div>
           <button className={css.primary} onClick={save}>保存</button>
           <button onClick={clear}>清空本地数据</button>
+          <button onClick={preview}>预览</button>
         </div>
         <div className={css.designer}>
           {
