@@ -422,6 +422,14 @@ function getComString (com, comPath, comJsonPath, arrPath = [], singleComs = [])
         }
       } catch (e) {}
 
+      try {
+        const runtimeEditPath = path.join(comPath, com['runtime.edit']);
+
+        if (fse.existsSync(runtimeEditPath)) {
+          editStr = editStr + `comDef['runtime.edit'] = require("${runtimeEditPath}").default;\n`;
+        }
+      } catch (e) {}
+
       
       if (/\.(js|ts|jsx|tsx)$/.test(preview)) {
         try {
