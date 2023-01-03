@@ -266,9 +266,10 @@ function initEditJS ({libName, libVersion, description, dependencies}) {
  */
 function initRuntimeJS ({libName, libVersion, description}) {
   let rtJS = `
-    let comlibRT = window['__comlibs_rt_'];
+    let world = typeof window == 'undefined' ?  global : window
+    let comlibRT = world['__comlibs_rt_'];
     if(!comlibRT){
-      comlibRT = window['__comlibs_rt_'] = [];
+      comlibRT = world['__comlibs_rt_'] = [];
     }
     const comAray = [];
     comlibRT.push({
