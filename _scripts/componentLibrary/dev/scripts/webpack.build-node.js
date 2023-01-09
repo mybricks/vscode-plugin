@@ -1,7 +1,6 @@
 const path = require("path");
 const fse = require("fs-extra");
 const WebpackBar = require("webpackbar");
-
 const publishplugin = require("./publishplugin");
 const { tempPubPath } = require("../../../const");
 
@@ -12,6 +11,7 @@ const config = fse.readJSONSync(docPath + "/" + configName);
 const { externals } = config;
 
 const externalsMap = {
+  axios: "axios",
 };
 
 /**
@@ -30,10 +30,10 @@ if (Array.isArray(externals)) {
   });
 }
 
-module.exports = {
+const baseConfig = {
   mode: "production",
-  target: 'node',
-  entry,
+  // target: 'node',
+  // entry,
   output: {
     path: path.resolve(docPath, './dist'),
     filename: "[name].js",
@@ -107,7 +107,7 @@ module.exports = {
       {
         test: /\.(xml|txt|html|cjs|theme)$/i,
         use: [{ loader: 'raw-loader' }]
-      }
+      },
     ]
   },
   plugins: [
@@ -115,3 +115,25 @@ module.exports = {
     new publishplugin({docPath})
   ]
 };
+
+// 逻辑编排的组件，edit中不需要runtime
+const changeEditEntry = (filePath) => {
+  let content = fse.readFileSync(filePath).toString();
+  content = content.replace(/comDef\.runtime.*\.default\;/g, 'comDef.runtime = () => {};');
+  fse.writeFileSync(filePath, content);
+};
+
+changeEditEntry(entry.edit);
+const editJsConfig = {
+  ...baseConfig,
+  target: 'web',
+  entry: { edit: entry.edit}
+};
+
+const rtJsConfig = {
+  ...baseConfig,
+  target: 'node',
+  entry: {rt: entry.rt}
+};
+
+module.exports = [editJsConfig,rtJsConfig];
