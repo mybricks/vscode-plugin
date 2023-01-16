@@ -1,5 +1,7 @@
 {
+  "debugger": "cloud-com",
   "comAry": [
-    "./src/button/com.json"
+    "./src/button/com.json",
+    "./src/_message/com.json"
   ]
 }

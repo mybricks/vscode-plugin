@@ -1,8 +1,8 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
 import { call } from "@mybricks/plugin-connector-http";
 // @ts-ignore
 import { render as renderUI } from "@mybricks/render-web";
+import { createScript } from '../../utils/createScript'
 
 //准备编译的数据，结构为 {slot,script}，根据 toJSON 导出
 let json = localStorage.getItem("--preview--");
@@ -16,20 +16,6 @@ try {
 } catch (ex) {
   throw ex;
 }
-
-(async function init() {
-  const script = document.createElement("script");
-
-  script.src = "./libEdt.js";
-
-  script.onload = () => {
-    const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
-
-    root.render(<Page />);
-  };
-
-  document.body.appendChild(script);
-})();
 
 function Page() {
   return (
@@ -52,3 +38,10 @@ function Page() {
     </div>
   );
 }
+
+createScript("./libEdt.js", () => {
+  const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
+  root.render(<Page />);
+});
+
+

@@ -4,10 +4,11 @@
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
     "target": "ES5",
-    "jsx": "react",
+    "jsx": "react-jsx",
     "sourceMap": true,
     "experimentalDecorators": true,
     "lib": ["dom", "ES2015"],
     "strict": true
-  }
+  },
+  "compileOnSave": true
 }

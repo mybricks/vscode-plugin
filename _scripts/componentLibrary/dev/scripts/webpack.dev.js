@@ -13,7 +13,7 @@ const { cacheId, entry, docPath, configName, extraWatchFiles } = jsonconfig;
 const watchFiles = JSON.parse(decodeURIComponent(extraWatchFiles));
 const outputPath = path.resolve(__dirname, "../public");
 const config = fse.readJSONSync(docPath + "/" + configName);
-const { externals } = config;
+const { externals, debugger: debuggerType } = config;
 
 const externalsMap = {
   "react": "React",
@@ -40,7 +40,7 @@ const defaultExternals = [
 let htmlLink = "";
 let htmlScript = "";
 
-function externalUrlsHandle (urls) {
+function externalUrlsHandle(urls) {
   urls.forEach((url) => {
     if (url.endsWith('.js')) {
       htmlScript = htmlScript + `<script src="${url}"></script>\n`;
@@ -51,7 +51,7 @@ function externalUrlsHandle (urls) {
 }
 
 if (Array.isArray(externals)) {
-  externals.forEach(({name, library, urls}) => {
+  externals.forEach(({ name, library, urls }) => {
     if (name && library && Array.isArray(urls) && !externalsMap[name]) {
       externalsMap[name] = library;
       externalUrlsHandle(urls);
@@ -59,19 +59,20 @@ if (Array.isArray(externals)) {
   });
 }
 
-defaultExternals.forEach(({name, library, urls}) => {
+defaultExternals.forEach(({ name, library, urls }) => {
   if (!externalsMap[name]) {
     externalsMap[name] = library;
     externalUrlsHandle(urls);
   }
 });
 
-
 module.exports = {
   mode: "development",
   entry: {
-    bundle: path.resolve(__dirname, "../src/index.tsx"),
-    preview: path.resolve(__dirname, "../src/preview/index.tsx"),
+    "spa-bundle": path.resolve(__dirname, '../src/pc-spa/debugger/index.tsx'),
+    "spa-preview": path.resolve(__dirname, '../src/pc-spa/preview/index.tsx'),
+    "cloud-bundle": path.resolve(__dirname, '../src/cloud-com/debugger/index.tsx'),
+    "cloud-preview": path.resolve(__dirname, '../src/cloud-com/preview/index.tsx'),
     libEdt: entry
   },
   output: {
@@ -123,7 +124,10 @@ module.exports = {
     client: {
       logging: "warn"
     },
-    proxy: []
+    proxy: [],
+    devMiddleware: {
+      index: debuggerType === 'pc-spa' ? "pc-spa.html" : "cloud-com.html",
+    }
   },
   module: {
     rules: [
@@ -137,7 +141,7 @@ module.exports = {
                 "@babel/preset-react"
               ],
               plugins: [
-                ["@babel/plugin-proposal-class-properties", {"loose": true}]
+                ["@babel/plugin-proposal-class-properties", { "loose": true }]
               ],
               cacheDirectory: true
             }
@@ -154,7 +158,7 @@ module.exports = {
                 "@babel/preset-react"
               ],
               plugins: [
-                ["@babel/plugin-proposal-class-properties", {"loose": true}]
+                ["@babel/plugin-proposal-class-properties", { "loose": true }]
               ],
               cacheDirectory: true
             }
@@ -177,7 +181,7 @@ module.exports = {
         use: [
           {
             loader: "style-loader",
-            options: {attributes: {title: "less"}}
+            options: { attributes: { title: "less" } }
           },
           {
             loader: "css-loader",
@@ -221,27 +225,48 @@ module.exports = {
   },
   plugins: [
     new WebpackBar(),
-    new devplugin({entry, docPath, configName, watchFiles}),
+    new devplugin({ entry, docPath, configName, watchFiles }),
     new ExtraWatchWebpackPlugin({
       files: watchFiles
     }),
     new HtmlWebpackPlugin({
       inject: false,
+      filename: "pc-spa.html",
       template: path.resolve(__dirname, "../public/index.ejs"),
       templateParameters: {
         title: "MyBricks-设计器（SPA版）Demo",
         link: htmlLink,
-        script: htmlScript + "<script src=\"./bundle.js\" defer></script>"
+        script: htmlScript + "<script src=\"./spa-bundle.js\" defer></script>"
       }
     }),
     new HtmlWebpackPlugin({
       inject: false,
-      filename: "preview.html",
+      filename: "spa-preview.html",
       template: path.resolve(__dirname, "../public/index.ejs"),
       templateParameters: {
         title: "MyBricks-设计器（SPA版）Demo",
         link: htmlLink,
-        script: htmlScript + "<script src=\"./preview.js\" defer></script>"
+        script: htmlScript + "<script src=\"./spa-preview.js\" defer></script>"
+      }
+    }),
+    new HtmlWebpackPlugin({
+      inject: false,
+      filename: "cloud-com.html",
+      template: path.resolve(__dirname, "../public/index.ejs"),
+      templateParameters: {
+        title: "MyBricks-设计器（Cloud版）Demo",
+        link: htmlLink,
+        script: htmlScript + "<script src=\"./cloud-bundle.js\" defer></script>"
+      }
+    }),
+    new HtmlWebpackPlugin({
+      inject: false,
+      filename: "cloud-preview.html",
+      template: path.resolve(__dirname, "../public/index.ejs"),
+      templateParameters: {
+        title: "MyBricks-设计器（Cloud版）Demo",
+        link: htmlLink,
+        script: htmlScript + "<script src=\"./cloud-preview.js\" defer></script>"
       }
     }),
   ]

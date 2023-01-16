@@ -1,4 +1,5 @@
 {
+  "debugger": "pc-spa",
   "comAry": [
     "./src/button/com.json"
   ]

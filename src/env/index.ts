@@ -85,7 +85,9 @@ const keepUpToDateNpm = [
   "@mybricks/designer",
   "@mybricks/render-web",
   "@mybricks/plugin-connector-http",
-  "@mybricks/plugin-tools"
+  "@mybricks/plugin-tools",
+  "@mybricks/file-parser",
+  "@mybricks/render-com"
 ];
 
 export function initNpm () {
