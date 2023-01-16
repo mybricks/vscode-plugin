@@ -115,7 +115,7 @@ module.exports = {
   externals: [externalsMap],
   devtool: "cheap-source-map",
   devServer: {
-    open: true,
+    open: debuggerType === 'pc-spa' ? ['/pc-spa.html'] : ['/cloud-com.html'],
     hot: true,
     allowedHosts: "all",
     static: {
@@ -124,10 +124,7 @@ module.exports = {
     client: {
       logging: "warn"
     },
-    proxy: [],
-    devMiddleware: {
-      index: debuggerType === 'pc-spa' ? "pc-spa.html" : "cloud-com.html",
-    }
+    proxy: []
   },
   module: {
     rules: [
