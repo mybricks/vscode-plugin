@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import React, { useRef } from "react";
 import ReactDOM from "react-dom/client";
 import Designer, { DesignerConfig } from "../../components/Designer";
 import Toolbar from "../../components/Toolbar";

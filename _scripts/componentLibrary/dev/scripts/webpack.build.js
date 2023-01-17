@@ -17,7 +17,7 @@ const externalsMap = {
 };
 
 if (Array.isArray(externals)) {
-  externals.forEach(({name, library, urls}) => {
+  externals.forEach(({ name, library, urls }) => {
     if (name && library && Array.isArray(urls)) {
       externalsMap[name] = library;
     }
@@ -52,7 +52,7 @@ module.exports = {
                 "@babel/preset-react"
               ],
               plugins: [
-                ["@babel/plugin-proposal-class-properties", {"loose": true}]
+                ["@babel/plugin-proposal-class-properties", { "loose": true }]
               ],
               cacheDirectory: true
             }
@@ -60,7 +60,7 @@ module.exports = {
         ]
       },
       {
-        test: /\.tsx?$/,
+        test: /\.(ts|tsx)?$/,
         use: [
           {
             loader: "babel-loader",
@@ -69,7 +69,7 @@ module.exports = {
                 "@babel/preset-react"
               ],
               plugins: [
-                ["@babel/plugin-proposal-class-properties", {"loose": true}]
+                ["@babel/plugin-proposal-class-properties", { "loose": true }]
               ],
               cacheDirectory: true
             }
@@ -92,7 +92,7 @@ module.exports = {
         use: [
           {
             loader: "style-loader",
-            options: {attributes: {title: "less"}}
+            options: { attributes: { title: "less" } }
           },
           {
             loader: "css-loader",
@@ -129,6 +129,6 @@ module.exports = {
   },
   plugins: [
     new WebpackBar(),
-    new publishplugin({docPath})
+    new publishplugin({ docPath })
   ]
 };
