@@ -76,8 +76,8 @@ module.exports = {
   entry: {
     "spa-bundle": path.resolve(__dirname, '../src/pc-spa/debugger/index.tsx'),
     "spa-preview": path.resolve(__dirname, '../src/pc-spa/preview/index.tsx'),
-    "cloud-bundle": path.resolve(__dirname, '../src/cloud-com/debugger/index.tsx'),
-    "cloud-preview": path.resolve(__dirname, '../src/cloud-com/preview/index.tsx'),
+    // "cloud-bundle": path.resolve(__dirname, '../src/cloud-com/debugger/index.tsx'),
+    // "cloud-preview": path.resolve(__dirname, '../src/cloud-com/preview/index.tsx'),
     libEdt: entry
   },
   output: {
@@ -120,7 +120,8 @@ module.exports = {
   externals: [externalsMap],
   devtool: "cheap-source-map",
   devServer: {
-    open: debuggerType === 'pc-spa' ? ['/pc-spa.html'] : ['/cloud-com.html'],
+    // open: debuggerType === 'pc-spa' ? ['/pc-spa.html'] : ['/cloud-com.html'],
+    open: '/pc-spa.html',
     hot: true,
     allowedHosts: "all",
     static: {
@@ -251,25 +252,25 @@ module.exports = {
         script: htmlScript + "<script src=\"./spa-preview.js\" defer></script>"
       }
     }),
-    new HtmlWebpackPlugin({
-      inject: false,
-      filename: "cloud-com.html",
-      template: path.resolve(__dirname, "../public/index.ejs"),
-      templateParameters: {
-        title: "MyBricks-设计器（Cloud版）Demo",
-        link: htmlLink,
-        script: htmlScript + "<script src=\"./cloud-bundle.js\" defer></script>"
-      }
-    }),
-    new HtmlWebpackPlugin({
-      inject: false,
-      filename: "cloud-preview.html",
-      template: path.resolve(__dirname, "../public/index.ejs"),
-      templateParameters: {
-        title: "MyBricks-设计器（Cloud版）Demo",
-        link: htmlLink,
-        script: htmlScript + "<script src=\"./cloud-preview.js\" defer></script>"
-      }
-    }),
+    // new HtmlWebpackPlugin({
+    //   inject: false,
+    //   filename: "cloud-com.html",
+    //   template: path.resolve(__dirname, "../public/index.ejs"),
+    //   templateParameters: {
+    //     title: "MyBricks-设计器（Cloud版）Demo",
+    //     link: htmlLink,
+    //     script: htmlScript + "<script src=\"./cloud-bundle.js\" defer></script>"
+    //   }
+    // }),
+    // new HtmlWebpackPlugin({
+    //   inject: false,
+    //   filename: "cloud-preview.html",
+    //   template: path.resolve(__dirname, "../public/index.ejs"),
+    //   templateParameters: {
+    //     title: "MyBricks-设计器（Cloud版）Demo",
+    //     link: htmlLink,
+    //     script: htmlScript + "<script src=\"./cloud-preview.js\" defer></script>"
+    //   }
+    // }),
   ]
 };
