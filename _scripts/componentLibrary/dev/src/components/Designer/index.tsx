@@ -4,7 +4,7 @@ import toolsPlugin from "@mybricks/plugin-tools";
 import servicePlugin, {
   call as callConnectorHttp,
 } from "@mybricks/plugin-connector-http";
-import { merge } from 'lodash'
+import _ from 'lodash'
 
 export type DesignerConfig = Partial<{
   plugins: Array<any>;
@@ -79,7 +79,7 @@ const DesignerHoc = ({ config, localDataKey }: Props, ref: any) => {
     }),
     []
   );
-  return <Designer config={merge(defaultConfig, config)} ref={ref} />;
+  return <Designer config={_.merge(defaultConfig, config)} ref={ref} />;
 };
 
 export default React.forwardRef<any, Props>(DesignerHoc);

@@ -34,6 +34,11 @@ const defaultExternals = [
       "https://assets.mybricks.world/pkg/moment-2.9.1/moment.min.js",
       "https://assets.mybricks.world/pkg/antd-4.21.6/antd.min.js"
     ]
+  },
+  {
+    name: "lodash",
+    library: "_",
+    urls: ["https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"]
   }
 ];
 
