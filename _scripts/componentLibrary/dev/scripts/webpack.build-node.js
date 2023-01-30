@@ -12,6 +12,7 @@ const { externals } = config;
 
 const externalsMap = {
   axios: "axios",
+  mysql2: 'mysql2',
 };
 
 /**
