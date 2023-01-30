@@ -1,7 +1,7 @@
 {
   "name": "Mybricks",
   "description": "快速便捷地开发和发布Mybricks组件",
-  "version": "0.0.30",
+  "version": "0.0.34",
   "icon": "images/mybricks.png",
   "engines": {
     "vscode": "^1.71.0"
@@ -119,10 +119,10 @@
     "@babel/core": "^7.6.2",
     "@babel/plugin-proposal-class-properties": "^7.18.6",
     "@babel/preset-react": "^7.18.6",
-    "@mybricks/designer": "^1.0.70",
-    "@mybricks/plugin-connector-http": "^1.1.1-beta.0",
-    "@mybricks/plugin-tools": "^1.0.8",
-    "@mybricks/render-web": "^1.0.87",
+    "@mybricks/designer": "^1.1.14",
+    "@mybricks/plugin-connector-http": "^1.1.2",
+    "@mybricks/plugin-tools": "^1.0.11",
+    "@mybricks/render-web": "^1.1.11",
     "babel-loader": "^8.0.6",
     "css-loader": "^6.7.1",
     "eslint": "^8.20.0",
