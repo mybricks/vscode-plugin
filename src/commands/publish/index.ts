@@ -1,3 +1,4 @@
+import { readJsonSync } from 'fs-extra';
 import * as vscode from "vscode";
 
 import start from "./start";
@@ -51,7 +52,14 @@ export class PublishCommands {
 
       const projPath = vscode.Uri.file(this._context.extensionPath).path;
       const filename = (docPath + configName).replace(/@|\//gi, "_");
-      devTerminal.sendText(`node ${projPath}/_scripts/generateCodePublish.js docPath=${docPath} configName=${configName} && export filename=${filename} && npm run --prefix ${projPath} publish:comlib`);
+      const libCfg = readJsonSync(path.join(docPath, configName));
+      let cmd = 'publish:comlib';
+      // 针对搭建产物为node的组件库
+      if(libCfg?.target === 'node') {
+        cmd = 'publish:comlib-node';
+        showInformationMessage("编译目标为node...");
+      }
+      devTerminal.sendText(`node ${projPath}/_scripts/generateCodePublish.js docPath=${docPath} configName=${configName} && export filename=${filename} && npm run --prefix ${projPath} ${cmd}`);
       devTerminal.show();
 
       showInformationMessage("组件库发布中...");

@@ -101,6 +101,7 @@
     "dev:comlib": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js --config ./_scripts/componentLibrary/dev/scripts/webpack.dev.js",
     "rebuild:comlib": "node ./_scripts/rebuild-comlib-dev.js",
     "publish:comlib": "./node_modules/webpack/bin/webpack.js --config ./_scripts/componentLibrary/dev/scripts/webpack.build.js",
+    "publish:comlib-node": "./node_modules/webpack/bin/webpack.js --config ./_scripts/componentLibrary/dev/scripts/webpack.build-node.js",
     "mybricks": "mybricks"
   },
   "devDependencies": {

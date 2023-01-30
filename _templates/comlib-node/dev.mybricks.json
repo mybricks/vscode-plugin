@@ -1,0 +1,6 @@
+{
+  "target": "node",
+  "comAry": [
+    "./src/log/com.json"
+  ]
+}

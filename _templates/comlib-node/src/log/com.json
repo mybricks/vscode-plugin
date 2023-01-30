@@ -1,0 +1,30 @@
+{
+  "title": "打印日志",
+  "namespace": "fangzhou.workflow.log",
+  "version": "0.0.1",
+  "rtType": "js",
+  "description": "打印日志",
+  "author": "liuzhigang06",
+  "author_name": "刘智刚",
+  "data": "./data.json",
+  "runtime": "./runtime.tsx",
+  "editors": "./editors.tsx",
+  "inputs": [
+    {
+      "id": "print",
+      "title": "打印",
+      "schema": {
+        "type": "any"
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "id": "then",
+      "title": "然后",
+      "schema": {
+        "type": "boolean"
+      }
+    }
+  ]
+}
