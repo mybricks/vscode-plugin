@@ -129,6 +129,6 @@ module.exports = {
   },
   plugins: [
     new WebpackBar(),
-    new publishplugin({docPath})
+    new publishplugin({jsonconfig, config})
   ]
 };
