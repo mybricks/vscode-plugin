@@ -2,16 +2,24 @@ const path = require("path");
 const fse = require("fs-extra");
 const WebpackBar = require("webpackbar");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const MybricksPluginConnectComlibApp = require("mybricks-plugin-connect-comlib-app");
+const ExtraWatchWebpackPlugin = require("extra-watch-webpack-plugin");
 
-const { mybricksJsonPath } = process.env;
+const devplugin = require("./devplugin");
+const { tempPath } = require("../../../const");
+
+const { filename } = process.env;
+const jsonconfig = fse.readJSONSync(path.resolve(tempPath, `./${filename}`));
+const { cacheId, entry, docPath, configName, extraWatchFiles } = jsonconfig;
+const watchFiles = JSON.parse(decodeURIComponent(extraWatchFiles)).concat(path.resolve(docPath, configName));
 const outputPath = path.resolve(__dirname, "../public");
-const config = fse.readJSONSync(mybricksJsonPath);
+const config = fse.readJSONSync(docPath + "/" + configName);
 const { externals } = config;
+
 const externalsMap = {
   "react": "React",
   "react-dom": "ReactDOM"
 };
+
 const defaultExternals = [
   {
     "name": "@ant-design/icons",
@@ -58,11 +66,13 @@ defaultExternals.forEach(({name, library, urls}) => {
   }
 });
 
+
 module.exports = {
   mode: "development",
   entry: {
     bundle: path.resolve(__dirname, "../src/index.tsx"),
-    preview: path.resolve(__dirname, "../src/preview/index.tsx")
+    preview: path.resolve(__dirname, "../src/preview/index.tsx"),
+    libEdt: entry
   },
   output: {
     path: outputPath,
@@ -78,6 +88,29 @@ module.exports = {
     alias: {},
     extensions: [".js", ".jsx", ".ts", ".tsx"],
   },
+  // 配置
+  // externals: [{
+  //   "react": {
+  //     commonjs: "react",
+  //     commonjs2: "react",
+  //     amd: "react",
+  //     root: "React"
+  //   },
+  //   "react-dom": {
+  //     commonjs: "react-dom",
+  //     commonjs2: "react-dom",
+  //     amd: "react-dom",
+  //     root: "ReactDOM"
+  //   },
+  //   'antd': {
+  //     commonjs: 'antd',
+  //     commonjs2: 'antd',
+  //     amd: 'antd',
+  //     root: "antd"
+  //   },
+  //   '@ant-design/icons': 'icons',
+  //   '@ant-design/charts': 'charts',
+  // }],
   externals: [externalsMap],
   devtool: "cheap-source-map",
   devServer: {
@@ -184,10 +217,14 @@ module.exports = {
   },
   cache: {
     type: 'filesystem',
-    name: 'comlib'
+    name: cacheId
   },
   plugins: [
     new WebpackBar(),
+    new devplugin({entry, docPath, configName, watchFiles}),
+    new ExtraWatchWebpackPlugin({
+      files: watchFiles
+    }),
     new HtmlWebpackPlugin({
       inject: false,
       template: path.resolve(__dirname, "../public/index.ejs"),
@@ -207,8 +244,5 @@ module.exports = {
         script: htmlScript + "<script src=\"./preview.js\" defer></script>"
       }
     }),
-    new MybricksPluginConnectComlibApp({
-      mybricksJsonPath
-    })
   ]
 };

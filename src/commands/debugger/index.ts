@@ -1,4 +1,6 @@
 import * as vscode from "vscode";
+
+import * as path from "path";
 // @ts-ignore
 import * as pid_descendant from "pid-descendant";
 
@@ -88,8 +90,10 @@ export class DebuggerCommands {
   
             const { docPath, configName } = res;
             const projPath = vscode.Uri.file(this._context.extensionPath).path;
-            const filename = (res.docPath + res.configName).replace(/@|\//gi, "_");
-            devTerminal.sendText(`node ${projPath}/_scripts/generateCode.js docPath=${docPath} configName=${configName} && export filename=${filename} && npm run --prefix ${projPath} dev:comlib`);
+            // const filename = (res.docPath + res.configName).replace(/@|\//gi, "_");
+            // devTerminal.sendText(`node ${projPath}/_scripts/generateCode.js docPath=${docPath} configName=${configName} && export filename=${filename} && npm run --prefix ${projPath} dev:comlib`);
+            
+            devTerminal.sendText(`export mybricksJsonPath=${path.resolve(docPath, configName)} && npm run --prefix ${projPath} dev:comlib`);
             devTerminal.show();
             devTerminal.processId.then((pid) => {
               if (pid) {
@@ -207,7 +211,11 @@ function start (): Promise<{docPath: string, configName: string}> {
   });
 }
 
-/** 监听进程(开始/退出) */
+/** 
+ * 监听进程(开始/退出) 
+ * 
+ * TODO 可以判断是否有npm进程，没有代表已报错
+ * */
 function watchPid (pid: number, { success, error }: {
   success: (pid: number) => void,
   error: (pid: number) => void

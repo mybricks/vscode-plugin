@@ -18,17 +18,21 @@ try {
 }
 
 (async function init() {
-  const script = document.createElement("script");
+  // const script = document.createElement("script");
 
-  script.src = "./libEdt.js";
+  // script.src = "./libEdt.js";
 
-  script.onload = () => {
-    const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
+  // script.onload = () => {
+  //   const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
-    root.render(<Page />);
-  };
+  //   root.render(<Page />);
+  // };
 
-  document.body.appendChild(script);
+  // document.body.appendChild(script);
+
+  const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
+
+  root.render(<Page />);
 })();
 
 function Page() {

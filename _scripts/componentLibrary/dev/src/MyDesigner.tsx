@@ -59,7 +59,9 @@ export default function MyDesigner () {
       ],
       comLibLoader() {
         return new Promise((resolve) => {
-          resolve(['./libEdt.js']);
+          // resolve(['./libEdt.js']); 
+          // @ts-ignore
+          resolve(window['__comlibs_edit_']);
         });
       },
       editView: {},
