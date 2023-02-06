@@ -90,8 +90,6 @@ export class DebuggerCommands {
   
             const { docPath, configName } = res;
             const projPath = vscode.Uri.file(this._context.extensionPath).path;
-            // const filename = (res.docPath + res.configName).replace(/@|\//gi, "_");
-            // devTerminal.sendText(`node ${projPath}/_scripts/generateCode.js docPath=${docPath} configName=${configName} && export filename=${filename} && npm run --prefix ${projPath} dev:comlib`);
             
             devTerminal.sendText(`export mybricksJsonPath=${path.resolve(docPath, configName)} && npm run --prefix ${projPath} dev:comlib`);
             devTerminal.show();
