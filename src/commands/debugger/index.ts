@@ -192,10 +192,16 @@ function start (): Promise<{docPath: string, configName: string}> {
     let configName;
   
     if (docPath && Array.isArray(mybricksJsonFiles) && mybricksJsonFiles.length) {
-      const selectConfigName = await vscode.window.showQuickPick(mybricksJsonFiles, {
-        placeHolder: "请选择配置文件"
-      });
-  
+      let selectConfigName;
+
+      if (mybricksJsonFiles.length > 1) {
+        selectConfigName = await vscode.window.showQuickPick(mybricksJsonFiles, {
+          placeHolder: "请选择配置文件"
+        });
+      } else {
+        selectConfigName = mybricksJsonFiles[0];
+      }
+
       configName = selectConfigName;
       if (!configName) {
         reject();
