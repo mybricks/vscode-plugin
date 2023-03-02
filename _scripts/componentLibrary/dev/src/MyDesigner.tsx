@@ -6,7 +6,7 @@ import React, {
 } from "react";
 import { message } from "antd";
 // @ts-ignore
-import Designer from '@mybricks/designer';
+import Designer from '@mybricks/designer-spa';
 import toolsPlugin from "@mybricks/plugin-tools";
 import servicePlugin, {call as callConnectorHttp} from "@mybricks/plugin-connector-http"; //连接器插件和运行时
 
