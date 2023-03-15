@@ -84,8 +84,35 @@ module.exports = {
         ]
       },
       {
-        test: /\.css$/,
-        use: ["style-loader", "css-loader"]
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
+        sideEffects: true
+      },
+      {
+        test: /\.less$/i,
+        use: [
+          {
+            loader: 'style-loader',
+            options: {attributes: {title: 'less'}}
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              modules: {
+                localIdentName: '[local]-[hash:5]'
+              }
+            }
+          },
+          {
+            loader: "less-loader",
+            options: {
+              lessOptions: {
+                javascriptEnabled: true
+              },
+            },
+          }
+        ],
+        exclude: /node_modules/
       },
       {
         test: /\.less$/i,
@@ -98,7 +125,7 @@ module.exports = {
             loader: "css-loader",
             options: {
               modules: {
-                localIdentName: "[local]-[hash:5]"
+                localIdentName: "[local]"
               }
             }
           },
@@ -110,7 +137,8 @@ module.exports = {
               },
             },
           }
-        ]
+        ],
+        include: /node_modules/
       },
       {
         test: /\.(gif|png|jpe?g|webp|svg|woff|woff2|eot|ttf)$/i,
