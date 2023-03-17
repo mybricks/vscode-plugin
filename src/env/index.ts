@@ -82,7 +82,6 @@ import * as cp from "child_process";
 
 /** 需要保持最新的npm包 */
 const keepUpToDateNpm = [
-  "@mybricks/designer-spa",
   "@mybricks/render-web",
   "@mybricks/plugin-connector-http",
   "@mybricks/plugin-tools"
