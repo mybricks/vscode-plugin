@@ -60,6 +60,16 @@ export default function MyDesigner () {
       geoView: {
         scenes: false,
       },
+      toplView: {
+        title: '交互',
+        cards: {
+          main: {
+            title: '页面'
+          }
+        },
+        vars: {},
+        fx: {}
+      },
       plugins: [
         toolsPlugin(),
         servicePlugin()
