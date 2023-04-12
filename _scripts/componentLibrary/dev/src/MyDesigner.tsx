@@ -81,7 +81,11 @@ export default function MyDesigner () {
           resolve(window['__comlibs_edit_']);
         });
       },
-      editView: {},
+      editView: {
+        // editorAppender(editConfig) {
+        //   return PcEditor({editConfig})
+        // }
+      },
       pageContentLoader() {//加载页面内容
         return new Promise((resolve) => {
           if (projectJson) {
