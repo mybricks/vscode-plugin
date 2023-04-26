@@ -58,8 +58,12 @@ export class PublishCommands {
       if(libCfg?.target === 'node') {
         cmd = 'publish:comlib-node';
         showInformationMessage("编译目标为node...");
+        devTerminal.sendText(`node ${projPath}/_scripts/generateCodePublish.js docPath=${docPath} configName=${configName} && export filename=${filename} && npm run --prefix ${projPath} ${cmd}`);
+      } else {
+        // devTerminal.sendText(`export mybricksJsonPath=${path.resolve(docPath, configName)} && node ${projPath}/_scripts/generateSingleCodePublish.js && npm run --prefix ${projPath} publish:single-component`);
+        devTerminal.sendText(`export mybricksJsonPath=${path.resolve(docPath, configName)} && npm run --prefix ${projPath} publish:single-component`);
       }
-      devTerminal.sendText(`node ${projPath}/_scripts/generateCodePublish.js docPath=${docPath} configName=${configName} && export filename=${filename} && npm run --prefix ${projPath} ${cmd}`);
+      
       devTerminal.show();
 
       showInformationMessage("组件库发布中...");

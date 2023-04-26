@@ -1,5 +1,9 @@
 {
   "comAry": [
     "./src/button/com.json"
-  ]
+  ],
+  "domain": "",
+  "sceneType": "PC",
+  "title": "my_comlib",
+  "namespace": "my_comlib"
 }
