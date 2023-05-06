@@ -33,7 +33,8 @@ export class PublishCommands {
       const {
         // token: configToken,
         docPath,
-        configName
+        configName,
+        publishType
       } = config;
 
       const terminals = vscode.window.terminals;
@@ -53,20 +54,22 @@ export class PublishCommands {
       const projPath = vscode.Uri.file(this._context.extensionPath).path;
       const filename = (docPath + configName).replace(/@|\//gi, "_");
       const libCfg = readJsonSync(path.join(docPath, configName));
-      let cmd = 'publish:comlib';
-      // 针对搭建产物为node的组件库
-      if(libCfg?.target === 'node') {
-        cmd = 'publish:comlib-node';
-        showInformationMessage("编译目标为node...");
+
+      if (publishType === 'dist') {
+        let cmd = 'publish:comlib';
+        // 针对搭建产物为node的组件库
+        if(libCfg?.target === 'node') {
+          cmd = 'publish:comlib-node';
+          showInformationMessage("编译目标为node..."); 
+        }
         devTerminal.sendText(`node ${projPath}/_scripts/generateCodePublish.js docPath=${docPath} configName=${configName} && export filename=${filename} && npm run --prefix ${projPath} ${cmd}`);
       } else {
-        // devTerminal.sendText(`export mybricksJsonPath=${path.resolve(docPath, configName)} && node ${projPath}/_scripts/generateSingleCodePublish.js && npm run --prefix ${projPath} publish:single-component`);
         devTerminal.sendText(`export mybricksJsonPath=${path.resolve(docPath, configName)} && npm run --prefix ${projPath} publish:single-component`);
       }
-      
+
       devTerminal.show();
 
-      showInformationMessage("组件库发布中...");
+      // showInformationMessage("组件库发布中...");
 
       // vscode.window.withProgress({
       //   location: vscode.ProgressLocation.Notification,

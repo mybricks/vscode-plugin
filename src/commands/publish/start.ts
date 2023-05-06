@@ -27,6 +27,21 @@ export default async function start () {
     return false;
   }
 
+  let publishType: any = await vscode.window.showQuickPick([
+    {label: "组件库产物保存至本地dist文件夹内", value: "dist"},
+    {label: "发布至物料中心，需在配置文件内正确配置平台地址（domain）", value: "material"}
+  ], {
+    placeHolder: "请选择发布方式",
+  });
+
+  if (!publishType) {
+    return false;
+  }
+
+  publishType = publishType.value;
+
+
+
   // const mybricksConfig = vscode.workspace.getConfiguration("mybricks");
   // const componentsPublishConfig: any = mybricksConfig.inspect("components.publishConfig")?.globalValue || {};
 
@@ -36,6 +51,7 @@ export default async function start () {
   return {
     // token,
     docPath,
+    publishType,
     configName: mybricksJsonName
   };
 }

@@ -15,34 +15,34 @@ module.exports =  class MyPlugin {
       const distPath = path.resolve(docPath, './dist');
 
       setTimeout(async () => {
-        const { publishConfig = {} } = config;
-        const { api } = publishConfig;
+        // const { publishConfig = {} } = config;
+        // const { api } = publishConfig;
 
-        if (typeof api === 'string') {
-          console.log(`\n\x1b[0m调用发布接口 ${api}`);
+        // if (typeof api === 'string') {
+        //   console.log(`\n\x1b[0m调用发布接口 ${api}`);
 
-          const { entry: { edit, rt } } = jsonconfig;
-          const editJs = fse.readFileSync(edit, 'utf-8');
-          const editJsMap = fse.readFileSync(edit + '.map', 'utf-8');
-          const rtJs = fse.readFileSync(rt, 'utf-8');
-          const rtJsMap = fse.readFileSync(rt + '.map', 'utf-8');
-          const date = new Date();
-          const prefix = `/${date.getFullYear()}-${date.getMonth()}-${date.getDay()}_${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}`;
-          const finalCdns = await this.uploadToCdn([
-            { path: prefix, filename: 'edit.js', content: editJs },
-            { path: prefix, filename: 'edit.js.map', content: editJsMap },
-            { path: prefix, filename: 'rt.js', content: rtJs },
-            { path: prefix, filename: 'rt.js.map', content: rtJsMap },
-          ], api);
+        //   const { entry: { edit, rt } } = jsonconfig;
+        //   const editJs = fse.readFileSync(edit, 'utf-8');
+        //   const editJsMap = fse.readFileSync(edit + '.map', 'utf-8');
+        //   const rtJs = fse.readFileSync(rt, 'utf-8');
+        //   const rtJsMap = fse.readFileSync(rt + '.map', 'utf-8');
+        //   const date = new Date();
+        //   const prefix = `/${date.getFullYear()}-${date.getMonth()}-${date.getDay()}_${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}`;
+        //   const finalCdns = await this.uploadToCdn([
+        //     { path: prefix, filename: 'edit.js', content: editJs },
+        //     { path: prefix, filename: 'edit.js.map', content: editJsMap },
+        //     { path: prefix, filename: 'rt.js', content: rtJs },
+        //     { path: prefix, filename: 'rt.js.map', content: rtJsMap },
+        //   ], api);
 
-          finalCdns.forEach((final) => {
-            final.forEach((f) => {
-              console.log(f);
-            });
-          });
-        } else {
-          console.log('\n未配置发布所需调用的api，当前发布仅保存在本地');
-        }
+        //   finalCdns.forEach((final) => {
+        //     final.forEach((f) => {
+        //       console.log(f);
+        //     });
+        //   });
+        // } else {
+        //   console.log('\n未配置发布所需调用的api，当前发布仅保存在本地');
+        // }
 
         console.log(`\x1b[0m发布产物默认保存至本地文件:\n    eidt.js:\x1b[32m${distPath + '/edit.js'}\n\x1b[0medit.js.map:\x1b[32m${distPath + '/edit.js.map'}\n      \x1b[0mrt.js:\x1b[32m${distPath + '/rt.js'}\n  \x1b[0mrt.js.map:\x1b[32m${distPath + '/rt.js.map'}`);
       });
