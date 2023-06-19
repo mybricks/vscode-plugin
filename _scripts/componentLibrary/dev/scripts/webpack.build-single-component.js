@@ -104,7 +104,14 @@ class Plugin {
           const keyAry = componentsIndexMap[prefix];
   
           keyAry.forEach((key) => {
-            const fileContent = `${fse.readFileSync(path.resolve(outputPath, `${prefix}-${key}.js`), 'utf-8')}return MybricksComDef.default;`;
+            let fileContent = `${fse.readFileSync(path.resolve(outputPath, `${prefix}-${key}.js`), 'utf-8')}return MybricksComDef.default;`;
+            // 这块处理与云组件对齐，物料中心只需处理相同逻辑，不需要判断兼容
+            if (key === 'editors') {
+              fileContent = `(function(){return function(){${fileContent}}})()`;
+            } else {
+              fileContent = `(function(){${fileContent}})()`;
+            }
+
             if (key === 'toReact') {
               comJson.target[key] = fileContent;
             } else {
@@ -142,10 +149,10 @@ class Plugin {
         if (code === 1) {
           console.log('发布成功: ', JSON.stringify(data, null, 2));
         } else {
-          console.log('发布失败: ', message); 
+          throw new Error(`发布失败: ${message}`);
         }
       }).catch((err) => {
-        console.log(`发布失败: `, err.response.data);
+        throw new Error(`发布失败: ${err.message}`);
       });
     });
   }
