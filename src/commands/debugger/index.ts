@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 
 import * as path from "path";
+import * as fse from "fs-extra";
 // @ts-ignore
 import * as pid_descendant from "pid-descendant";
 
@@ -90,8 +91,15 @@ export class DebuggerCommands {
   
             const { docPath, configName } = res;
             const projPath = vscode.Uri.file(this._context.extensionPath).path;
-            
-            devTerminal.sendText(`export mybricksJsonPath=${path.resolve(docPath, configName)} && npm run --prefix ${projPath} dev:comlib`);
+
+            const mybricksJsonPath = path.resolve(docPath, configName);
+            const mybricksJson = fse.readJSONSync(mybricksJsonPath);
+
+            if (mybricksJson.componentType === 'MP') {
+              devTerminal.sendText(`node ${projPath}/_scripts/devmp.js ${mybricksJsonPath}`);
+            } else {
+              devTerminal.sendText(`export mybricksJsonPath=${mybricksJsonPath} && npm run --prefix ${projPath} dev:comlib`);
+            }
             devTerminal.show();
             devTerminal.processId.then((pid) => {
               if (pid) {
@@ -125,7 +133,7 @@ export class DebuggerCommands {
                       this.stop.call(this);
                     }
                   }, "start");
-                }, 2000);
+                });
               }
             });
           });
@@ -229,10 +237,13 @@ function watchPid (pid: number, { success, error }: {
       if (err) {
         error(pid);
       } else {
-        if (!data.length) {
+        if (data.length < 2) {
           error(pid);
         } else {
-          const hasWebpackProcess = data.find(item => item.find((item: string) => item === "webpack"));
+          // const hasWebpackProcess = data.find(item => item.find((item: string) => item === "webpack"));
+
+          const hasWebpackProcess = data.length > 1;
+
           if (type === "start") {
             // 开始          
             if (hasWebpackProcess) {

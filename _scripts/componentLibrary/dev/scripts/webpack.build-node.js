@@ -124,7 +124,7 @@ const changeEditEntry = (filePath) => {
   fse.writeFileSync(filePath, content);
 };
 
-changeEditEntry(entry.edit);
+// changeEditEntry(entry.edit);
 const editJsConfig = {
   ...baseConfig,
   target: 'web',

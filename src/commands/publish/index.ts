@@ -55,6 +55,11 @@ export class PublishCommands {
       const filename = (docPath + configName).replace(/@|\//gi, "_");
       const libCfg = readJsonSync(path.join(docPath, configName));
 
+      if (libCfg?.componentType === 'MP') {
+        vscode.window.showInformationMessage(`暂时没有提供该类型组件的发布能力，加速开发中...`);
+        return;
+      }
+
       if (publishType === 'dist') {
         let cmd = 'publish:comlib';
         // 针对搭建产物为node的组件库
