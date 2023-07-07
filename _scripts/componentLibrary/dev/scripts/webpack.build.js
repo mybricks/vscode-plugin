@@ -141,16 +141,31 @@ module.exports = {
         include: /node_modules/
       },
       {
-        test: /\.(gif|png|jpe?g|webp|svg|woff|woff2|eot|ttf)$/i,
-        use: [
-          {
-            loader: 'url-loader',
-            options: {
-              limit: 1024 * 2,
-              name: 'img_[name]_[contenthash:4].[ext]'
-            }
-          }
-        ]
+        // test: /\.(gif|png|jpe?g|webp|svg|woff|woff2|eot|ttf)$/i,
+        test: /\.(gif|png|jpe?g|webp|woff|woff2|eot|ttf)$/i,
+        type: 'asset',
+        generator: {
+          dataUrl: {
+            encoding: 'base64',
+          },
+        },
+      },
+      {
+        test: /\.svg$/i,
+        type: 'asset',
+        resourceQuery: /url/,
+        generator: {
+          dataUrl: {
+            encoding: 'base64',
+          },
+        },
+      },
+      // TODO: 局部开放webpack配置项
+      {
+        test: /\.svg$/i,
+        issuer: /\.[jt]sx?$/,
+        resourceQuery: { not: [/url/] }, // exclude react component if *.svg?url
+        use: ['@svgr/webpack'],
       },
       {
         test: /\.d.ts$/i,
