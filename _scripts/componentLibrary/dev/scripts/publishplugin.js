@@ -8,7 +8,7 @@ module.exports =  class MyPlugin {
   }
 
   apply (compiler) {
-    const { config, jsonconfig } = this._props;
+    const { config, jsonconfig, type } = this._props;
     const { docPath } = jsonconfig;
 
     compiler.hooks.done.tap("Done", async () => {
@@ -44,7 +44,13 @@ module.exports =  class MyPlugin {
         //   console.log('\n未配置发布所需调用的api，当前发布仅保存在本地');
         // }
 
-        console.log(`\x1b[0m发布产物默认保存至本地文件:\n    eidt.js:\x1b[32m${distPath + '/edit.js'}\n\x1b[0medit.js.map:\x1b[32m${distPath + '/edit.js.map'}\n      \x1b[0mrt.js:\x1b[32m${distPath + '/rt.js'}\n  \x1b[0mrt.js.map:\x1b[32m${distPath + '/rt.js.map'}`);
+        if (type === 'rt') {
+          console.log(`\x1b[0m发布rt产物默认保存至本地文件:\n    \x1b[0mrt.js:\x1b[32m${distPath + '/rt.js'}\n\x1b[0mrt.js.map:\x1b[32m${distPath + '/rt.js.map'}`);
+        } else if (type === 'edit') {
+          console.log(`\x1b[0m发布edit产物默认保存至本地文件:\n    eidt.js:\x1b[32m${distPath + '/edit.js'}\n\x1b[0medit.js.map:\x1b[32m${distPath + '/edit.js.map'}\n`);
+        }
+
+        // console.log(`\x1b[0m发布产物默认保存至本地文件:\n    eidt.js:\x1b[32m${distPath + '/edit.js'}\n\x1b[0medit.js.map:\x1b[32m${distPath + '/edit.js.map'}\n      \x1b[0mrt.js:\x1b[32m${distPath + '/rt.js'}\n  \x1b[0mrt.js.map:\x1b[32m${distPath + '/rt.js.map'}`);
       });
     });
   }

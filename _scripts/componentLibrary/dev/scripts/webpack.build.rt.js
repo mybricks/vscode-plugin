@@ -9,7 +9,7 @@ const { filename } = process.env;
 const jsonconfig = fse.readJSONSync(path.resolve(tempPubPath, `./${filename}`));
 const { entry, docPath, configName } = jsonconfig;
 const config = fse.readJSONSync(docPath + "/" + configName);
-const { externals } = config;
+const { externals, pxToRem } = config;
 
 const externalsMap = {
   "react": "React",
@@ -27,7 +27,7 @@ if (Array.isArray(externals)) {
 module.exports = {
   mode: "production",
   entry: {
-    edit: entry.edit
+    rt: entry.rt
   },
   output: {
     path: path.resolve(docPath, './dist'),
@@ -87,7 +87,27 @@ module.exports = {
       },
       {
         test: /\.css$/i,
-        use: ['style-loader', 'css-loader'],
+        use: [
+          'style-loader',
+          'css-loader',
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: pxToRem ? [
+                  [
+                    'postcss-pixel-to-remvw',
+                    {
+                      baseSize: {
+                        rem: 12, // 10rem = 120px
+                      },
+                    },
+                  ],
+                ] : [],
+              },
+            },
+          },
+        ],
         sideEffects: true
       },
       {
@@ -104,6 +124,23 @@ module.exports = {
                 localIdentName: '[local]-[hash:5]'
               }
             }
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: pxToRem ? [
+                  [
+                    'postcss-pixel-to-remvw',
+                    {
+                      baseSize: {
+                        rem: 12, // 10rem = 120px
+                      },
+                    },
+                  ],
+                ] : [],
+              },
+            },
           },
           {
             loader: "less-loader",
@@ -130,6 +167,23 @@ module.exports = {
                 localIdentName: "[local]"
               }
             }
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: pxToRem ? [
+                  [
+                    'postcss-pixel-to-remvw',
+                    {
+                      baseSize: {
+                        rem: 12, // 10rem = 120px
+                      },
+                    },
+                  ],
+                ] : [],
+              },
+            },
           },
           {
             loader: "less-loader",
@@ -181,6 +235,6 @@ module.exports = {
   },
   plugins: [
     new WebpackBar(),
-    new publishplugin({jsonconfig, config, type: 'edit'})
+    new publishplugin({jsonconfig, config, type: 'rt'})
   ]
 };
