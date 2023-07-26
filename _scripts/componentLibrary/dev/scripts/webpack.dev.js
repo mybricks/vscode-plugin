@@ -5,7 +5,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MybricksPluginConnectComlibApp = require("mybricks-plugin-connect-comlib-app");
 
 const { mybricksJsonPath } = process.env;
-const outputPath = path.resolve(__dirname, "../public");
+const outputPath = path.resolve(__dirname, "../../public");
 const config = fse.readJSONSync(mybricksJsonPath);
 const { externals } = config;
 const externalsMap = {
@@ -61,8 +61,8 @@ defaultExternals.forEach(({name, library, urls}) => {
 module.exports = {
   mode: "development",
   entry: {
-    bundle: path.resolve(__dirname, "../src/index.tsx"),
-    preview: path.resolve(__dirname, "../src/preview/index.tsx")
+    bundle: path.resolve(__dirname, "../../src/index.tsx"),
+    preview: path.resolve(__dirname, "../../src/preview/index.tsx")
   },
   output: {
     path: outputPath,
@@ -197,7 +197,7 @@ module.exports = {
     new WebpackBar(),
     new HtmlWebpackPlugin({
       inject: false,
-      template: path.resolve(__dirname, "../public/index.ejs"),
+      template: path.resolve(__dirname, "../../public/index.ejs"),
       templateParameters: {
         title: "MyBricks-设计器（SPA版）Demo",
         link: htmlLink,
@@ -207,7 +207,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       inject: false,
       filename: "preview.html",
-      template: path.resolve(__dirname, "../public/index.ejs"),
+      template: path.resolve(__dirname, "../../public/index.ejs"),
       templateParameters: {
         title: "MyBricks-设计器（SPA版）Demo",
         link: htmlLink,

@@ -90,15 +90,27 @@ export class DebuggerCommands {
             this.devTerminal = devTerminal;
   
             const { docPath, configName } = res;
-            const projPath = vscode.Uri.file(this._context.extensionPath).path;
-
+            // const projPath = vscode.Uri.file(this._context.extensionPath).path;
+            const projPath = this._context.extensionPath;
             const mybricksJsonPath = path.resolve(docPath, configName);
             const mybricksJson = fse.readJSONSync(mybricksJsonPath);
+            const devTempPath = path.resolve(projPath, './_scripts/componentLibrary/dev/scripts/_devTemp');
+            
+            if (!fse.existsSync(devTempPath)) {
+              fse.mkdirSync(devTempPath);
+            }
+            const pattern = /[^a-zA-Z0-9]+/g;
+            const replacement = '_';
+            const result = mybricksJsonPath.replace(pattern, replacement) + '.js';
+            const webpackdevjsPath = path.resolve(devTempPath, result);
+            const webpackdevjs = fse.readFileSync(path.resolve(projPath, './_scripts/componentLibrary/dev/scripts/webpack.dev.js'), 'utf-8');
+            fse.writeFileSync(webpackdevjsPath, webpackdevjs.replace('const { mybricksJsonPath } = process.env;', `const mybricksJsonPath = '${mybricksJsonPath}'`), 'utf-8');
 
             if (mybricksJson.componentType === 'MP') {
               devTerminal.sendText(`node ${projPath}/_scripts/devmp.js ${mybricksJsonPath}`);
             } else {
-              devTerminal.sendText(`export mybricksJsonPath=${mybricksJsonPath} && npm run --prefix ${projPath} dev:comlib`);
+              // devTerminal.sendText(`export mybricksJsonPath=${mybricksJsonPath} && npm run --prefix ${projPath} dev:comlib`);
+              devTerminal.sendText(`node ${projPath}/node_modules/webpack-dev-server/bin/webpack-dev-server.js --config ${webpackdevjsPath}`);
             }
             devTerminal.show();
             devTerminal.processId.then((pid) => {
