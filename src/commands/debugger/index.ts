@@ -104,7 +104,7 @@ export class DebuggerCommands {
             const result = mybricksJsonPath.replace(pattern, replacement) + '.js';
             const webpackdevjsPath = path.resolve(devTempPath, result);
             const webpackdevjs = fse.readFileSync(path.resolve(projPath, './_scripts/componentLibrary/dev/scripts/webpack.dev.js'), 'utf-8');
-            fse.writeFileSync(webpackdevjsPath, webpackdevjs.replace('const { mybricksJsonPath } = process.env;', `const mybricksJsonPath = '${mybricksJsonPath}'`), 'utf-8');
+            fse.writeFileSync(webpackdevjsPath, webpackdevjs.replace('const { mybricksJsonPath } = process.env;', `const mybricksJsonPath = decodeURIComponent("${encodeURIComponent(mybricksJsonPath)}")`), 'utf-8');
 
             if (mybricksJson.componentType === 'MP') {
               devTerminal.sendText(`node ${projPath}/_scripts/devmp.js ${mybricksJsonPath}`);
