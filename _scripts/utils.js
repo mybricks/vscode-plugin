@@ -1,6 +1,16 @@
 // @ts-check
 const path = require("path");
 const fse = require("fs-extra");
+const os = require("os");
+
+const isWindows = os.platform() === "win32";
+
+function getSafePath(value) {
+  if (isWindows) {
+    return value.replace(/\\/g, '\\\\');
+  }
+  return value;
+}
 
 /**
  * 
@@ -390,12 +400,12 @@ function getComString (com, comPath, comJsonPath, arrPath = [], singleComs = [])
 
       editStr = editStr + 
         `comDef = ${JSON.stringify(com)};\n` +
-        `comDef.runtime = require("${runtimePath}").default;\n`;
+        `comDef.runtime = require("${getSafePath(runtimePath)}").default;\n`;
       rtStr = rtStr + `
         comDef = {
           namespace: "${namespace}",
           version: "${version}",
-          runtime: require("${runtimePath}").default
+          runtime: require("${getSafePath(runtimePath)}").default
         };\n
       `;
 
@@ -403,7 +413,7 @@ function getComString (com, comPath, comJsonPath, arrPath = [], singleComs = [])
         const editorsPath = path.join(comPath, editors);
 
         if (fse.existsSync(editorsPath)) {
-          editStr = editStr + `comDef.editors = require("${editorsPath}").default;\n`;
+          editStr = editStr + `comDef.editors = require("${getSafePath(editorsPath)}").default;\n`;
         }
       } catch (e) {}
 
@@ -411,7 +421,7 @@ function getComString (com, comPath, comJsonPath, arrPath = [], singleComs = [])
         const dataPath = path.join(comPath, data);
 
         if (fse.existsSync(dataPath)) {
-          editStr = editStr + `comDef.data = require("${dataPath}");\n`;
+          editStr = editStr + `comDef.data = require("${getSafePath(dataPath)}");\n`;
         }
       } catch (e) {}
 
@@ -419,7 +429,7 @@ function getComString (com, comPath, comJsonPath, arrPath = [], singleComs = [])
         const upgradePath = path.join(comPath, upgrade);
 
         if (fse.existsSync(upgradePath)) {
-          editStr = editStr + `comDef.upgrade = require("${upgradePath}").default;\n`;
+          editStr = editStr + `comDef.upgrade = require("${getSafePath(upgradePath)}").default;\n`;
         }
       } catch (e) {}
 
@@ -427,7 +437,7 @@ function getComString (com, comPath, comJsonPath, arrPath = [], singleComs = [])
         const runtimeEditPath = path.join(comPath, com['runtime.edit']);
 
         if (fse.existsSync(runtimeEditPath)) {
-          editStr = editStr + `comDef['runtime.edit'] = require("${runtimeEditPath}").default;\n`;
+          editStr = editStr + `comDef['runtime.edit'] = require("${getSafePath(runtimeEditPath)}").default;\n`;
         }
       } catch (e) {}
 
@@ -437,7 +447,7 @@ function getComString (com, comPath, comJsonPath, arrPath = [], singleComs = [])
           const previewPath = path.join(comPath, preview);
 
           if (fse.existsSync(previewPath)) {
-            editStr = editStr + `comDef.preview = require("${previewPath}").default;\n`;
+            editStr = editStr + `comDef.preview = require("${getSafePath(previewPath)}").default;\n`;
           }
         } catch (e) {}
       } else if (/^http/.test(preview)) {
