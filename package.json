@@ -1,7 +1,7 @@
 {
   "name": "Mybricks",
   "description": "快速便捷地开发和发布Mybricks组件",
-  "version": "0.0.73",
+  "version": "0.0.74",
   "icon": "images/mybricks.png",
   "engines": {
     "vscode": "^1.71.0"
@@ -98,12 +98,12 @@
     "package": "npm-run-all package:*",
     "package:extension": "webpack --mode production --config ./webpack.config.js --devtool hidden-source-map",
     "package:views": "webpack --mode production --config ./webpack.views.config.js --devtool hidden-source-map",
-    "dev:comlib": "webpack-dev-server --config",
-    "rebuild:comlib": "node ./_scripts/rebuild-comlib-dev.js",
-    "publish:comlib": "webpack --config",
-    "publish:comlib-node": "webpack --config",
-    "publish:single-component": "webpack --config",
-    "mybricks": "mybricks"
+    "dev:comlib": "node ./node_modules/webpack-dev-server/bin/webpack-dev-server.js --config",
+		"rebuild:comlib": "node ./_scripts/rebuild-comlib-dev.js",
+		"publish:comlib": "node ./node_modules/webpack/bin/webpack.js --config",
+		"publish:comlib-node": "node ./node_modules/webpack/bin/webpack.js --config",
+		"publish:single-component": "node ./node_modules/webpack/bin/webpack.js --config",
+		"mybricks": "mybricks"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.13",
