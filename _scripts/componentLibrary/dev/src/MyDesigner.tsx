@@ -58,7 +58,7 @@ export default function MyDesigner () {
   const getConfig = useCallback(({projectJson}: any) => {
     return {
       geoView: {
-        scenes: false,
+        scenes: true,
       },
       toplView: {
         title: '交互',

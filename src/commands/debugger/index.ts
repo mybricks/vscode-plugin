@@ -110,7 +110,9 @@ export class DebuggerCommands {
               devTerminal.sendText(`node ${projPath}/_scripts/devmp.js ${mybricksJsonPath}`);
             } else {
               // devTerminal.sendText(`export mybricksJsonPath=${mybricksJsonPath} && npm run --prefix ${projPath} dev:comlib`);
-              devTerminal.sendText(`node ${projPath}/node_modules/webpack-dev-server/bin/webpack-dev-server.js --config ${webpackdevjsPath}`);
+              
+              devTerminal.sendText(`npm run --prefix ${projPath} dev:comlib ${webpackdevjsPath}`);
+              // devTerminal.sendText(`node ${projPath}/node_modules/webpack-dev-server/bin/webpack-dev-server.js --config ${webpackdevjsPath}`);
             }
             devTerminal.show();
             devTerminal.processId.then((pid) => {
