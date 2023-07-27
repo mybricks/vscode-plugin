@@ -98,11 +98,11 @@
     "package": "npm-run-all package:*",
     "package:extension": "webpack --mode production --config ./webpack.config.js --devtool hidden-source-map",
     "package:views": "webpack --mode production --config ./webpack.views.config.js --devtool hidden-source-map",
-    "dev:comlib": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js --config",
+    "dev:comlib": "webpack-dev-server --config",
     "rebuild:comlib": "node ./_scripts/rebuild-comlib-dev.js",
-    "publish:comlib": "./node_modules/webpack/bin/webpack.js --config ./_scripts/componentLibrary/dev/scripts/webpack.build.js && ./node_modules/webpack/bin/webpack.js --config ./_scripts/componentLibrary/dev/scripts/webpack.build.rt.js",
-    "publish:comlib-node": "./node_modules/webpack/bin/webpack.js --config ./_scripts/componentLibrary/dev/scripts/webpack.build-node.js",
-    "publish:single-component": "./node_modules/webpack/bin/webpack.js --config ./_scripts/componentLibrary/dev/scripts/webpack.build-single-component.js",
+    "publish:comlib": "webpack --config",
+    "publish:comlib-node": "webpack --config",
+    "publish:single-component": "webpack --config",
     "mybricks": "mybricks"
   },
   "devDependencies": {

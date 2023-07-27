@@ -1,6 +1,8 @@
 import { readJsonSync } from 'fs-extra';
 import * as vscode from "vscode";
 
+import * as os from "os";
+import * as fse from 'fs-extra';
 import start from "./start";
 import * as path from "path";
 import * as cp from "child_process";
@@ -8,6 +10,14 @@ import * as cp from "child_process";
 import { registerCommand, showInformationMessage } from "../../utils";
 
 const terminalName = "mybricks.publish.comlib";
+const isWindows = os.platform() === "win32";
+
+function getSafePath(value: string) {
+  if (isWindows) {
+    return value.replace(/\\/g, '\\\\');
+  }
+  return value;
+}
 
 export class PublishCommands {
 
@@ -51,9 +61,39 @@ export class PublishCommands {
 
       // this.devTerminal = devTerminal;
 
-      const projPath = vscode.Uri.file(this._context.extensionPath).path;
+      // const projPath = vscode.Uri.file(this._context.extensionPath).path;
       const filename = (docPath + configName).replace(/@|\//gi, "_");
       const libCfg = readJsonSync(path.join(docPath, configName));
+
+      const projPath = this._context.extensionPath;
+      const mybricksJsonPath = path.resolve(docPath, configName);
+      const mybricksJson = fse.readJSONSync(mybricksJsonPath);
+      const buildTempPath = path.resolve(projPath, './_scripts/componentLibrary/dev/scripts/_buildTemp');
+      // webpack.new.build.js
+      if (!fse.existsSync(buildTempPath)) {
+        fse.mkdirSync(buildTempPath);
+      }
+      const pattern = /[^a-zA-Z0-9]+/g;
+      const replacement = '_';
+      const result = mybricksJsonPath.replace(pattern, replacement) + '.js';
+      const webpackbuildjsPath = path.resolve(buildTempPath, result);
+      const webpackbuildjsRtPath = webpackbuildjsPath.replace('.js', '.rt.js');
+      const webpackbuildjs = fse.readFileSync(path.resolve(projPath, './_scripts/componentLibrary/dev/scripts/webpack.new.build.js'), 'utf-8');
+      const webpackbuildRtjs = fse.readFileSync(path.resolve(projPath, './_scripts/componentLibrary/dev/scripts/webpack.new.build.rt.js'), 'utf-8');
+      fse.writeFileSync(
+        webpackbuildjsPath,
+        webpackbuildjs
+          .replace('--replace-docPath--', getSafePath(docPath))
+          .replace('--replace-configName--', configName),
+        'utf-8'
+      );
+      fse.writeFileSync(
+        webpackbuildjsRtPath,
+        webpackbuildRtjs
+          .replace('--replace-docPath--', getSafePath(docPath))
+          .replace('--replace-configName--', configName),
+        'utf-8'
+      );
 
       if (libCfg?.componentType === 'MP') {
         vscode.window.showInformationMessage(`暂时没有提供该类型组件的发布能力，加速开发中...`);
@@ -67,9 +107,22 @@ export class PublishCommands {
           cmd = 'publish:comlib-node';
           showInformationMessage("编译目标为node..."); 
         }
-        devTerminal.sendText(`node ${projPath}/_scripts/generateCodePublish.js docPath=${docPath} configName=${configName} && export filename=${filename} && npm run --prefix ${projPath} ${cmd}`);
+        // devTerminal.sendText(`node ${projPath}/_scripts/generateCodePublish.js docPath=${docPath} configName=${configName} && export filename=${filename} && npm run --prefix ${projPath} ${cmd}`);
+        devTerminal.sendText(`npm run --prefix ${projPath} ${cmd} ${webpackbuildjsPath}; npm run --prefix ${projPath} ${cmd} ${webpackbuildjsRtPath}`);
+        // devTerminal.sendText(`node ${projPath}/node_modules/webpack/bin/webpack.js --config ${webpackbuildjsPath}; node ${projPath}/node_modules/webpack/bin/webpack.js --config ${webpackbuildjsRtPath}`);
       } else {
-        devTerminal.sendText(`export mybricksJsonPath=${path.resolve(docPath, configName)} && npm run --prefix ${projPath} publish:single-component`);
+        // webpack.build-single-component
+        const webpackbuildjs = fse.readFileSync(path.resolve(projPath, './_scripts/componentLibrary/dev/scripts/webpack.build-single-component.new.js'), 'utf-8');
+        fse.writeFileSync(
+          webpackbuildjsPath,
+          webpackbuildjs
+            .replace('--replace-mybricksJsonPath--', getSafePath(path.resolve(docPath, configName))),
+          'utf-8'
+        );
+        // devTerminal.sendText(`export mybricksJsonPath=${path.resolve(docPath, configName)} && npm run --prefix ${projPath} publish:single-component`);
+        devTerminal.sendText(`npm run --prefix ${projPath} publish:single-component ${webpackbuildjsPath}`);
+        // devTerminal.sendText(`node ${projPath}/node_modules/webpack/bin/webpack.js --config ${webpackbuildjsPath}`);
+        // "./node_modules/webpack/bin/webpack.js --config ./_scripts/componentLibrary/dev/scripts/webpack.build-single-component.js",
       }
 
       devTerminal.show();
