@@ -31,7 +31,7 @@ export function activate(context: vscode.ExtensionContext) {
   // envStatus.initReadyCb(regist);
 
   // npm包
-  initNpm();
+  // initNpm();
 
   // 注册全局监听事件
   initListener(context);

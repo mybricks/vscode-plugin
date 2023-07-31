@@ -175,8 +175,9 @@ export class DebuggerCommands {
     if (this.status !== "dev") {
       vscode.commands.executeCommand("mybricks.debugger.dev");
       this.status = "dev";
-      this.devTerminal?.dispose();
-      this.devTerminal = undefined;
+      // TODO: 暂时注释，windows系统问题
+      // this.devTerminal?.dispose();
+      // this.devTerminal = undefined;
     }
    
 
