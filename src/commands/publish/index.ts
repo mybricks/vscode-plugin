@@ -105,10 +105,13 @@ export class PublishCommands {
         // 针对搭建产物为node的组件库
         if(libCfg?.target === 'node') {
           cmd = 'publish:comlib-node';
-          showInformationMessage("编译目标为node..."); 
+          showInformationMessage("编译目标为node...");
+          devTerminal.sendText(`node ${projPath}/_scripts/generateCodePublish.js docPath=${docPath} configName=${configName} && export filename=${filename} && npm run --prefix ${projPath} ${cmd}`);
+        } else {
+          devTerminal.sendText(`npm run --prefix ${projPath} ${cmd} ${webpackbuildjsPath}; npm run --prefix ${projPath} ${cmd} ${webpackbuildjsRtPath}`);
         }
         // devTerminal.sendText(`node ${projPath}/_scripts/generateCodePublish.js docPath=${docPath} configName=${configName} && export filename=${filename} && npm run --prefix ${projPath} ${cmd}`);
-        devTerminal.sendText(`npm run --prefix ${projPath} ${cmd} ${webpackbuildjsPath}; npm run --prefix ${projPath} ${cmd} ${webpackbuildjsRtPath}`);
+        // devTerminal.sendText(`npm run --prefix ${projPath} ${cmd} ${webpackbuildjsPath}; npm run --prefix ${projPath} ${cmd} ${webpackbuildjsRtPath}`);
         // devTerminal.sendText(`node ${projPath}/node_modules/webpack/bin/webpack.js --config ${webpackbuildjsPath}; node ${projPath}/node_modules/webpack/bin/webpack.js --config ${webpackbuildjsRtPath}`);
       } else {
         // webpack.build-single-component
