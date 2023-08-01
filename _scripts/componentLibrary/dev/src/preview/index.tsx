@@ -1,5 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+
+import axios from "axios";
 import { call } from "@mybricks/plugin-connector-http";
 // @ts-ignore
 import { render as renderUI } from "@mybricks/render-web";
@@ -50,6 +52,22 @@ function Page() {
                 return {};
               },
             },
+            ajax(url: string, opts: any) {
+              return new Promise((resolve, reject) => {
+                if (typeof url !== 'string') {
+                  reject('url is undefined');
+                }
+                axios({url, ...opts}).then(resp => {
+                  if (resp && resp.status === 200) {
+                    resolve(resp.data);
+                  } else {
+                    reject(resp);
+                  }
+                }).catch(error => {
+                  reject(error);
+                });
+              });
+            }
           },
         })
       }

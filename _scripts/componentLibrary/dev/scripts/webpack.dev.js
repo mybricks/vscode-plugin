@@ -7,7 +7,7 @@ const MybricksPluginConnectComlibApp = require("mybricks-plugin-connect-comlib-a
 const { mybricksJsonPath } = process.env;
 const outputPath = path.resolve(__dirname, "../../public");
 const config = fse.readJSONSync(mybricksJsonPath);
-const { externals } = config;
+const { externals, proxy = [] } = config;
 const externalsMap = {
   "react": "React",
   "react-dom": "ReactDOM"
@@ -90,7 +90,7 @@ module.exports = {
     client: {
       logging: "warn"
     },
-    proxy: []
+    proxy
   },
   module: {
     rules: [

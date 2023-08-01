@@ -5,6 +5,7 @@ import React, {
   useCallback,
   useLayoutEffect
 } from "react";
+import axios from "axios";
 import { message } from "antd";
 import toolsPlugin from "@mybricks/plugin-tools";
 import servicePlugin, {call as callConnectorHttp} from "@mybricks/plugin-connector-http"; //连接器插件和运行时
@@ -114,6 +115,27 @@ export default function MyDesigner () {
               return Promise.reject('错误的连接器类型.');
             }
           },
+          vars: { // 环境变量
+            getQuery () { // 获取真实路由参数
+              return {};
+            },
+          },
+          ajax(url: string, opts: any) {
+            return new Promise((resolve, reject) => {
+              if (typeof url !== 'string') {
+                reject('url is undefined');
+              }
+              axios({url, ...opts}).then(resp => {
+                if (resp && resp.status === 200) {
+                  resolve(resp.data);
+                } else {
+                  reject(resp);
+                }
+              }).catch(error => {
+                reject(error);
+              });
+            });
+          }
         },
       },
     };
