@@ -3,7 +3,7 @@ const axios = require('axios');
 const fse = require('fs-extra');
 const WebpackBar = require('webpackbar');
 const { execSync } = require('child_process');
-const { generateSourceCode } = require('generate-mybricks-component-library-code');
+const { generateSourceCode } = require('generate-mybricks-component-library-code2');
 
 console.log('获取当前npm登录账号...');
 
