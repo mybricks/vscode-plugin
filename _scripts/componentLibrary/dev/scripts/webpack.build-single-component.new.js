@@ -5,15 +5,15 @@ const WebpackBar = require('webpackbar');
 const { execSync } = require('child_process');
 const { generateSourceCode } = require('generate-mybricks-component-library-code2');
 
-console.log('获取当前npm登录账号...');
+// console.log('获取当前npm登录账号...');
 
-let userId;
+// let userId;
 
-try {
-  userId = execSync('npm whoami').toString().trim();
-} catch {
-  throw new Error('请登录npm账号');
-}
+// try {
+//   userId = execSync('npm whoami').toString().trim();
+// } catch {
+//   throw new Error('请登录npm账号');
+// }
 
 console.log('组件编译中...');
 
@@ -25,10 +25,15 @@ const mybricksJson = fse.readJSONSync(mybricksJsonPath);
 const outputPath = path.resolve(__dirname, 'dist');
 
 
-const { domain } = mybricksJson;
+const { domain, email } = mybricksJson;
 if (!domain) {
   throw new Error('请配置domain(平台地址)...');
 }
+if (!email) {
+  throw new Error(`请正确填写 ${domain} 平台的账号...`);
+}
+
+let userId = email;
 
 function recursiveComponentTree (components, cb, prefix = '') {
   components.forEach((component, index) => {
