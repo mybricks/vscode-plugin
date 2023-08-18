@@ -2,6 +2,8 @@ const path = require("path");
 const fse = require("fs-extra");
 const WebpackBar = require("webpackbar");
 
+const { VueLoaderPlugin } = require('vue-loader')
+
 const publishplugin = require("./publishplugin");
 const { tempPubPath } = require("../../../const");
 
@@ -44,6 +46,10 @@ module.exports = {
   devtool: 'source-map',
   module: {
     rules: [
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+      },
       {
         test: /\.jsx?$/,
         use: [
@@ -235,6 +241,7 @@ module.exports = {
   },
   plugins: [
     new WebpackBar(),
+    new VueLoaderPlugin(),
     new publishplugin({jsonconfig, config, type: 'rt'})
   ]
 };

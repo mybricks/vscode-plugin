@@ -60,6 +60,9 @@ export default function MyDesigner () {
     return {
       geoView: {
         scenes: true,
+        theme: {
+          css: ["https://unpkg.com/element-plus/dist/index.css", 'https://assets.mybricks.world/pkg/antd-4.21.6/antd.min.css']
+        }
       },
       toplView: {
         title: '交互',
