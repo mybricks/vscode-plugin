@@ -16,6 +16,7 @@
 	"exclude": [
 		"./_scripts",
 		"./_templates",
-		"./views"
+		"./views",
+		"./vue-polyfill"
 	]
 }
