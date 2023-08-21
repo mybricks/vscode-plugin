@@ -140,7 +140,37 @@ module.exports = {
         use: ["style-loader", "css-loader"]
       },
       {
-        test: /\.less$/i,
+        test: /\.lazy.less$/i,
+        use: [
+          {
+            loader: 'style-loader',
+            options: {
+              injectType: "lazyStyleTag",
+              insert: function insertIntoTarget(element, options) {
+                (options.target || document.head).appendChild(element)
+              },
+            },
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              modules: {
+                localIdentName: '[local]-[hash:5]'
+              }
+            }
+          },
+          {
+            loader: 'less-loader',
+            options: {
+              lessOptions: {
+                javascriptEnabled: true,
+              }
+            }
+          }
+        ]
+      },
+      {
+        test: /^(?!.*\.lazy\.less$).*\.less$/i,
         use: [
           {
             loader: "style-loader",
