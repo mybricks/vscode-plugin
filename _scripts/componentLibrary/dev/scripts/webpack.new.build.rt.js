@@ -4,8 +4,8 @@ const WebpackBar = require("webpackbar");
 const { VueLoaderPlugin } = require('vue-loader')
 const { build } = require("../../../../utils");
 const publishplugin = require("../publishplugin");
-const babelPluginAutoCssModules = require('./babel-plugins/babel-plugin-auto-css-modules');
-const getLessLoaders = require('./utils/getLessLoader');
+const babelPluginAutoCssModules = require('../babel-plugins/babel-plugin-auto-css-modules');
+const getLessLoaders = require('../utils/getLessLoader');
 const { tempPubPath } = require("../../../../const");
 
 function mybricksJsonTips (configName) {
