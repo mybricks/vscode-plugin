@@ -20,9 +20,10 @@ import React, { useMemo } from "react";
 // }
 
 const SlotRender = ({ slots, name, params = {} }) => {
+  const props = params?.m ? { ...(params ?? {}), ...(params?.m ?? {}) } : params;
   return (
     <>
-      {slots[name]?.render?.(params)}
+      {slots[name]?.render?.(props)}
     </>
   );
 };
@@ -65,8 +66,13 @@ function VUEHoc(com) {
     const _slots = {}; // slots不能直接丢进去，否则会触发bug
     for (const key in slots) {
       if (Object.prototype.hasOwnProperty.call(slots, key)) {
-        vSlots[key] = (params) => <SlotRender slots={slots} name={key} params={params} />;
+        vSlots[key] = (params) => {
+          return <SlotRender slots={slots} name={key} params={params} />;
+        };
         _slots[key] = slots[key];
+        
+        // 手动调用getter，触发设计器的size响应式
+        _slots[key].size;
       }
     }
 
@@ -76,7 +82,7 @@ function VUEHoc(com) {
     return (
       <Basic
         // style={style}
-        config={{ style }}
+        m={{ style }}
         env={env}
         logger={logger}
         data={{ ...data }}

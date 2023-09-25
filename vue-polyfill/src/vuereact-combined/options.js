@@ -2,6 +2,22 @@ import React from "react";
 
 const originOptions = {
   react: {
+    // componentWrap: 'div',
+    // slotWrap: 'div',
+    // componentWrapAttrs: {
+    //   __use_react_component_wrap: '',
+    //   style: {
+    //     all: 'unset'
+    //   }
+    // },
+    // slotWrapAttrs: {
+    //   __use_react_slot_wrap: '',
+    //   style: {
+    //     all: 'unset'
+    //   }
+    // }
+  },
+  react: {
     componentWrap: 'div',
     slotWrap: 'div',
     componentWrapAttrs: {
@@ -17,13 +33,36 @@ const originOptions = {
       }
     }
   },
+  // vue: {
+  //   // 组件wrapper
+  //   componentWrapHOC: (VueComponentMountAt, nativeProps = []) => {
+  //     // 传入portals
+  //     return function ({ portals = [] } = {}) {
+  //       return (<div {...nativeProps}>{VueComponentMountAt}{portals.map(({ Portal, key }) => <Portal key={key}/>)}</div>)
+  //     }
+  //   },
+  //   componentWrapAttrs: {
+  //     'data-use-vue-component-wrap': '',
+  //     style: {
+  //       // all: 'unset',
+  //       width: 'inherit',
+  //       // width: 375,
+  //       height: 'inherit',
+  //     }
+  //   },
+  //   slotWrapAttrs: {
+  //     'data-use-vue-slot-wrap': '',
+  //     style: {
+  //       all: 'unset'
+  //     }
+  //   }
+  // },
   vue: {
-    // 组件wrapper
     componentWrapHOC: (VueComponentMountAt, nativeProps = []) => {
       // 传入portals
       return function ({ portals = [] } = {}) {
-        return (<div {...nativeProps}>{VueComponentMountAt}{portals.map(({ Portal, key }) => <Portal key={key}/>)}</div>)
-      }
+        return (<React.Fragment {...nativeProps}>{VueComponentMountAt}{portals.map(({ Portal, key }) => <Portal key={key}/>)}</React.Fragment>);
+      };
     },
     componentWrapAttrs: {
       'data-use-vue-component-wrap': '',

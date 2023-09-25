@@ -1,6 +1,6 @@
 {
   "name": "vue-polyfill",
-  "version": "0.0.6",
+  "version": "0.0.8",
   "description": "> TODO: description",
   "private": true,
   "main": "lib/index.umd.js",
