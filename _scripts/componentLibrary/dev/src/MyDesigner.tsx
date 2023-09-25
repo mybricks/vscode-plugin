@@ -12,7 +12,9 @@ import servicePlugin, {call as callConnectorHttp} from "@mybricks/plugin-connect
 
 import css from "./MyDesigner.less";
 
-const localDataKey = "--mybricks--";
+const localDataKey = `--mybricks--${MYBRICKS_JSON?.componentType ?? 'NONE'}`;
+
+const isH5 = ['H5', 'KH5'].includes(MYBRICKS_JSON?.componentType);
 
 export default function MyDesigner () {
   const designerRef = useRef<{ dump: () => any, toJSON: () => any }>();
@@ -56,14 +58,22 @@ export default function MyDesigner () {
     }
   }, []);
 
+  const h5GeoView = {
+    type: "mobile",
+    width: 375,
+    height: 667,
+  };
+
+  const pcGeoView = {
+    scenes: true,
+    theme: {
+      css: ["https://unpkg.com/element-plus/dist/index.css", 'https://assets.mybricks.world/pkg/antd-4.21.6/antd.min.css']
+    }
+  };
+
   const getConfig = useCallback(({projectJson}: any) => {
     return {
-      geoView: {
-        scenes: true,
-        theme: {
-          css: ["https://unpkg.com/element-plus/dist/index.css", 'https://assets.mybricks.world/pkg/antd-4.21.6/antd.min.css']
-        }
-      },
+      geoView: isH5 ? h5GeoView : pcGeoView ,
       toplView: {
         title: '交互',
         cards: {

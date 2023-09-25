@@ -1,4 +1,6 @@
 import {applyPureVueInReact} from 'veaury';
+
+// import { applyPureVueInReact } from './veaury'
 import React, { useMemo } from "react";
 
 // if (window.Vue && window.veaury && window.Vue.use === undefined) {
@@ -45,9 +47,11 @@ function VUEHoc(com) {
   const Basic = applyPureVueInReact(com);
   return function ({ data, outputs, inputs, slots, style, env, logger }) {
     const vSlots = {};
+    const _slots = {}; // slots不能直接丢进去，否则会触发bug
     for (const key in slots) {
       if (Object.prototype.hasOwnProperty.call(slots, key)) {
         vSlots[key] = (params) => <SlotRender slots={slots} name={key} params={params} />;
+        _slots[key] = slots[key];
       }
     }
 
@@ -56,13 +60,14 @@ function VUEHoc(com) {
 
     return (
       <Basic
-        style={style}
+        // style={style}
+        config={{ style }}
         env={env}
         logger={logger}
         data={{ ...data }}
         outputs={outputsProxy}
         inputs={inputsProxy}
-        slots={slots}
+        slots={_slots}
         v-slots={vSlots}
       />
     );

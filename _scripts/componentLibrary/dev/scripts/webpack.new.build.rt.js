@@ -1,8 +1,11 @@
 const path = require("path");
 const fse = require("fs-extra");
 const WebpackBar = require("webpackbar");
+const { VueLoaderPlugin } = require('vue-loader')
 const { build } = require("../../../../utils");
 const publishplugin = require("../publishplugin");
+const babelPluginAutoCssModules = require('./babel-plugins/babel-plugin-auto-css-modules');
+const getLessLoaders = require('./utils/getLessLoader');
 const { tempPubPath } = require("../../../../const");
 
 function mybricksJsonTips (configName) {
@@ -57,11 +60,12 @@ const jsonconfig = {
 
 const config = fse.readJSONSync(docPath + "/" + configName);
 
-const { externals, pxToRem } = config;
+const { externals, pxToRem, pxToVw } = config;
 
 const externalsMap = {
-  "react": "React",
-  "react-dom": "ReactDOM"
+  'react': 'React',
+  'react-dom': 'ReactDOM',
+  'vue': 'vue',
 };
 
 if (Array.isArray(externals)) {
@@ -71,6 +75,40 @@ if (Array.isArray(externals)) {
     }
   });
 }
+
+const getPostCssOption = ({ pxToVw, pxToRem }) => {
+  if (pxToRem) {
+    return {
+      plugins: [
+        [
+          'postcss-pixel-to-remvw',
+          {
+            baseSize: {
+              rem: 12, // 10rem = 120px
+            },
+          },
+        ],
+      ]
+    };
+  }
+
+  if (pxToVw) {
+    const postcssPxToViewport = require('postcss-px-to-viewport');
+    return {
+      plugins: [
+        new postcssPxToViewport({
+          unitPrecision: 13,
+          viewportWidth: 375,
+          selectorBlackList: ['-noPxToVw'],
+        }),
+      ]
+    };
+  }
+
+  return {};
+};
+
+const postCssOptions = getPostCssOption(config);
 
 module.exports = {
   mode: "production",
@@ -93,6 +131,13 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+        options: {
+          hotReload: false,
+        },
+      },
+      {
         test: /\.jsx?$/,
         use: [
           {
@@ -102,7 +147,8 @@ module.exports = {
                 "@babel/preset-react"
               ],
               plugins: [
-                ["@babel/plugin-proposal-class-properties", {"loose": true}]
+                ["@babel/plugin-proposal-class-properties", {"loose": true}],
+                [babelPluginAutoCssModules]
               ],
               cacheDirectory: true
             }
@@ -119,7 +165,8 @@ module.exports = {
                 "@babel/preset-react"
               ],
               plugins: [
-                ["@babel/plugin-proposal-class-properties", {"loose": true}]
+                ["@babel/plugin-proposal-class-properties", {"loose": true}],
+                [babelPluginAutoCssModules]
               ],
               cacheDirectory: true
             }
@@ -141,109 +188,77 @@ module.exports = {
           {
             loader: 'postcss-loader',
             options: {
-              postcssOptions: {
-                plugins: pxToRem ? [
-                  [
-                    'postcss-pixel-to-remvw',
-                    {
-                      baseSize: {
-                        rem: 12, // 10rem = 120px
-                      },
-                    },
-                  ],
-                ] : [],
-              },
+              postcssOptions: postCssOptions,
             },
           },
         ],
         sideEffects: true
       },
-      {
-        test: /\.less$/i,
-        use: [
-          {
-            loader: 'style-loader',
-            options: {attributes: {title: 'less'}}
-          },
-          {
-            loader: 'css-loader',
-            options: {
-              modules: {
-                localIdentName: '[local]-[hash:5]'
-              }
-            }
-          },
-          {
-            loader: 'postcss-loader',
-            options: {
-              postcssOptions: {
-                plugins: pxToRem ? [
-                  [
-                    'postcss-pixel-to-remvw',
-                    {
-                      baseSize: {
-                        rem: 12, // 10rem = 120px
-                      },
-                    },
-                  ],
-                ] : [],
-              },
-            },
-          },
-          {
-            loader: "less-loader",
-            options: {
-              lessOptions: {
-                javascriptEnabled: true
-              },
-            },
-          }
-        ],
-        exclude: /node_modules/
-      },
-      {
-        test: /\.less$/i,
-        use: [
-          {
-            loader: "style-loader",
-            options: {attributes: {title: "less"}}
-          },
-          {
-            loader: "css-loader",
-            options: {
-              modules: {
-                localIdentName: "[local]"
-              }
-            }
-          },
-          {
-            loader: 'postcss-loader',
-            options: {
-              postcssOptions: {
-                plugins: pxToRem ? [
-                  [
-                    'postcss-pixel-to-remvw',
-                    {
-                      baseSize: {
-                        rem: 12, // 10rem = 120px
-                      },
-                    },
-                  ],
-                ] : [],
-              },
-            },
-          },
-          {
-            loader: "less-loader",
-            options: {
-              lessOptions: {
-                javascriptEnabled: true
-              },
-            },
-          }
-        ],
-        include: /node_modules/
-      },
+      ...getLessLoaders({ postCssOptions }),
+      // {
+      //   test: /\.less$/i,
+      //   use: [
+      //     {
+      //       loader: 'style-loader',
+      //       options: {attributes: {title: 'less'}}
+      //     },
+      //     {
+      //       loader: 'css-loader',
+      //       options: {
+      //         modules: {
+      //           localIdentName: '[local]-[hash:5]'
+      //         }
+      //       }
+      //     },
+      //     {
+      //       loader: 'postcss-loader',
+      //       options: {
+      //         postcssOptions: postCssOptions,
+      //       },
+      //     },
+      //     {
+      //       loader: "less-loader",
+      //       options: {
+      //         lessOptions: {
+      //           javascriptEnabled: true
+      //         },
+      //       },
+      //     }
+      //   ],
+      //   exclude: /node_modules/
+      // },
+      // {
+      //   test: /\.less$/i,
+      //   use: [
+      //     {
+      //       loader: "style-loader",
+      //       options: {attributes: {title: "less"}}
+      //     },
+      //     {
+      //       loader: "css-loader",
+      //       options: {
+      //         modules: {
+      //           localIdentName: "[local]"
+      //         }
+      //       }
+      //     },
+      //     {
+      //       loader: 'postcss-loader',
+      //       options: {
+      //         postcssOptions: postCssOptions,
+      //       },
+      //     },
+      //     {
+      //       loader: "less-loader",
+      //       options: {
+      //         lessOptions: {
+      //           javascriptEnabled: true
+      //         },
+      //       },
+      //     }
+      //   ],
+      //   include: /node_modules/
+      // },
       {
         // test: /\.(gif|png|jpe?g|webp|svg|woff|woff2|eot|ttf)$/i,
         test: /\.(gif|png|jpe?g|webp|woff|woff2|eot|ttf)$/i,
@@ -283,6 +298,7 @@ module.exports = {
   },
   plugins: [
     new WebpackBar(),
+    new VueLoaderPlugin(),
     new publishplugin({jsonconfig, config, type: 'rt'})
   ]
 };

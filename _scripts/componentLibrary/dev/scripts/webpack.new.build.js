@@ -1,8 +1,10 @@
 const path = require("path");
 const fse = require("fs-extra");
 const WebpackBar = require("webpackbar");
+const { VueLoaderPlugin } = require('vue-loader')
 const { build } = require("../../../../utils");
 const publishplugin = require("../publishplugin");
+const babelPluginAutoCssModules = require('./babel-plugins/babel-plugin-auto-css-modules');
 const { tempPubPath } = require("../../../../const");
 
 function mybricksJsonTips (configName) {
@@ -60,8 +62,9 @@ console.log(config, 'config');
 const { externals } = config;
 
 const externalsMap = {
-  "react": "React",
-  "react-dom": "ReactDOM"
+  'react': 'React',
+  'react-dom': 'ReactDOM',
+  'vue': 'vue',
 };
 
 if (Array.isArray(externals)) {
@@ -93,6 +96,13 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+        options: {
+          hotReload: false,
+        },
+      },
+      {
         test: /\.jsx?$/,
         use: [
           {
@@ -102,7 +112,8 @@ module.exports = {
                 "@babel/preset-react"
               ],
               plugins: [
-                ["@babel/plugin-proposal-class-properties", {"loose": true}]
+                ["@babel/plugin-proposal-class-properties", {"loose": true}],
+                [babelPluginAutoCssModules]
               ],
               cacheDirectory: true
             }
@@ -119,7 +130,8 @@ module.exports = {
                 "@babel/preset-react"
               ],
               plugins: [
-                ["@babel/plugin-proposal-class-properties", {"loose": true}]
+                ["@babel/plugin-proposal-class-properties", {"loose": true}],
+                [babelPluginAutoCssModules]
               ],
               cacheDirectory: true
             }
@@ -229,6 +241,7 @@ module.exports = {
   },
   plugins: [
     new WebpackBar(),
+    new VueLoaderPlugin(),
     new publishplugin({jsonconfig, config, type: 'edit'})
   ]
 };

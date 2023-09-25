@@ -1,20 +1,18 @@
 {
   "name": "vue-polyfill",
-  "version": "0.0.1",
+  "version": "0.0.6",
   "description": "> TODO: description",
   "private": true,
   "main": "lib/index.umd.js",
   "scripts": {
+    "watch": "rollup -c ./script/rollup.config.js -w",
     "build": "rollup -c ./script/rollup.config.js"
   },
   "dependencies": {
-    "veaury": "^2.3.12"
+    "veaury": "^2.3.12",
+    "vuereact-combined": "^1.2.11"
   },
   "devDependencies": {
-    "@types/react": "^17.0.2",
-    "@types/react-dom": "^17.0.2",
-    "rimraf": "^3.0.2",
-    "rollup": "^2.69.2",
     "@babel/core": "^7.8.7",
     "@babel/preset-env": "^7.14.8",
     "@babel/preset-react": "^7.8.3",
@@ -27,6 +25,10 @@
     "@rollup/plugin-node-resolve": "^15.0.0",
     "@rollup/plugin-replace": "^5.0.0",
     "@rollup/plugin-terser": "^0.1.0",
+    "@types/react": "^17.0.2",
+    "@types/react-dom": "^17.0.2",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.69.2",
     "rollup-plugin-typescript2": "^0.31.2"
   }
 }

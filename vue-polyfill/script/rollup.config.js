@@ -42,14 +42,12 @@ module.exports = [
   //   ],
   // },
   {
-    input: path.resolve(__dirname, './../index.tsx'),
-    output: [
-      {
-        file: path.resolve(__dirname, `./../dist/${packageJson.version}/index.umd.js`),
-        format: 'umd',
-        name: packageJson.name,
-      },
-    ],
+    input: [path.resolve(__dirname, './../vue2.tsx')],
+    output: {
+      dir: path.resolve(__dirname, `./../dist/${packageJson.version}`),
+      // dir: '/Users/cocolbell/Desktop/projects/apps/mybricks-app-th5/assets/js',
+      format: 'umd'
+    },
     external: ['react', 'react-dom', 'vue'],
     plugins: [
       // postcss({
@@ -58,12 +56,13 @@ module.exports = [
       //   process: processLess,
       // }),
       // nodeResolve(),
-      commonjs(),
       resolve({
         // jsnext: true,
         // main: true,
         // browser: true,
       }),
+      babel(babelOptions),
+      commonjs(),
       // typescript({
       //   check: false, // 不检查ts报错
       //   tsconfig: {
@@ -75,8 +74,42 @@ module.exports = [
       //   },
       // }),
       json(),
+      terser()
+    ],
+  },
+  {
+    input: [path.resolve(__dirname, './../vue3.tsx')],
+    output: {
+      dir: path.resolve(__dirname, `./../dist/${packageJson.version}`),
+      format: 'umd'
+    },
+    external: ['react', 'react-dom', 'vue'],
+    plugins: [
+      // postcss({
+      //   extract: false,
+      //   modules: true,
+      //   process: processLess,
+      // }),
+      // nodeResolve(),
+      resolve({
+        // jsnext: true,
+        // main: true,
+        // browser: true,
+      }),
       babel(babelOptions),
-      // terser()
+      commonjs(),
+      // typescript({
+      //   check: false, // 不检查ts报错
+      //   tsconfig: {
+      //     compilerOptions: {
+      //       // module: 'esnext',
+      //       target: 'esnext',
+      //       rootDir: './../'
+      //     },
+      //   },
+      // }),
+      json(),
+      terser()
     ],
   },
 ];
