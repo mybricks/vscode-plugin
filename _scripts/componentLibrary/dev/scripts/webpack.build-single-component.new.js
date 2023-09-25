@@ -164,6 +164,7 @@ class Plugin {
                 let fileContent = `${fse.readFileSync(path.resolve(outputPath, `${prefix}-${'runtime'}.js`), 'utf-8')}return MybricksComDef.default;`;
                 fileContent = `(function(){${fileContent}})()`;
                 comJson[key] = fileContent;
+                comJson.tags = ['vue2'];
                 return;
               }
               if (key === 'runtime') {
