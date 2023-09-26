@@ -13,3 +13,4 @@ _scripts/.temp
 _scripts/.temp-pub
 yarn.lock
 /_scripts/componentLibrary/dev/scripts/_buildTemp
+/_scripts/componentLibrary/dev/scripts/_devTemp
