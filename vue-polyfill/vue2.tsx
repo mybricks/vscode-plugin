@@ -85,7 +85,7 @@ function VUEHoc(com) {
       env,
       _env,
       logger,
-      data: { ...data },
+      data: data,
       outputs: outputsProxy,
       inputs: inputsProxy,
       slots: _slots,
