@@ -61,7 +61,7 @@ const useRawObject = (obj) => {
 
 function VUEHoc(com) {
   const Basic = applyVueInReact(com);
-  return function ({ data, outputs, inputs, slots, style, env, logger }) {
+  return function ({ data, outputs, inputs, slots, style, env, _env, logger, title, id }) {
     const vSlots = {};
     const _slots = {}; // slots不能直接丢进去，否则会触发bug
     for (const key in slots) {
@@ -79,18 +79,23 @@ function VUEHoc(com) {
     const inputsProxy = useRawObject(inputs);
     const outputsProxy = useRawObject(outputs);
 
+    const props = {
+      id,
+      title,
+      env,
+      _env,
+      logger,
+      data: { ...data },
+      outputs: outputsProxy,
+      inputs: inputsProxy,
+      slots: _slots,
+    };
+
     return (
       <Basic
-        // style={style}
-        m={{ style }}
-        env={env}
-        logger={logger}
-        data={{ ...data }}
-        outputs={outputsProxy}
-        inputs={inputsProxy}
-        slots={_slots}
+        m={{ style, ...props }}
+        {...props}
         $scopedSlots={vSlots}
-        // v-slots={vSlots}
       />
     );
   };
