@@ -3,7 +3,7 @@
     "./src/button/com.json"
   ],
   "domain": "",
-  "sceneType": "PC",
+  "componentType": "KH5",
   "title": "my_comlib",
   "namespace": "my_comlib"
 }

@@ -22,7 +22,8 @@ export default class Provider implements vscode.WebviewViewProvider {
 
     webviewView.webview.onDidReceiveMessage(async (data) => {
       switch (true) {
-        case data.action === "create" && data.type === "pcComlib":
+        case data.action === "create" && data.type === "pcComlib": {
+
           const saveRtn = await vscode.window.showSaveDialog({
             title: "请选择项目要保存的文件夹"
           });
@@ -36,9 +37,10 @@ export default class Provider implements vscode.WebviewViewProvider {
 
             openFolder(projectDir);
           }
+        }
           break;
         
-        case data.action === "create" && data.type === "h5VueComlib":
+        case data.action === "create" && data.type === "h5VueComlib": {
           const saveRtn = await vscode.window.showSaveDialog({
             title: "请选择项目要保存的文件夹"
           });
@@ -52,6 +54,7 @@ export default class Provider implements vscode.WebviewViewProvider {
 
             openFolder(projectDir);
           }
+        }
           break;
 
         case data.action === "openDir": 
