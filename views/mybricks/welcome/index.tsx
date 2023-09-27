@@ -28,17 +28,25 @@ function App (): JSX.Element {
  * @returns 
  */
 function CreateProject (): JSX.Element {
-  const onClick: () => void = useCallback(() => {
-    vscode.postMessage({action: "create", type: "pcComlib"});
+  const onCreate: () => void = useCallback((type) => {
+    vscode.postMessage({action: "create", type});
   }, []);
 
   return (
-    <div
-      data-mybricks-btn
-      onClick={onClick}
-    >
-      <div>新建PC组件库</div>
-    </div>
+    <>
+      <div
+        data-mybricks-btn
+        onClick={() => { onCreate("pcComlib"); }}
+      >
+        <div>新建PC组件库</div>
+      </div>
+      <div
+        data-mybricks-btn
+        onClick={() => { onCreate("h5VueComlib"); }}
+      >
+        <div>新建H5组件库(Vue)</div>
+      </div>
+    </>
   );
 }
 
