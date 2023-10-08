@@ -1,0 +1,1 @@
+export { createComMybricks } from "./create-com";

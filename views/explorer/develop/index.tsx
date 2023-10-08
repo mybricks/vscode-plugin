@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 
 import Divider from "../../components/divider";
+import Block from "../../components/block";
 
 import "../../index.css";
 import css from "./index.less";
@@ -30,6 +31,10 @@ function App (): JSX.Element {
       <Debugger />
       <Divider />
       <Publish />
+      <Divider />
+      <Block title={'实验性功能'}>
+        <ImportComponent />
+      </Block>
     </div>
   );
 }
@@ -91,6 +96,25 @@ function Publish (): JSX.Element {
       </div> */}
     </div>
     
+  );
+}
+
+/**
+ * 导入组件
+ * @returns 
+ */
+function ImportComponent (): JSX.Element {
+  const onClick: () => void = useCallback(() => {
+    vscode.postMessage({action: "import", type: "component"});
+  }, []);
+
+  return (
+    <div
+      data-mybricks-btn
+      onClick={onClick}
+    >
+      <div>导入：组件</div>
+    </div>
   );
 }
 

@@ -37,6 +37,11 @@ export default class Provider implements vscode.WebviewViewProvider {
         case 'settings':
           vscode.commands.executeCommand("mybricks.publish.settings.open");
           break;
+        case "import": 
+          const { type } = data;
+          // vscode.Uri.joinPath(vscode.workspace.workspaceFolders?.[0]?.uri, './src')
+          vscode.commands.executeCommand("mybricks.import.com");
+          break;
         default:
           break;
       }
