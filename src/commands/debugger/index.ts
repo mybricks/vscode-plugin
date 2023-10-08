@@ -178,6 +178,11 @@ export class DebuggerCommands {
       // TODO: 暂时注释，windows系统问题
       // this.devTerminal?.dispose();
       // this.devTerminal = undefined;
+      // 打开调试的terminal模拟执行Ctrl+C
+      this.devTerminal?.show();
+      vscode.commands.executeCommand('workbench.action.terminal.sendSequence', {
+        text: '\x03' // \x03 是 Ctrl+C 的 ASCII 码
+      });
     }
    
 
