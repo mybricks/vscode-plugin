@@ -115,7 +115,7 @@ function Hoc (WrappedComponent) {
   }
 }
 
-export default window.VUEHoc(Hoc(Component));
+export default Hoc(Component);
     `;
   },
 };
