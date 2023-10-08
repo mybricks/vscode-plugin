@@ -61,16 +61,16 @@ const originOptions = {
     componentWrapHOC: (VueComponentMountAt, nativeProps = []) => {
       // 传入portals
       return function ({ portals = [] } = {}) {
-        return (<React.Fragment {...nativeProps}>{VueComponentMountAt}{portals.map(({ Portal, key }) => <Portal key={key}/>)}</React.Fragment>);
+        // return (<>{VueComponentMountAt}{portals.map(({ Portal, key }) => <Portal key={key}/>)}</>);
+        return (<div {...nativeProps}>{VueComponentMountAt}{portals.map(({ Portal, key }) => <Portal key={key}/>)}</div>);
       };
     },
     componentWrapAttrs: {
       'data-use-vue-component-wrap': '',
       style: {
-        // all: 'unset',
-        width: 'inherit',
-        // width: 375,
-        height: 'inherit',
+        // all: 'inherit',
+        width: '100%',
+        height: '100%',
       }
     },
     slotWrapAttrs: {
