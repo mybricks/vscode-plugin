@@ -8,6 +8,9 @@ const babelPluginAutoCssModules = require('./../babel-plugins/babel-plugin-auto-
 const getLessLoaders = require('./../utils/getLessLoader');
 const { execSync } = require('child_process');
 const { generateSourceCode } = require('generate-mybricks-component-library-code2');
+const t = require("@babel/types");
+const parser = require("@babel/parser");
+const generator = require("@babel/generator");
 
 // vue源码的key
 const VUE_ORIGINCODE_KEY = 'runtime.vue';
@@ -34,15 +37,15 @@ const mybricksJson = fse.readJSONSync(mybricksJsonPath);
 const outputPath = path.resolve(__dirname, 'dist');
 
 
-const { domain, email } = mybricksJson;
-if (!domain) {
-  throw new Error('请配置domain(平台地址)...');
-}
-if (!email) {
-  throw new Error(`请正确填写 ${domain} 平台的账号...`);
-}
+// const { domain, email } = mybricksJson;
+// if (!domain) {
+//   throw new Error('请配置domain(平台地址)...');
+// }
+// if (!email) {
+//   throw new Error(`请正确填写 ${domain} 平台的账号...`);
+// }
 
-let userId = email;
+// let userId = email;
 
 const getPostCssOption = ({ pxToVw, pxToRem }) => {
   if (pxToRem) {
@@ -373,7 +376,69 @@ class Plugin {
   }
 }
 
+process.stdin.setEncoding('utf8');
+
+function getInput(tips) {
+  console.log(tips);
+  return new Promise(resolve => {
+    process.stdin.once('data', data => {
+      resolve(data.trim());
+    });
+  });
+}
+
 async function build() {
+  let userId;
+
+  async function checkOnlineInfo () {
+    const pushNewObjectPropertys = [];
+
+    if (!mybricksJson.domain) {
+      const domain = await getInput('请输入平台地址...');
+      mybricksJson.domain = domain;
+      pushNewObjectPropertys.push({
+        key: 'domain',
+        value: domain
+      });
+    }
+    // email兼容老的，后续使用userName
+    if (!mybricksJson.email && !mybricksJson.userName) {
+      const userName = await getInput(`请正确填写 ${mybricksJson.domain} 平台的账号...`);
+      mybricksJson.userName = userName;
+      pushNewObjectPropertys.push({
+        key: 'userName',
+        value: userName
+      });
+    }
+
+    if (pushNewObjectPropertys.length) {
+      const mybricksJsonStr = `(${fse.readFileSync(mybricksJsonPath, 'utf-8')})`;
+      const ast = parser.parse(mybricksJsonStr, {
+        sourceType: "module",
+      });
+      const properties = ast.program.body[0].expression.properties;
+      pushNewObjectPropertys.forEach(({key, value}) => {
+        const propertie = properties.find((obj) => obj.key.value === key);
+        if (propertie) {
+          propertie.value.value = value;
+        } else {
+          properties.push(t.objectProperty(
+            t.identifier(`"${key}"`),
+            t.stringLiteral(value)
+          ));
+        }
+      });
+
+      let modifiedJsonStr = generator.default(ast).code;
+      modifiedJsonStr = modifiedJsonStr.slice(1, modifiedJsonStr.length-2);
+
+      fse.writeFileSync(mybricksJsonPath, modifiedJsonStr, 'utf-8');
+    }
+
+    userId = mybricksJson.userName || mybricksJson.email;
+  }
+
+  await checkOnlineInfo();
   await Promise.all([
     new Promise((resolve, reject) => {
       webpack(getConfig({ entry, postCssOptions: getPostCssOption({}) }), (err, stats) => {
