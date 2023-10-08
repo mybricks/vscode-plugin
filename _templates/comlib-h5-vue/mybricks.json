@@ -1,0 +1,9 @@
+{
+  "comAry": [
+    "./src/button/com.json"
+  ],
+  "domain": "",
+  "componentType": "KH5",
+  "title": "my_comlib",
+  "namespace": "my_comlib"
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@your-team/pc-lib0",
+  "version": "1.0.0-main.0",
+  "description": "Mybricks H5组件库 vue",
+  "main": "index.js",
+  "scripts": {},
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/react": "^18.0.21",
+    "@types/react-dom": "^18.0.6"
+  }
+}

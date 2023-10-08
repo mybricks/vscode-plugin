@@ -78,7 +78,7 @@ module.exports = ({ postCssOptions }) => {
       test: /\.less$/i,
       use: getLessNoModulesLoaders({ postCssOptions: postCssOptions ?? {} }),
       include: /node_modules/
-    },
+    }
   ];
 };
 

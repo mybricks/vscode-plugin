@@ -67,7 +67,11 @@ export default function MyDesigner () {
   const pcGeoView = {
     scenes: true,
     theme: {
-      css: ["https://unpkg.com/element-plus/dist/index.css", 'https://assets.mybricks.world/pkg/antd-4.21.6/antd.min.css']
+      css: [
+        "https://unpkg.com/element-plus/dist/index.css", 
+        "https://assets.mybricks.world/pkg/antd-4.21.6/antd.min.css",
+        "https://f2.beckwai.com/udata/pkg/eshop/fangzhou/temp/editor.d5c483a324024fb6.css",
+      ]
     }
   };
 

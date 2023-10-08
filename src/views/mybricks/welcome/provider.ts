@@ -21,8 +21,9 @@ export default class Provider implements vscode.WebviewViewProvider {
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
     webviewView.webview.onDidReceiveMessage(async (data) => {
-      switch (data.action) {
-        case "create":
+      switch (true) {
+        case data.action === "create" && data.type === "pcComlib": {
+
           const saveRtn = await vscode.window.showSaveDialog({
             title: "请选择项目要保存的文件夹"
           });
@@ -36,8 +37,27 @@ export default class Provider implements vscode.WebviewViewProvider {
 
             openFolder(projectDir);
           }
+        }
           break;
-        case "openDir": 
+        
+        case data.action === "create" && data.type === "h5VueComlib": {
+          const saveRtn = await vscode.window.showSaveDialog({
+            title: "请选择项目要保存的文件夹"
+          });
+
+          const projectDir = saveRtn?.fsPath;
+
+          if (projectDir) {
+            const tptDirPath = vscode.Uri.joinPath(this._context.extensionUri, "_templates/comlib-h5-vue").fsPath;
+
+            fse.copySync(tptDirPath, projectDir);
+
+            openFolder(projectDir);
+          }
+        }
+          break;
+
+        case data.action === "openDir": 
           const { value } = data;
 
           if (!openFolder(value)) {

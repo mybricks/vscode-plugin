@@ -18,7 +18,7 @@ function App (): JSX.Element {
     <div className={css.welComeContainer}>
       <CreateProject />
       <Divider />
-      <QuickStart />
+      {/* <QuickStart /> */}
     </div>
   );
 }
@@ -28,17 +28,25 @@ function App (): JSX.Element {
  * @returns 
  */
 function CreateProject (): JSX.Element {
-  const onClick: () => void = useCallback(() => {
-    vscode.postMessage({action: "create", type: "pcComlib"});
+  const onCreate: any = useCallback((type: any) => {
+    vscode.postMessage({action: "create", type});
   }, []);
 
   return (
-    <div
-      data-mybricks-btn
-      onClick={onClick}
-    >
-      <div>新建PC组件库</div>
-    </div>
+    <>
+      <div
+        data-mybricks-btn
+        onClick={() => { onCreate("pcComlib"); }}
+      >
+        <div>新建PC组件库</div>
+      </div>
+      <div
+        data-mybricks-btn
+        onClick={() => { onCreate("h5VueComlib"); }}
+      >
+        <div>新建H5组件库(Vue)</div>
+      </div>
+    </>
   );
 }
 
