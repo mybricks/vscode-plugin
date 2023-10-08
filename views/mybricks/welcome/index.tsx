@@ -18,7 +18,7 @@ function App (): JSX.Element {
     <div className={css.welComeContainer}>
       <CreateProject />
       <Divider />
-      <QuickStart />
+      {/* <QuickStart /> */}
     </div>
   );
 }
@@ -28,7 +28,7 @@ function App (): JSX.Element {
  * @returns 
  */
 function CreateProject (): JSX.Element {
-  const onCreate: () => void = useCallback((type) => {
+  const onCreate: any = useCallback((type: any) => {
     vscode.postMessage({action: "create", type});
   }, []);
 
