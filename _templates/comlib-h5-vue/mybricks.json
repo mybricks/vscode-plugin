@@ -3,7 +3,8 @@
     "./src/button/com.json"
   ],
   "domain": "",
-  "componentType": "KH5",
+  "componentType": "H5",
+  "pxToVw": {},
   "title": "my_comlib",
   "namespace": "my_comlib"
 }
