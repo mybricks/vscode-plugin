@@ -34,6 +34,7 @@ function App (): JSX.Element {
       <Divider />
       <Block title={'实验性功能'}>
         <ImportComponent />
+        <ImportSetting />
       </Block>
     </div>
   );
@@ -115,6 +116,34 @@ function ImportComponent (): JSX.Element {
     >
       <div>导入：组件</div>
     </div>
+  );
+}
+
+function ImportSetting () {
+  const [saveFolder, setSaveFolder] = useState(window.importComSaveFolderPath);
+
+  const handleSelectSaveFolder = useCallback(() => {
+    vscode.postMessage({action: "import.setSaveFolderPath"});
+  }, []);
+
+  useEffect(() => {
+    function messageEvent (event: MessageEvent<any>) {
+      const action = event.data.action;
+
+      if (action === 'setSaveFolder') {
+        setSaveFolder(event.data.value);
+      }
+    };
+
+    window.addEventListener("message", messageEvent);
+
+    return () => {
+      window.removeEventListener("message", messageEvent);
+    };
+  }, []);
+
+  return (
+    <div className={css.importSetting}><span className={css.text}>导入后的组件存储位置：</span><span className={css.uri} onClick={handleSelectSaveFolder}>{saveFolder || '请配置'}</span></div>
   );
 }
 

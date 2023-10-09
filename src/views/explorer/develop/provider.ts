@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { uuid } from "../../../utils";
+import { ImportCom } from './import-com';
 
 export default class Provider implements vscode.WebviewViewProvider {
   private _view?: vscode.WebviewView;
@@ -42,6 +43,9 @@ export default class Provider implements vscode.WebviewViewProvider {
           // vscode.Uri.joinPath(vscode.workspace.workspaceFolders?.[0]?.uri, './src')
           vscode.commands.executeCommand("mybricks.import.com");
           break;
+        case "import.setSaveFolderPath": 
+          await ImportCom.selectAndSetSaveFolderPath(this._context, webviewView.webview);
+          break;
         default:
           break;
       }
@@ -70,6 +74,8 @@ export default class Provider implements vscode.WebviewViewProvider {
     // TODO 刷新vscode窗口，webpack进程未断开，且globalState保留了状态
     const debuggerStatus = vscode.debug.activeDebugSession ? (this._context.globalState.get('debuggerStatus') || "dev") : "dev";
 
+    const importComSaveFolderPath = this._context.workspaceState.get('mybricks.import.com.saveFolderPath');
+
     return `<!DOCTYPE html>
       <html lang="en">
       <head>
@@ -82,6 +88,8 @@ export default class Provider implements vscode.WebviewViewProvider {
             <script nonce="${nonce}">
               const vscode = acquireVsCodeApi();
               vscode.setState({debuggerStatus: "${debuggerStatus}"});
+
+              window.importComSaveFolderPath = ${importComSaveFolderPath ? `"${importComSaveFolderPath}"` : undefined};
             </script>
             <script nonce="${nonce}" src="${scriptUri}"></script>
         </body>
