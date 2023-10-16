@@ -1,7 +1,7 @@
 {
   "name": "Mybricks",
   "description": "快速便捷地开发和发布Mybricks组件",
-  "version": "0.0.87",
+  "version": "0.0.88",
   "icon": "images/mybricks.png",
   "engines": {
     "vscode": "^1.71.0"
@@ -116,6 +116,7 @@
     "publish:comlib": "node ./node_modules/webpack/bin/webpack.js --config",
     "publish:comlib-node": "./node_modules/webpack/bin/webpack.js --config ./_scripts/componentLibrary/dev/scripts/webpack.build-node.js",
     "publish:single-component": "node ",
+    "publish:any": "node ",
     "mybricks": "mybricks"
   },
   "devDependencies": {
@@ -143,7 +144,7 @@
     "eslint": "^8.20.0",
     "extra-watch-webpack-plugin": "^1.0.3",
     "fs-extra": "^10.1.0",
-    "generate-mybricks-component-library-code": "0.0.4-beta26",
+    "generate-mybricks-component-library-code": "^0.0.4-beta29",
     "generate-mybricks-component-library-code2": "0.0.1",
     "html-webpack-plugin": "^5.5.0",
     "less": "^4.1.3",

@@ -1,5 +1,6 @@
 import { readJsonSync } from 'fs-extra';
 import * as vscode from "vscode";
+import { window } from "vscode";
 
 import * as os from "os";
 import * as fse from 'fs-extra';
@@ -32,6 +33,58 @@ export class PublishCommands {
   }
 
   async start () {
+    const config = await start();
+    if (config) {
+      const { configName, docPath, materialType, publishType } = config;
+      let devTerminal = window.terminals.find(terminal => terminal.name === terminalName);
+      if (!devTerminal) {
+        devTerminal = window.createTerminal(terminalName);
+      }
+      const filename = (docPath + configName).replace(/@|\//gi, "_");
+      const libCfg = readJsonSync(path.join(docPath, configName));
+      const projPath = this._context.extensionPath;
+      const mybricksJsonPath = path.resolve(docPath, configName);
+      const mybricksJson = fse.readJSONSync(mybricksJsonPath);
+      const buildTempPath = path.resolve(projPath, './_scripts/componentLibrary/dev/newScripts/_buildTemp');
+      if (!fse.existsSync(buildTempPath)) {
+        fse.mkdirSync(buildTempPath);
+      }
+      const pattern = /[^a-zA-Z0-9]+/g;
+      const replacement = '_';
+      const result = mybricksJsonPath.replace(pattern, replacement) + '.js';
+      const webpackbuildjsPath = path.resolve(buildTempPath, result);
+      const webpackbuildjs = fse.readFileSync(path.resolve(projPath, `./_scripts/componentLibrary/dev/newScripts/build.${mybricksJson.tags || 'react'}.${materialType}.js`), 'utf-8');
+      
+      // 编写webpack
+      // 
+      // react
+      // 组件库 com_lib 进行中
+      // 组件 component
+      // vue2
+      // 组件库 com_lib
+      // 组件 component
+
+      fse.writeFileSync(
+        webpackbuildjsPath,
+        webpackbuildjs
+          .replace('--replace-docPath--', getSafePath(docPath))
+          .replace('--replace-configName--', configName)
+          .replace('--publish-type--', publishType),
+        'utf-8'
+      );
+
+      if(libCfg?.target === 'node') {
+        showInformationMessage("编译目标为node...");
+        devTerminal.sendText(`node ${projPath}/_scripts/generateCodePublish.js docPath=${docPath} configName=${configName} && export filename=${filename} && npm run --prefix ${projPath} ${'publish:comlib-node'}`);
+      } else {
+        devTerminal.sendText(`npm run --prefix ${projPath} publish:any ${webpackbuildjsPath}`);
+      }
+
+      devTerminal.show();
+    }
+  }
+
+  async start2 () {
     if (this._resove) {
       showInformationMessage("组件库正在发布中，请稍后再试...");
       return;

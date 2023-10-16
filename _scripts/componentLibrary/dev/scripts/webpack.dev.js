@@ -3,7 +3,7 @@ const fse = require("fs-extra");
 const WebpackBar = require("webpackbar");
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const MybricksPluginConnectComlibApp = require("./../../../../../mybricks-plugin-connect-comlib-app");
+const MybricksPluginConnectComlibApp = require("mybricks-plugin-connect-comlib-app");
 
 const { mybricksJsonPath } = process.env;
 const outputPath = path.resolve(__dirname, "../../public");
