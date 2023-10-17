@@ -1,10 +1,11 @@
 const path = require('path');
+const JSZip = require('jszip');
 const axios = require('axios');
 const fse = require('fs-extra');
 const webpack = require('webpack');
 const WebpackBar = require('webpackbar');
 const generateMybricksComponentLibraryCode = require('generate-mybricks-component-library-code');
-const { getOnlineInfo } = require("../utils");
+const { getOnlineInfo, getDistInfo } = require("../utils");
 // 组件库根目录
 const docPath = '--replace-docPath--';
 // 配置文件
@@ -14,27 +15,29 @@ const publishType = '--publish-type--';
 const mybricksJsonPath = path.join(docPath, configName);
 const mybricksJson = fse.readJSONSync(mybricksJsonPath);
 const packageJson = fse.readJSONSync(path.join(docPath, "./package.json"));
-const { editCode, runtimeCode, components } = generateMybricksComponentLibraryCode(
-  {
-    id: packageJson.name,
-    name: packageJson.description,
-    version: packageJson.version,
-    mybricksJsonPath: path.join(docPath, configName),
-  },
-  {
-    useTestComponentLibrary: false,
-    collectionStyleTags: true
-  }
-);
 
 async function build() {
-  let onlineConfig;
-  if (!(publishType === 'dist')) {
+  let finalConfig;
+  const isPublishToDist = publishType === 'dist';
+  if (!isPublishToDist) {
     console.log('发布至物料中心');
-    onlineConfig = await getOnlineInfo({configPath: mybricksJsonPath});
+    finalConfig = await getOnlineInfo({configPath: mybricksJsonPath});
   } else {
     console.log('保存至本地dist文件夹');
+    finalConfig = await getDistInfo({configPath: mybricksJsonPath});
   }
+  const { editCode, runtimeCode, components } = generateMybricksComponentLibraryCode(
+    {
+      id: packageJson.name,
+      name: packageJson.description,
+      version: packageJson.version,
+      mybricksJsonPath: path.join(docPath, configName),
+    },
+    {
+      useTestComponentLibrary: false,
+      collectionStyleTags: true
+    }
+  );
   const compileProductFolderPath = path.resolve(__dirname, `compile${String(Math.random()).replace('\.', '_')}`);
   fse.mkdirSync(compileProductFolderPath);
   const { externals } = mybricksJson;
@@ -86,23 +89,69 @@ async function build() {
       runtime: encodeURIComponent(fse.readFileSync(componentJsPath, 'utf-8')),
       version
     };
-    if (!onlineConfig) {
+    if (isPublishToDist) {
       fse.unlinkSync(componentJsPath);
     }
   });
   const runtimeComponentsMapString = JSON.stringify(runtimeComponentsMap);
 
-  if (!onlineConfig) {
+  if (isPublishToDist) {
     const docDistDirPath = path.join(docPath, 'dist');
     if (!fse.existsSync(docDistDirPath)) {
       fse.mkdirSync(docDistDirPath);
     }
     fse.copySync(compileProductFolderPath, docDistDirPath);
-    fse.writeFileSync(path.resolve(docDistDirPath, 'rtCom.js'), runtimeComponentsMapString, 'utf-8');    
+    fse.writeFileSync(path.resolve(docDistDirPath, 'rtCom.js'), runtimeComponentsMapString, 'utf-8');
+
+    const zip = new JSZip();
+    const userName = mybricksJson.userName;
+    const time = new Date().getTime();
+    zip.file('组件库.material@mybricks.json', JSON.stringify({
+      type: "material",
+      material: {
+        name: packageJson.description,
+        namespace: mybricksJson.namespace,
+        // TODO: 这里是场景信息，不应该传1，和中心化一起改造
+        scene: 1,
+        type: 'com_lib',
+        creatorName: userName,
+        creatorId: userName,
+        createTime: time,
+        updateTime: time,
+        updatorId: userName,
+        updatorName: userName
+      },
+      materialPub: {
+        content: JSON.stringify({
+          rtJs: './resource/rt.js',
+          editJs: './resource/edit.js',
+          coms: './resource/rtCom.js'
+        }),
+        version: packageJson.version,
+        creatorName: userName,
+        creatorId: userName,
+        createTime: time,
+        updateTime: time,
+        updatorId: userName,
+        updatorName: userName
+      }
+    }));
+    zip.file('./resource/rt.js', fse.readFileSync(rtCodePath, 'utf-8'));
+    zip.file('./resource/edit.js', fse.readFileSync(editCodePath, 'utf-8'));
+    zip.file('./resource/rtCom.js', runtimeComponentsMapString);
+
+    const content = await zip.generateAsync({
+      type: 'nodebuffer',
+      compression: 'DEFLATE',
+      compressionOptions: {
+        level: 9
+      }
+    });
+    fse.writeFileSync(path.resolve(docDistDirPath, '物料.zip'), content, 'utf-8');
     console.log(`\x1b[0m编译产物已保存至本地文件:\n \x1b[0meidt.js: \x1b[32m${path.resolve(docDistDirPath, 'edit.js')}\n   \x1b[0mrt.js: \x1b[32m${path.resolve(docDistDirPath, 'rt.js')}\n\x1b[0mrtCom.js: \x1b[32m${path.resolve(docDistDirPath, 'rtCom.js')}`);
   } else {
     console.log('开始上传物料中心...');
-    const { domain, userName } = onlineConfig;
+    const { domain, userName } = finalConfig;
     await axios({
       method: 'post',
       url: `${domain.endsWith('/') ? domain.slice(0, -1) : domain}/api/material/vsc/createComlib`,

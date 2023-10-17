@@ -39,7 +39,7 @@ async function getOnlineInfo ({configPath}) {
     });
   }
   if (!config.namespace) {
-    const namespace = await getInput('请输入组件库namespace（唯一标识）...');
+    const namespace = await getInput('请输入组件库namespace（唯一标识，用于组件库升级）...');
     config.namespace = namespace;
     pushNewObjectPropertys.push({
       key: 'namespace',
@@ -83,8 +83,56 @@ async function getOnlineInfo ({configPath}) {
   return config;
 }
 
+async function getDistInfo ({configPath}) {
+  const configCode = fs.readFileSync(configPath, 'utf-8');
+  const config = JSON.parse(configCode);
+  const pushNewObjectPropertys = [];
+  if (!config.namespace) {
+    const namespace = await getInput('请输入组件库namespace（唯一标识，用于组件库升级）...');
+    config.namespace = namespace;
+    pushNewObjectPropertys.push({
+      key: 'namespace',
+      value: namespace
+    });
+  }
+  if (!config.userName) {
+    if (!config.email) {
+      const userName = await getInput(`请输入组件库发布人名称（userName，发布至物料中心时用作平台账号）...`);
+      config.userName = userName;
+    } else {
+      config.userName = config.email;
+    }
+    pushNewObjectPropertys.push({
+      key: 'userName',
+      value: config.userName
+    });
+  }
+  if (!config.tags) {
+    config.tags = 'react';
+    pushNewObjectPropertys.push({
+      key: 'tags',
+      value: 'react'
+    });
+  }
+  if (pushNewObjectPropertys.length) {
+    const newConfig = {};
+    // TODO: 转ast是为了保证原JSON顺序不变
+    const ast = babelParser.parse(`(${configCode})`);
+    const properties = ast.program.body[0].expression.properties;
+    properties.forEach((propertie) => {
+      const key = propertie.key.value;
+      newConfig[key] = config[key];
+    });
+    pushNewObjectPropertys.forEach(({ key, value }) => {
+      newConfig[key] = value;
+    });
+    fs.writeJSONSync(configPath, newConfig, { spaces: 2 });
+  }
+}
+
 module.exports = {
   getOnlineInfo,
+  getDistInfo,
 
   getLessLoaders
 };
