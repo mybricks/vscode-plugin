@@ -137,13 +137,13 @@ async function build() {
     fse.writeFileSync(path.resolve(docDistDirPath, 'rtCom.js'), runtimeComponentsMapString, 'utf-8');
     
     const zip = new JSZip();
-    const userName = mybricksJson.userName;
+    const userName = finalConfig.userName;
     const time = new Date().getTime();
     zip.file('组件库.material@mybricks.json', JSON.stringify({
       type: "material",
       material: {
         name: packageJson.description,
-        namespace: mybricksJson.namespace,
+        namespace: finalConfig.namespace,
         // TODO: 这里是场景信息，不应该传1，和中心化一起改造
         scene: 1,
         type: 'com_lib',
@@ -194,7 +194,7 @@ async function build() {
         runtimeCode: fse.readFileSync(rtCodePath, 'utf-8'),
         runtimeComponentsMapCode: runtimeComponentsMapString,
         version: packageJson.version,
-        namespace: mybricksJson.namespace,
+        namespace: finalConfig.namespace,
         tags: ['vue2'],
         title: packageJson.description
       }
