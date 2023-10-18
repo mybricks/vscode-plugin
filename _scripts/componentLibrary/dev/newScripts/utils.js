@@ -128,6 +128,8 @@ async function getDistInfo ({configPath}) {
     });
     fs.writeJSONSync(configPath, newConfig, { spaces: 2 });
   }
+
+  return config;
 }
 
 module.exports = {
