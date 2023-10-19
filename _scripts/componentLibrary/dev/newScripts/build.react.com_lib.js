@@ -112,7 +112,10 @@ async function build() {
         name: packageJson.description,
         namespace: finalConfig.namespace,
         // TODO: 这里是场景信息，不应该传1，和中心化一起改造
-        scene: 1,
+        sceneInfo: {
+          title: 'PC中后台',
+          type: 'PC',
+        },
         type: 'com_lib',
         creatorName: userName,
         creatorId: userName,
