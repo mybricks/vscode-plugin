@@ -62,6 +62,11 @@ export default function MyDesigner () {
     type: "mobile",
     width: 375,
     height: 667,
+    theme: {
+      css: [
+        "https://f2.beckwai.com/udata/pkg/eshop/fangzhou/temp/editor.d5c483a324024fb6.css",
+      ]
+    }
   };
 
   const pcGeoView = {
