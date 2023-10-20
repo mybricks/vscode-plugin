@@ -92,7 +92,7 @@ async function build() {
 
   await Promise.all([
     new Promise((resolve, reject) => {
-      webpack(getWebpckConfig({ entry: { 'edit': editCodePath }, outputPath: compileProductFolderPath, externals: [externalsMap], postCssOptions: getPostCssOption(mybricksJson) }), (err, stats) => {
+      webpack(getWebpckConfig({ entry: { 'edit': editCodePath }, outputPath: compileProductFolderPath, externals: [externalsMap], postCssOptions: getPostCssOption({}) }), (err, stats) => {
         if (err || stats.hasErrors()) {
           console.error(err || stats.compilation.errors);
           reject(err || stats);
