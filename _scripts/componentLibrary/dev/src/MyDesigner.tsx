@@ -64,7 +64,7 @@ export default function MyDesigner () {
     height: 667,
     theme: {
       css: [
-        "https://f2.beckwai.com/udata/pkg/eshop/fangzhou/temp/editor.d5c483a324024fb6.css",
+        "./assets/editor.d5c483a324024fb6.css",
       ]
     }
   };
@@ -73,9 +73,9 @@ export default function MyDesigner () {
     scenes: true,
     theme: {
       css: [
-        "https://unpkg.com/element-plus/dist/index.css", 
-        "https://assets.mybricks.world/pkg/antd-4.21.6/antd.min.css",
-        "https://f2.beckwai.com/udata/pkg/eshop/fangzhou/temp/editor.d5c483a324024fb6.css",
+        "./assets/element-plus.index.css", 
+        "./assets/4.21.6.antd.min.css",
+        "./assets/editor.d5c483a324024fb6.css",
       ]
     }
   };
