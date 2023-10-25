@@ -6,5 +6,6 @@
   "componentType": "H5",
   "pxToVw": {},
   "title": "my_comlib",
-  "namespace": "my_comlib"
+  "namespace": "my_comlib",
+  "tags": "vue"
 }
