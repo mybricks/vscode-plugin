@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 const originOptions = {
   react: {
@@ -17,6 +17,7 @@ const originOptions = {
     //   }
     // }
   },
+  // [Mybricks Hack]
   react: {
     componentWrap: 'div',
     slotWrap: 'div',
@@ -57,6 +58,8 @@ const originOptions = {
   //     }
   //   }
   // },
+
+  // [Mybricks Hack]
   vue: {
     componentWrapHOC: (VueComponentMountAt, nativeProps = []) => {
       // 传入portals

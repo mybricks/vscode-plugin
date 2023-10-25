@@ -2,6 +2,7 @@ import React, {version} from 'react'
 import Vue from 'vue'
 
 import applyReactInVue from './applyReactInVue'
+import { applyReactScopeSlotInVue } from './applyReactScopeSlotInVue'
 import vueRootInfo from './vueRootInfo'
 import { reactRouterInfo, setReactRouterInVue, updateReactRouterInVue } from './applyReactRouterInVue'
 import globalOptions, {setOptions} from './options'
@@ -92,7 +93,7 @@ class VueComponentLoader extends React.Component {
       Portal: reactPortal,
       key
     })
-    this.setState({ portals })
+    this.setState({ portals: [...portals] })
   }
 
   removeReactPortal (reactPortal) {
@@ -106,7 +107,7 @@ class VueComponentLoader extends React.Component {
     })
     this.portalKeyPool.push(portalData.key)
     portals.splice(index, 1)
-    this.vueRef && this.setState({ portals })
+    this.vueRef && this.setState({ portals: [...portals] });
   }
 
   // 这一步变的复杂是要判断插槽和组件的区别，如果是插槽则对wrapper传入原生事件和插槽相关的属性，如果是组件对wrapper不传入原生事件
@@ -368,6 +369,10 @@ class VueComponentLoader extends React.Component {
                 if (scopedSlot.vueFunction) {
                   return scopedSlot.vueFunction.apply(this, args)
                 }
+                // [Mybricks Hack] 不缓存，缓存的话会出现scopeslot最新参数没更新的情况，setState的时候组件已经被卸载了，直接重写一个专门for插槽的方法
+                newSlot = applyReactScopeSlotInVue(createElement, () => scopedSlot.apply(this, args), options);
+                return newSlot;
+
                 // 使用单例模式进行缓存，类似getChildren
                 let newSlot
                 if (!this.getScopedSlots.__scopeSlots[i]?.child?.reactInstance) {

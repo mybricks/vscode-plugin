@@ -1,7 +1,7 @@
 import { applyVueInReact } from './src/vuereact-combined';
 
 // import { applyPureVueInReact } from './veaury'
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 // if (window.Vue && window.veaury && window.Vue.use === undefined) {
 //   window.__VueUseComponents = window.__VueUseComponents || [];
@@ -28,24 +28,6 @@ const SlotRender = ({ slots, name, params = {} }) => {
   );
 };
 
-// const useHasStringObj = (obj) => {
-
-//   const proxyObj = useMemo(() => {
-//     return new Proxy({}, {
-//       get(target, key) {
-//         if (key === 'toString') {
-//           return () => '_';
-//         }
-//         if (target.hasOwnProperty(key)) {
-//           return obj[key];
-//         }
-//         return obj[key];
-//       }
-//     });
-//   }, [obj]);
-
-//   return proxyObj;
-// };
 
 const useRawObject = (obj) => {
   return useMemo(() => {
@@ -56,6 +38,36 @@ const useRawObject = (obj) => {
       }
     }
     return rawObject;
+  }, [obj]);
+};
+
+/**
+ * 
+ * @description 目前引擎IO的代理不完整，当Vue使用setAttribute的时候会发生隐式调用，调用Symbol.toPrimitive 方法，必须包含
+ * @returns 
+ */
+const useValidProxy = (obj) => {
+  return useMemo(() => {
+    // if (!obj[Symbol.toPrimitive]) {
+    //   obj[Symbol.toPrimitive] = function() {return '{}';};
+    // }
+    // if (obj.toString) {
+    //   obj.toString = function() {return '{}';};
+    // }
+    return new Proxy({}, {
+      has(target, key) {
+        return key in obj;
+      },
+      ownKeys(target) {
+        return Reflect.ownKeys(obj);
+      },
+      get(target, key) {
+        if (key === Symbol.toPrimitive) {
+          return  function() {return '{}';};
+        }
+        return obj[key];
+      },
+    });
   }, [obj]);
 };
 
@@ -76,8 +88,8 @@ function VUEHoc(com) {
       }
     }
 
-    const inputsProxy = useRawObject(inputs);
-    const outputsProxy = useRawObject(outputs);
+    const inputsProxy = useValidProxy(inputs);
+    const outputsProxy = useValidProxy(outputs);
 
     const props = {
       id,
