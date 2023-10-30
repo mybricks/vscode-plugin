@@ -4,7 +4,8 @@ const axios = require('axios');
 const fse = require('fs-extra');
 const webpack = require('webpack');
 const WebpackBar = require('webpackbar');
-const { VueLoaderPlugin } = require('vue-loader')
+const { merge } = require('webpack-merge');
+const { VueLoaderPlugin } = require('vue-loader');
 const generateMybricksComponentLibraryCode = require('generate-mybricks-component-library-code');
 const { getOnlineInfo, getDistInfo, getLessLoaders } = require("../utils");
 const babelPluginAutoCssModules = require('../../scripts/babel-plugins/babel-plugin-auto-css-modules');
@@ -51,6 +52,7 @@ function getPostCssOption ({ pxToVw, pxToRem }) {
 };
 
 async function build() {
+  let webpackMergeConfig = getWebpackMergeConfig(docPath);
   let finalConfig;
   const isPublishToDist = publishType === 'dist';
   if (!isPublishToDist) {
@@ -92,7 +94,7 @@ async function build() {
 
   await Promise.all([
     new Promise((resolve, reject) => {
-      webpack(getWebpckConfig({ entry: { 'edit': editCodePath }, outputPath: compileProductFolderPath, externals: [externalsMap], postCssOptions: getPostCssOption({}) }), (err, stats) => {
+      webpack(getWebpckConfig({ entry: { 'edit': editCodePath }, outputPath: compileProductFolderPath, externals: [externalsMap], postCssOptions: getPostCssOption({}) }, webpackMergeConfig), (err, stats) => {
         if (err || stats.hasErrors()) {
           console.error(err || stats.compilation.errors);
           reject(err || stats);
@@ -105,7 +107,7 @@ async function build() {
         f[s.namespace] = s.runtime;
         return f;
       }, {});
-      webpack(getWebpckConfig({ entry: { 'rt': rtCodePath, ...entry }, outputPath: compileProductFolderPath, externals: [externalsMap], postCssOptions: getPostCssOption(mybricksJson) }), (err, stats) => {
+      webpack(getWebpckConfig({ entry: { 'rt': rtCodePath, ...entry }, outputPath: compileProductFolderPath, externals: [externalsMap], postCssOptions: getPostCssOption(mybricksJson) }, webpackMergeConfig), (err, stats) => {
         if (err || stats.hasErrors()) {
           console.error(err || stats.compilation.errors);
           reject(err || stats);
@@ -218,8 +220,8 @@ async function build() {
 
 build();
 
-function getWebpckConfig({ entry, outputPath, externals = [], postCssOptions }) {
-  return {
+function getWebpckConfig({ entry, outputPath, externals = [], postCssOptions }, webpackMergeConfig) {
+  return merge({
     mode: 'production',
     entry,
     output: {
@@ -326,5 +328,16 @@ function getWebpckConfig({ entry, outputPath, externals = [], postCssOptions }) 
       new WebpackBar(),
       new VueLoaderPlugin()
     ]
-  };
+  }, webpackMergeConfig);
+}
+
+function getWebpackMergeConfig (rootPath) {
+  let webpackConfig = {};
+  for (const webpackConfigFileName of ['webpack.config.prod.js', 'webpack.config.js']) {
+    try {
+      webpackConfig = require(path.resolve(rootPath, webpackConfigFileName));
+      break;
+    } catch {}
+  }
+  return webpackConfig;
 }

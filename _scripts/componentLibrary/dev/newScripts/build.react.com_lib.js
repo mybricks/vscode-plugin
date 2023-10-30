@@ -4,6 +4,7 @@ const axios = require('axios');
 const fse = require('fs-extra');
 const webpack = require('webpack');
 const WebpackBar = require('webpackbar');
+const { merge } = require('webpack-merge');
 const generateMybricksComponentLibraryCode = require('generate-mybricks-component-library-code');
 const { getOnlineInfo, getDistInfo } = require("../utils");
 // 组件库根目录
@@ -17,6 +18,7 @@ const mybricksJson = fse.readJSONSync(mybricksJsonPath);
 const packageJson = fse.readJSONSync(path.join(docPath, "./package.json"));
 
 async function build() {
+  let webpackMergeConfig = getWebpackMergeConfig(docPath);
   let finalConfig;
   const isPublishToDist = publishType === 'dist';
   if (!isPublishToDist) {
@@ -59,7 +61,7 @@ async function build() {
 
   await Promise.all([
     new Promise((resolve, reject) => {
-      webpack(getWebpckConfig({ entry: { 'edit': editCodePath }, outputPath: compileProductFolderPath, externals: [externalsMap] }), (err, stats) => {
+      webpack(getWebpckConfig({ entry: { 'edit': editCodePath }, outputPath: compileProductFolderPath, externals: [externalsMap] }, webpackMergeConfig), (err, stats) => {
         if (err || stats.hasErrors()) {
           console.error(err || stats.compilation.errors);
           reject(err || stats);
@@ -72,7 +74,7 @@ async function build() {
         f[s.namespace] = s.runtime;
         return f;
       }, {});
-      webpack(getWebpckConfig({ entry: { 'rt': rtCodePath, ...entry }, outputPath: compileProductFolderPath, externals: [externalsMap] }), (err, stats) => {
+      webpack(getWebpckConfig({ entry: { 'rt': rtCodePath, ...entry }, outputPath: compileProductFolderPath, externals: [externalsMap] }, webpackMergeConfig), (err, stats) => {
         if (err || stats.hasErrors()) {
           console.error(err || stats.compilation.errors);
           reject(err || stats);
@@ -185,8 +187,8 @@ async function build() {
 
 build();
 
-function getWebpckConfig({ entry, outputPath, externals = [] }) {
-  return {
+function getWebpckConfig({ entry, outputPath, externals = [] }, webpackMergeConfig) {
+  return merge({
     mode: 'production',
     entry,
     output: {
@@ -325,5 +327,16 @@ function getWebpckConfig({ entry, outputPath, externals = [] }) {
     plugins: [
       new WebpackBar(),
     ]
-  };
+  }, webpackMergeConfig);
+}
+
+function getWebpackMergeConfig (rootPath) {
+  let webpackConfig = {};
+  for (const webpackConfigFileName of ['webpack.config.prod.js', 'webpack.config.js']) {
+    try {
+      webpackConfig = require(path.resolve(rootPath, webpackConfigFileName));
+      break;
+    } catch {}
+  }
+  return webpackConfig;
 }

@@ -5,7 +5,7 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MybricksPluginConnectComlibApp = require("mybricks-plugin-connect-comlib-app");
 
-const { mybricksJsonPath } = process.env;
+const { mybricksJsonPath, docPath } = process.env;
 const outputPath = path.resolve(__dirname, "../../public");
 const config = fse.readJSONSync(mybricksJsonPath);
 const { externals, proxy = [] } = config;
@@ -64,6 +64,19 @@ defaultExternals.forEach(({name, library, urls}) => {
     externalUrlsHandle(urls);
   }
 });
+
+let webpackConfig = getWebpackConfig(docPath);
+
+function getWebpackConfig (rootPath) {
+  let webpackConfig = {};
+  for (const webpackConfigFileName of ['webpack.config.dev.js', 'webpack.config.js']) {
+    try {
+      webpackConfig = require(path.resolve(rootPath, webpackConfigFileName));
+      break;
+    } catch {}
+  }
+  return webpackConfig;
+}
 
 module.exports = {
   mode: "development",
@@ -255,7 +268,8 @@ module.exports = {
       'MYBRICKS_JSON': JSON.stringify(config),
     }),
     new MybricksPluginConnectComlibApp({
-      mybricksJsonPath
+      mybricksJsonPath,
+      webpackConfig
     })
   ]
 };
