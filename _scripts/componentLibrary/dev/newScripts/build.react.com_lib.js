@@ -18,7 +18,7 @@ const mybricksJson = fse.readJSONSync(mybricksJsonPath);
 const packageJson = fse.readJSONSync(path.join(docPath, "./package.json"));
 
 async function build() {
-  let webpackMergeConfig = getWebpackMergeConfig(docPath);
+  let webpackMergeConfig = getWebpackMergeConfig();
   let finalConfig;
   const isPublishToDist = publishType === 'dist';
   if (!isPublishToDist) {
@@ -330,13 +330,31 @@ function getWebpckConfig({ entry, outputPath, externals = [] }, webpackMergeConf
   }, webpackMergeConfig);
 }
 
-function getWebpackMergeConfig (rootPath) {
-  let webpackConfig = {};
-  for (const webpackConfigFileName of ['webpack.config.prod.js', 'webpack.config.js']) {
-    try {
-      webpackConfig = require(path.resolve(rootPath, webpackConfigFileName));
-      break;
-    } catch {}
+function getWebpackMergeConfig () {
+  let webpackMergeConfig;
+
+  const { webpackConfig } = mybricksJson;
+
+  if (webpackConfig) {
+    const typeWebpackConfig = Object.prototype.toString.call(webpackConfig);
+    if (typeWebpackConfig === '[object String]') {
+      try {
+        webpackMergeConfig = require(path.resolve(docPath, webpackConfig));
+      } catch {}
+    } else if (typeWebpackConfig === '[object Object]') {
+      try {
+        webpackMergeConfig = require(path.resolve(docPath, webpackConfig.prod));
+      } catch {}
+    }
   }
-  return webpackConfig;
+
+  if (!webpackMergeConfig) {
+    for (const webpackConfigFileName of ['webpack.config.prod.js', 'webpack.config.js']) {
+      try {
+        webpackMergeConfig = require(path.resolve(docPath, webpackConfigFileName));
+        break;
+      } catch {}
+    }
+  }
+  return webpackMergeConfig || {};
 }

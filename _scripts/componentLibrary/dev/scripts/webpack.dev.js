@@ -65,17 +65,35 @@ defaultExternals.forEach(({name, library, urls}) => {
   }
 });
 
-let webpackConfig = getWebpackConfig(docPath);
+let webpackMergeConfig = getWebpackMergeConfig();
 
-function getWebpackConfig (rootPath) {
-  let webpackConfig = {};
-  for (const webpackConfigFileName of ['webpack.config.dev.js', 'webpack.config.js']) {
-    try {
-      webpackConfig = require(path.resolve(rootPath, webpackConfigFileName));
-      break;
-    } catch {}
+function getWebpackMergeConfig () {
+  let webpackMergeConfig;
+
+  const { webpackConfig } = config;
+
+  if (webpackConfig) {
+    const typeWebpackConfig = Object.prototype.toString.call(webpackConfig);
+    if (typeWebpackConfig === '[object String]') {
+      try {
+        webpackMergeConfig = require(path.resolve(docPath, webpackConfig));
+      } catch {}
+    } else if (typeWebpackConfig === '[object Object]') {
+      try {
+        webpackMergeConfig = require(path.resolve(docPath, webpackConfig.dev));
+      } catch {}
+    }
   }
-  return webpackConfig;
+
+  if (!webpackMergeConfig) {
+    for (const webpackConfigFileName of ['webpack.config.dev.js', 'webpack.config.js']) {
+      try {
+        webpackMergeConfig = require(path.resolve(docPath, webpackConfigFileName));
+        break;
+      } catch {}
+    }
+  }
+  return webpackMergeConfig || {};
 }
 
 module.exports = {
@@ -269,7 +287,7 @@ module.exports = {
     }),
     new MybricksPluginConnectComlibApp({
       mybricksJsonPath,
-      webpackConfig
+      webpackConfig: webpackMergeConfig
     })
   ]
 };
