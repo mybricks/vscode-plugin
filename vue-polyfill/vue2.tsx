@@ -1,23 +1,6 @@
 import { applyVueInReact } from './src/vuereact-combined';
-
-// import { applyPureVueInReact } from './veaury'
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-// if (window.Vue && window.veaury && window.Vue.use === undefined) {
-//   window.__VueUseComponents = window.__VueUseComponents || [];
-//   window.Vue.use = function(com) {
-//     if (window.__VueUseComponents.indexOf(com) === -1) {
-//       window.__VueUseComponents.push(com);
-//       window.veaury.setVeauryOptions({
-//         beforeVueAppMount: function(app) {
-//           for (var i = 0; i < window.__VueUseComponents.length; i++) {
-//             app.use(window.__VueUseComponents[i]);
-//           }
-//         }
-//       });
-//     }
-//   };
-// }
 
 const SlotRender = ({ slots, name, params = {} }) => {
   const props = params?.m ? { ...(params ?? {}), ...(params?.m ?? {}) } : params;
@@ -28,18 +11,6 @@ const SlotRender = ({ slots, name, params = {} }) => {
   );
 };
 
-
-const useRawObject = (obj) => {
-  return useMemo(() => {
-    const rawObject = {};
-    for (const key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        rawObject[key] = obj[key];
-      }
-    }
-    return rawObject;
-  }, [obj]);
-};
 
 /**
  * 
@@ -114,3 +85,9 @@ function VUEHoc(com) {
 }
 
 (window as any).VUEHoc = VUEHoc;
+
+
+/** vue添加eventBus */
+if (window?.Vue) {
+  window.Vue.prototype.$eventBus = new window.Vue();
+}

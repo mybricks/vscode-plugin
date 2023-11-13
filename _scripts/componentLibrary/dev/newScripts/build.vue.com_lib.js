@@ -141,16 +141,22 @@ async function build() {
     const zip = new JSZip();
     const userName = finalConfig.userName;
     const time = new Date().getTime();
+
+    const sceneInfo = ['H5', 'KH5'].includes(mybricksJson?.componentType) ? {
+      title: 'H5',
+      type: 'H5',
+    } : {
+      title: 'PC中后台',
+      type: 'PC',
+    };
+
     zip.file('组件库.material@mybricks.json', JSON.stringify({
       type: "material",
       material: {
         name: packageJson.description,
         namespace: finalConfig.namespace,
         // TODO: 这里是场景信息，不应该传1，和中心化一起改造
-        sceneInfo: {
-          title: 'PC中后台',
-          type: 'PC',
-        },
+        sceneInfo,
         type: 'com_lib',
         creatorName: userName,
         creatorId: userName,

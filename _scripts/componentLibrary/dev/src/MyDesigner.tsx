@@ -173,7 +173,7 @@ export default function MyDesigner () {
           </div>
           <button className={css.primary} onClick={save}>保存</button>
           <button onClick={clear}>清空本地数据</button>
-          <button onClick={preview}>预览</button>
+          { !isH5 && <button onClick={preview}>预览</button> }
         </div>
         <div className={css.designer}>
           {
