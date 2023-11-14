@@ -9,6 +9,7 @@ import * as path from "path";
 import * as cp from "child_process";
 
 import { registerCommand, showInformationMessage } from "../../utils";
+import { configValidCheck, publishConfigValidCheck } from './../../utils/validCheck';
 
 const terminalName = "mybricks.publish.comlib";
 const isWindows = os.platform() === "win32";
@@ -34,6 +35,10 @@ export class PublishCommands {
 
   async start () {
     const config = await start();
+
+    configValidCheck(config);
+    publishConfigValidCheck(config);
+
     if (config) {
       const { configName, docPath, materialType, publishType } = config;
       let devTerminal = window.terminals.find(terminal => terminal.name === terminalName);

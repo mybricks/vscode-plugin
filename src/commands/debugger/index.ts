@@ -10,6 +10,7 @@ import {
   getWorkspaceFsPath,
   checkIsMybricksProject
 } from "../../utils";
+import { configValidCheck } from './../../utils/validCheck';
 
 const terminalName = "mybricks.dev.comlib";
 
@@ -71,6 +72,9 @@ export class DebuggerCommands {
       registerCommand("mybricks.debugger.start", () => {
         if (this.status === "dev") {
           start().then((res) => {
+
+            configValidCheck(res);
+
             this.status = "check";
             vscode.commands.executeCommand("mybricks.debugger.check");
             // vscode.commands.executeCommand("mybricks.debugger.debug");

@@ -62,6 +62,15 @@ async function build() {
     console.log('保存至本地dist文件夹');
     finalConfig = await getDistInfo({configPath: mybricksJsonPath});
   }
+
+  const sceneInfo = ['H5', 'KH5'].includes(mybricksJson?.componentType) ? {
+    title: 'H5',
+    type: 'H5',
+  } : {
+    title: 'PC中后台',
+    type: 'PC',
+  };
+  
   const { editCode, runtimeCode, components } = generateMybricksComponentLibraryCode(
     {
       id: packageJson.name,
@@ -142,14 +151,6 @@ async function build() {
     const userName = finalConfig.userName;
     const time = new Date().getTime();
 
-    const sceneInfo = ['H5', 'KH5'].includes(mybricksJson?.componentType) ? {
-      title: 'H5',
-      type: 'H5',
-    } : {
-      title: 'PC中后台',
-      type: 'PC',
-    };
-
     zip.file('组件库.material@mybricks.json', JSON.stringify({
       type: "material",
       material: {
@@ -206,6 +207,7 @@ async function build() {
         runtimeComponentsMapCode: runtimeComponentsMapString,
         version: packageJson.version,
         namespace: finalConfig.namespace,
+        scene: sceneInfo,
         tags: ['vue2'],
         title: packageJson.description
       }
@@ -216,7 +218,11 @@ async function build() {
         console.error(`发布失败: ${message}`);
       }
     }).catch((err) => {
-      console.error(`发布失败: ${err.message}`);
+      if (err?.response?.data?.statusCode === 404) {
+        console.error(`发布失败: ${err.message}，请检查平台是否正常安装物料中心`);
+      } else {
+        console.error(`发布失败: ${err.message}，请检查是否能正常访问 ${domain}`);
+      }
     });
   }
 
