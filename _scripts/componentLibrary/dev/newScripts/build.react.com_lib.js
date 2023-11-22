@@ -71,8 +71,9 @@ async function build() {
 
   const componentsEntry = {};
   const componentFileMap = {};
+  const deps = [];
   components.forEach((component) => {
-    const { namespace, ...other } = component;
+    const { namespace, version, ...other } = component;
     const fileMap = componentFileMap[namespace] = {};
     Object.entries(other).forEach(([key, value]) => {
       if (typeof value === 'string' && fse.existsSync(value)) {
@@ -80,6 +81,7 @@ async function build() {
         fileMap[key] = true;
       }
     });
+    deps.push({namespace, version});
   });
 
   /** TODO: 后续单组件的runtime需要打两份，一份编辑时的，一份runtime，如果需要类似px转vw的能力 */
@@ -210,7 +212,7 @@ async function build() {
       await publishToCentral({
         sceneType: sceneInfo.type,
         name: packageJson.description,
-        content: JSON.stringify({ editJs, rtJs, coms }),
+        content: JSON.stringify({ editJs, rtJs, coms, deps }),
         tags: ['react'],
         namespace: finalConfig.namespace,
         version: packageJson.version,
