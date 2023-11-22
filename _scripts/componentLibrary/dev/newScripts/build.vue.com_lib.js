@@ -151,7 +151,7 @@ async function build() {
     };
     Object.entries(other).forEach(([key, value]) => {
       if (fileMap[key]) {
-        const code = fse.readFileSync(path.resolve(compileProductFolderPath, `${namespace}-${key}.js`), 'utf-8');
+        const code = `${fse.readFileSync(path.resolve(compileProductFolderPath, `${namespace}-${key}.js`), 'utf-8')} return MybricksComDef.default;`;
         if (key === 'editors') {
           componentInfo[key] = encodeURIComponent(`(function(){return function(){${code}}})()`);
         } else {
