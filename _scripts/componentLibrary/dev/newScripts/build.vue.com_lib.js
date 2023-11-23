@@ -151,9 +151,9 @@ async function build() {
     };
     Object.entries(other).forEach(([key, value]) => {
       if (fileMap[key]) {
-        const code = `${fse.readFileSync(path.resolve(compileProductFolderPath, `${namespace}-${key}.js`), 'utf-8')} return MybricksComDef.default;`;
+        const code = fse.readFileSync(path.resolve(compileProductFolderPath, `${namespace}-${key}.js`), 'utf-8');
         if (key === 'editors') {
-          componentInfo[key] = encodeURIComponent(`(function(){return function(){${code}}})()`);
+          componentInfo[key] = encodeURIComponent(`(function(){return function(){${code} return MybricksComDef.default;}})()`);
         } else {
           if (key === 'runtime') {
             runtimeComponentsMap[`${namespace}@${version}`] = {
@@ -161,7 +161,7 @@ async function build() {
               version
             };
           }
-          componentInfo[key] = encodeURIComponent(`(function(){${code}})()`);
+          componentInfo[key] = encodeURIComponent(`(function(){${code} return MybricksComDef.default;})()`);
         }
       } else {
         componentInfo[key] = value;
