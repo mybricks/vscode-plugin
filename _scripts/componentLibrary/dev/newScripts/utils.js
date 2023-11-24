@@ -26,6 +26,44 @@ function getInput(prompt) {
   });
 }
 
+// 获取发布至中心化所需的数据
+async function getCentralInfo ({configPath}) {
+  const configCode = fs.readFileSync(configPath, 'utf-8');
+  const config = JSON.parse(configCode);
+  const pushNewObjectPropertys = [];
+  if (!config.namespace) {
+    const namespace = await getInput('请输入组件库namespace（唯一标识，用于组件库升级）...');
+    config.namespace = namespace;
+    pushNewObjectPropertys.push({
+      key: 'namespace',
+      value: namespace
+    });
+  }
+  if (!config.tags) {
+    config.tags = 'react';
+    pushNewObjectPropertys.push({
+      key: 'tags',
+      value: 'react'
+    });
+  }
+  if (pushNewObjectPropertys.length) {
+    const newConfig = {};
+    // TODO: 转ast是为了保证原JSON顺序不变
+    const ast = babelParser.parse(`(${configCode})`);
+    const properties = ast.program.body[0].expression.properties;
+    properties.forEach((propertie) => {
+      const key = propertie.key.value;
+      newConfig[key] = config[key];
+    });
+    pushNewObjectPropertys.forEach(({ key, value }) => {
+      newConfig[key] = value;
+    });
+    fs.writeJSONSync(configPath, newConfig, { spaces: 2 });
+  }
+
+  return config;
+}
+
 // 获取发布至物料中心所需的数据
 async function getOnlineInfo ({configPath}) {
   const configCode = fs.readFileSync(configPath, 'utf-8');
@@ -216,6 +254,7 @@ async function publishToCentral({
 }
 
 module.exports = {
+  getCentralInfo,
   getOnlineInfo,
   getDistInfo,
 

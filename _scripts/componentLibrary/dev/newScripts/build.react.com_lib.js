@@ -6,7 +6,7 @@ const webpack = require('webpack');
 const WebpackBar = require('webpackbar');
 const { merge } = require('webpack-merge');
 const generateMybricksComponentLibraryCode = require('generate-mybricks-component-library-code');
-const { getOnlineInfo, getDistInfo, getCurrentTimeYYYYMMDDHHhhmmss, uploadToOSS, publishToCentral } = require("../utils");
+const { getOnlineInfo, getDistInfo, getCentralInfo, getCurrentTimeYYYYMMDDHHhhmmss, uploadToOSS, publishToCentral } = require("../utils");
 // 组件库根目录
 const docPath = '--replace-docPath--';
 // 配置文件
@@ -22,8 +22,11 @@ async function build() {
   let finalConfig;
   const isPublishToDist = publishType === 'dist';
   const isPublishToCentral = publishType === 'central';
-  if (!isPublishToDist) {
-    console.log(isPublishToCentral ? '发布至中心化' : '发布至物料中心');
+  if (isPublishToCentral) {
+    console.log("发布至中心化");
+    finalConfig = await getCentralInfo({configPath: mybricksJsonPath});
+  } else if (!isPublishToDist) {
+    console.log("发布至物料中心");
     finalConfig = await getOnlineInfo({configPath: mybricksJsonPath});
   } else {
     console.log('保存至本地dist文件夹');
@@ -412,11 +415,7 @@ function getWebpckConfig({ entry, outputPath, externals = [] }, webpackMergeConf
           test: /\.(gif|png|jpe?g|webp|svg|woff|woff2|eot|ttf)$/i,
           use: [
             {
-              loader: 'url-loader',
-              options: {
-                limit: 1024 * 2,
-                name: 'img_[name]_[contenthash:4].[ext]'
-              }
+              loader: 'url-loader'
             }
           ]
         },
