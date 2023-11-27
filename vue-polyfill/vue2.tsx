@@ -61,11 +61,12 @@ function VUEHoc(com) {
 
     const inputsProxy = useValidProxy(inputs);
     const outputsProxy = useValidProxy(outputs);
+    const envProxy = useValidProxy(env);
 
     const props = {
       id,
       title,
-      env,
+      env: envProxy,
       _env,
       logger,
       data: data,
