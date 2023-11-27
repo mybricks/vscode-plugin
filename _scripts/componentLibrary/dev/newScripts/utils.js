@@ -1,5 +1,7 @@
 const fs = require('fs-extra');
+const axios = require('axios');
 const babelParser = require("@babel/parser");
+const FormData = require('form-data');
 
 // @babel/parser 处理js字符串，使用@babel/generator转回，如何保证换行和空格都不被改变？
 
@@ -22,6 +24,44 @@ function getInput(prompt) {
       }
     });
   });
+}
+
+// 获取发布至中心化所需的数据
+async function getCentralInfo ({configPath}) {
+  const configCode = fs.readFileSync(configPath, 'utf-8');
+  const config = JSON.parse(configCode);
+  const pushNewObjectPropertys = [];
+  if (!config.namespace) {
+    const namespace = await getInput('请输入组件库namespace（唯一标识，用于组件库升级）...');
+    config.namespace = namespace;
+    pushNewObjectPropertys.push({
+      key: 'namespace',
+      value: namespace
+    });
+  }
+  if (!config.tags) {
+    config.tags = 'react';
+    pushNewObjectPropertys.push({
+      key: 'tags',
+      value: 'react'
+    });
+  }
+  if (pushNewObjectPropertys.length) {
+    const newConfig = {};
+    // TODO: 转ast是为了保证原JSON顺序不变
+    const ast = babelParser.parse(`(${configCode})`);
+    const properties = ast.program.body[0].expression.properties;
+    properties.forEach((propertie) => {
+      const key = propertie.key.value;
+      newConfig[key] = config[key];
+    });
+    pushNewObjectPropertys.forEach(({ key, value }) => {
+      newConfig[key] = value;
+    });
+    fs.writeJSONSync(configPath, newConfig, { spaces: 2 });
+  }
+
+  return config;
 }
 
 // 获取发布至物料中心所需的数据
@@ -132,11 +172,96 @@ async function getDistInfo ({configPath}) {
   return config;
 }
 
+function getCurrentTimeYYYYMMDDHHhhmmss() {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  const formattedDate = `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
+
+  return formattedDate;
+}
+
+async function uploadToOSS({content, folderPath, fileName, noHash}) {
+  const blob = new Buffer.from(content);
+  const formData = new FormData();
+  formData.append('file', blob, fileName);
+  formData.append('fileName', fileName);
+  formData.append('folderPath', folderPath);
+  formData.append('noHash', JSON.stringify(noHash));
+  
+  try {
+    const res = await axios.post('https://my.mybricks.world/paas/api/oss/uploadFile', formData);
+    const { code, data } = res.data;
+    if (code === 1) {
+      return data.url;
+    } else {
+      throw new Error(res);
+    }
+  } catch (err) {
+    throw new Error(err);
+  }
+}
+
+// const domain = 'http://localhost:4100/central/api';
+const domain = 'https://my.mybricks.world/central/api';
+
+async function publishToCentral({
+  sceneType, // PC
+  name,
+  content,
+  tags, // ['react']
+  namespace,
+  version,
+  description,
+  type, // com_lib
+  icon,
+  previewImg,
+  creatorName,
+  creatorId
+}) {
+  try {
+    const res = await axios({
+      method: 'post',
+      url: domain + '/channel/gateway',
+      data: {
+        action: 'material_publishVersion',
+        payload: {
+          namespace,
+          version,
+          description,
+          type,
+          icon,
+          scene_type: sceneType,
+          name,
+          content,
+          tags,
+          preview_img: previewImg,
+          creator_name: creatorName,
+          creator_id: creatorId,
+        }
+      }
+    });
+
+    console.log(`${namespace}@${version}: `, res.data);
+  } catch (err) {
+    throw new Error(err);
+  }
+}
+
 module.exports = {
+  getCentralInfo,
   getOnlineInfo,
   getDistInfo,
 
-  getLessLoaders
+  getLessLoaders,
+  getCurrentTimeYYYYMMDDHHhhmmss,
+  uploadToOSS,
+  publishToCentral
 };
 
 

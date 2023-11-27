@@ -80,6 +80,15 @@ async function start2() {
 
     return (input: MultiStepInput) => pickPublishType(input, state);
   }
+
+  const publishTypeitems = [
+    {label: "组件库产物保存至本地dist文件夹内", value: "dist"},
+    {label: "发布至物料中心，需在配置文件内正确配置平台地址（domain）", value: "material"}
+  ];
+
+  if ((vscode.workspace.getConfiguration("mybricks").get("components.publishConfig") as any).toCentral === "08edac515e841c3222ba352fe8e32403b258316b0c10ae6e45f754d5bb5b5034") {
+    publishTypeitems.push({label: "发布至中心化服务（内部使用，非必要不外传）", value: "central"});
+  }
   
   async function pickPublishType(input: MultiStepInput, state: Partial<State>) {
     state.publishType = await input.showQuickPick<MyQuickPickItem, QuickPickParameters<MyQuickPickItem>>({ // TODO:类型是否合适
@@ -87,10 +96,7 @@ async function start2() {
 			step: 2,
 			totalSteps: 2,
 			placeholder: '请选择发布方式',
-			items: [
-        {label: "组件库产物保存至本地dist文件夹内", value: "dist"},
-        {label: "发布至物料中心，需在配置文件内正确配置平台地址（domain）", value: "material"}
-      ],
+			items: publishTypeitems,
 			// activeItem: state.publishType.value,
 			shouldResume: shouldResume
 		});

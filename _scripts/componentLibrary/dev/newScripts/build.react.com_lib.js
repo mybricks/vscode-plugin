@@ -6,7 +6,7 @@ const webpack = require('webpack');
 const WebpackBar = require('webpackbar');
 const { merge } = require('webpack-merge');
 const generateMybricksComponentLibraryCode = require('generate-mybricks-component-library-code');
-const { getOnlineInfo, getDistInfo } = require("../utils");
+const { getOnlineInfo, getDistInfo, getCentralInfo, getCurrentTimeYYYYMMDDHHhhmmss, uploadToOSS, publishToCentral } = require("../utils");
 // 组件库根目录
 const docPath = '--replace-docPath--';
 // 配置文件
@@ -21,8 +21,12 @@ async function build() {
   let webpackMergeConfig = getWebpackMergeConfig();
   let finalConfig;
   const isPublishToDist = publishType === 'dist';
-  if (!isPublishToDist) {
-    console.log('发布至物料中心');
+  const isPublishToCentral = publishType === 'central';
+  if (isPublishToCentral) {
+    console.log("发布至中心化");
+    finalConfig = await getCentralInfo({configPath: mybricksJsonPath});
+  } else if (!isPublishToDist) {
+    console.log("发布至物料中心");
     finalConfig = await getOnlineInfo({configPath: mybricksJsonPath});
   } else {
     console.log('保存至本地dist文件夹');
@@ -68,9 +72,26 @@ async function build() {
   const rtCodePath = path.resolve(compileProductFolderPath, 'rt.js');
   fse.writeFileSync(rtCodePath, runtimeCode, 'utf-8');
 
+  const componentsEntry = {};
+  const componentFileMap = {};
+  const deps = [];
+  components.forEach((component) => {
+    const { namespace, version, ...other } = component;
+    const fileMap = componentFileMap[namespace] = {};
+    Object.entries(other).forEach(([key, value]) => {
+      if (typeof value === 'string' && fse.existsSync(value)) {
+        componentsEntry[`${namespace}-${key}`] = value;
+        fileMap[key] = true;
+      }
+    });
+    deps.push({namespace, version});
+  });
+
+  /** TODO: 后续单组件的runtime需要打两份，一份编辑时的，一份runtime，如果需要类似px转vw的能力 */
+
   await Promise.all([
     new Promise((resolve, reject) => {
-      webpack(getWebpckConfig({ entry: { 'edit': editCodePath }, outputPath: compileProductFolderPath, externals: [externalsMap] }, webpackMergeConfig), (err, stats) => {
+      webpack(getWebpckConfig({ entry: { edit: editCodePath, ...componentsEntry}, outputPath: compileProductFolderPath, externals: [externalsMap] }, webpackMergeConfig), (err, stats) => {
         if (err || stats.hasErrors()) {
           console.error(err || stats.compilation.errors);
           reject(err || stats);
@@ -79,11 +100,7 @@ async function build() {
       });
     }),
     new Promise((resolve, reject) => {
-      const entry = components.reduce((f, s) => {
-        f[s.namespace] = s.runtime;
-        return f;
-      }, {});
-      webpack(getWebpckConfig({ entry: { 'rt': rtCodePath, ...entry }, outputPath: compileProductFolderPath, externals: [externalsMap] }, webpackMergeConfig), (err, stats) => {
+      webpack(getWebpckConfig({ entry: { 'rt': rtCodePath }, outputPath: compileProductFolderPath, externals: [externalsMap] }, webpackMergeConfig), (err, stats) => {
         if (err || stats.hasErrors()) {
           console.error(err || stats.compilation.errors);
           reject(err || stats);
@@ -93,16 +110,34 @@ async function build() {
     })
   ]);
 
+  const componentsArray = [];
   const runtimeComponentsMap = {};
-  components.forEach(({ version, namespace }) => {
-    const componentJsPath = path.resolve(compileProductFolderPath, `${namespace}.js`);
-    runtimeComponentsMap[`${namespace}@${version}`] = {
-      runtime: encodeURIComponent(fse.readFileSync(componentJsPath, 'utf-8')),
+  components.forEach((component) => {
+    const { namespace, version, ...other } = component;
+    const fileMap = componentFileMap[namespace];
+    const componentInfo = {
+      namespace,
       version
     };
-    if (isPublishToDist) {
-      fse.unlinkSync(componentJsPath);
-    }
+    Object.entries(other).forEach(([key, value]) => {
+      if (fileMap[key]) {
+        const code = fse.readFileSync(path.resolve(compileProductFolderPath, `${namespace}-${key}.js`), 'utf-8');
+        if (key === 'editors') {
+          componentInfo[key] = encodeURIComponent(`(function(){return function(){${code} return MybricksComDef.default;}})()`);
+        } else {
+          if (key === 'runtime') {
+            runtimeComponentsMap[`${namespace}@${version}`] = {
+              runtime: encodeURIComponent(code),
+              version
+            };
+          }
+          componentInfo[key] = encodeURIComponent(`(function(){${code} return MybricksComDef.default;})()`);
+        }
+      } else {
+        componentInfo[key] = value;
+      }
+    });
+    componentsArray.push(componentInfo);
   });
   const runtimeComponentsMapString = JSON.stringify(runtimeComponentsMap);
 
@@ -162,35 +197,99 @@ async function build() {
     fse.writeFileSync(path.resolve(docDistDirPath, '物料.zip'), content, 'utf-8');
     console.log(`\x1b[0m编译产物已保存至本地文件:\n \x1b[0meidt.js: \x1b[32m${path.resolve(docDistDirPath, 'edit.js')}\n   \x1b[0mrt.js: \x1b[32m${path.resolve(docDistDirPath, 'rt.js')}\n\x1b[0mrtCom.js: \x1b[32m${path.resolve(docDistDirPath, 'rtCom.js')}`);
   } else {
-    console.log('开始上传物料中心...');
     const { domain, userName } = finalConfig;
-    await axios({
-      method: 'post',
-      url: `${domain.endsWith('/') ? domain.slice(0, -1) : domain}/api/material/vsc/createComlib`,
-      data: {
-        userId: userName,
-        editCode: fse.readFileSync(editCodePath, 'utf-8'),
-        runtimeCode: fse.readFileSync(rtCodePath, 'utf-8'),
-        runtimeComponentsMapCode: runtimeComponentsMapString,
-        version: packageJson.version,
-        namespace: finalConfig.namespace,
-        scene: sceneInfo,
+
+    if (isPublishToCentral) {
+      console.log('开始上传中心化...');
+      console.log("上传edit.js、rt.js、rtCom.js...");
+      const time = getCurrentTimeYYYYMMDDHHhhmmss();
+      const [editJs, rtJs, coms] = await Promise.all([
+        await uploadToOSS({content: fse.readFileSync(editCodePath, 'utf-8'), folderPath: `comlibs/${finalConfig.namespace}/${packageJson.version}/${time}`, fileName: 'edit.js', noHash: true}),
+        await uploadToOSS({content: fse.readFileSync(rtCodePath, 'utf-8'), folderPath: `comlibs/${finalConfig.namespace}/${packageJson.version}/${time}`, fileName: 'rt.js', noHash: true}),
+        await uploadToOSS({content: runtimeComponentsMapString, folderPath: `comlibs/${finalConfig.namespace}/${packageJson.version}/${time}`, fileName: 'rtCom.js', noHash: true})
+      ]);
+
+      console.log("组件库资源地址: ", { editJs, rtJs, coms });
+
+      // 上传组件库
+      await publishToCentral({
+        sceneType: sceneInfo.type,
+        name: packageJson.description,
+        content: JSON.stringify({ editJs, rtJs, coms, deps }),
         tags: ['react'],
-        title: packageJson.description
+        namespace: finalConfig.namespace,
+        version: packageJson.version,
+        // description,
+        type: 'com_lib',
+        // icon,
+        // previewImg,
+        creatorName: 'Mybricks',
+        creatorId: 'Mybricks'
+      });
+
+      const chunkSize = 5;
+      const chunks = [];
+
+      for (let i = 0; i < componentsArray.length; i += chunkSize) {
+        chunks.push(componentsArray.slice(i, i + chunkSize));
       }
-    }).then(({data: { code, data, message }}) => {
-      if (code === 1) {
-        console.log('发布成功: ', JSON.stringify(data, null, 2));
-      } else {
-        console.error(`发布失败: ${message}`);
+
+      async function uploadChunks(chunks) {
+        const chunk = chunks.pop();
+        if (chunk) {
+          await Promise.all(chunk.map(async (content) => {
+            await publishToCentral({
+              sceneType: sceneInfo.type,
+              name: content.title,
+              content: JSON.stringify(content),
+              tags: ['react'],
+              namespace: content.namespace,
+              version: content.version,
+              description: content.description,
+              type: 'component',
+              icon: content.icon,
+              previewImg: content.preview,
+              creatorName: 'Mybricks',
+              creatorId: 'Mybricks'
+            });
+          }));
+          await uploadChunks(chunks);
+        }
       }
-    }).catch((err) => {
-      if (err?.response?.data?.statusCode === 404) {
-        console.error(`发布失败: ${err.message}，请检查平台是否正常安装物料中心`);
-      } else {
-        console.error(`发布失败: ${err.message}，请检查是否能正常访问 ${domain}`);
-      }
-    });
+
+      await uploadChunks(chunks);
+
+      console.log("全部上传完成");
+    } else {
+      console.log('开始上传物料中心...');
+      await axios({
+        method: 'post',
+        url: `${domain.endsWith('/') ? domain.slice(0, -1) : domain}/api/material/vsc/createComlib`,
+        data: {
+          userId: userName,
+          editCode: fse.readFileSync(editCodePath, 'utf-8'),
+          runtimeCode: fse.readFileSync(rtCodePath, 'utf-8'),
+          runtimeComponentsMapCode: runtimeComponentsMapString,
+          version: packageJson.version,
+          namespace: finalConfig.namespace,
+          scene: sceneInfo,
+          tags: ['react'],
+          title: packageJson.description
+        }
+      }).then(({data: { code, data, message }}) => {
+        if (code === 1) {
+          console.log('发布成功: ', JSON.stringify(data, null, 2));
+        } else {
+          console.error(`发布失败: ${message}`);
+        }
+      }).catch((err) => {
+        if (err?.response?.data?.statusCode === 404) {
+          console.error(`发布失败: ${err.message}，请检查平台是否正常安装物料中心`);
+        } else {
+          console.error(`发布失败: ${err.message}，请检查是否能正常访问 ${domain}`);
+        }
+      });
+    }
   }
 
   fse.remove(__filename);
@@ -223,10 +322,8 @@ function getWebpckConfig({ entry, outputPath, externals = [] }, webpackMergeConf
               loader: 'babel-loader',
               options: {
                 presets: [
+                  '@babel/preset-env',
                   '@babel/preset-react'
-                ],
-                plugins: [
-                  ['@babel/plugin-proposal-class-properties', {'loose': true}]
                 ],
                 cacheDirectory: true
               }
@@ -318,11 +415,7 @@ function getWebpckConfig({ entry, outputPath, externals = [] }, webpackMergeConf
           test: /\.(gif|png|jpe?g|webp|svg|woff|woff2|eot|ttf)$/i,
           use: [
             {
-              loader: 'url-loader',
-              options: {
-                limit: 1024 * 2,
-                name: 'img_[name]_[contenthash:4].[ext]'
-              }
+              loader: 'url-loader'
             }
           ]
         },
