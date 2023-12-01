@@ -7,7 +7,7 @@ const WebpackBar = require('webpackbar');
 const { merge } = require('webpack-merge');
 const { VueLoaderPlugin } = require('vue-loader');
 const generateMybricksComponentLibraryCode = require('generate-mybricks-component-library-code');
-const { getOnlineInfo, getDistInfo, getCentralInfo, getCurrentTimeYYYYMMDDHHhhmmss, uploadToOSS, publishToCentral } = require("../utils");
+const { getOnlineInfo, getDistInfo, getCentralInfo, getCurrentTimeYYYYMMDDHHhhmmss, uploadToOSS, publishToCentral, getLessLoaders } = require("../utils");
 const babelPluginAutoCssModules = require('../../scripts/babel-plugins/babel-plugin-auto-css-modules');
 // 组件库根目录
 const docPath = '--replace-docPath--';
