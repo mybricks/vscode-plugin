@@ -27,6 +27,17 @@ export default function MyDesigner () {
   }, []);
 
   useMemo(() => {
+    if (isH5 && Array.isArray(MYBRICKS_JSON?.comlibs)) { // 临时在H5调试中添加H5基础组件库
+      const scriptEle = document.createElement('script');
+      scriptEle.src = '/assets/comlibs/mybricks.normal-h5-comlib.vue/0.0.14/edit.js';
+
+      document.body.appendChild(scriptEle);
+
+      scriptEle.onload = () => {
+        (window as any).mybricks.SPADesigner && setSPADesigner((window as any).mybricks.SPADesigner);
+      };
+      return;
+    }
 		(window as any).mybricks.SPADesigner && setSPADesigner((window as any).mybricks.SPADesigner);
 	}, []);
 
@@ -62,9 +73,10 @@ export default function MyDesigner () {
     type: "mobile",
     width: 375,
     height: 667,
+    scenes: true,
     theme: {
       css: [
-        "./assets/editor.d5c483a324024fb6.css",
+        "./assets/editor-h5-reset.css",
       ]
     }
   };

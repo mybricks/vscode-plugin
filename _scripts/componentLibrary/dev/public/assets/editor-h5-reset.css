@@ -1,0 +1,79 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
+a,
+blockquote,
+body,
+button,
+dd,
+div,
+dl,
+dt,
+fieldset,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+hr,
+input,
+legend,
+li,
+ol,
+p,
+pre,
+td,
+textarea,
+th,
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+body,
+button,
+input,
+select,
+textarea {
+  font: system-ui, -apple-system, BlinkMacSystemFont, 'PingFang SC', miui,
+    Roboto, Helvetica Neue, Helvetica, sans-serif;
+}
+
+button,
+input,
+optgroup,
+option,
+select,
+textarea {
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box;
+  font: inherit;
+  background: 0 0;
+  border: 0;
+  outline: 0;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+a {
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-touch-callout: none;
+}
+
+ol,
+ul {
+  list-style: none;
+}
