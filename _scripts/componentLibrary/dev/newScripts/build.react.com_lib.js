@@ -79,7 +79,14 @@ async function build() {
     const { namespace, version, ...other } = component;
     const fileMap = componentFileMap[namespace] = {};
     Object.entries(other).forEach(([key, value]) => {
-      if (typeof value === 'string' && fse.existsSync(value)) {
+      if (key === 'target') {
+        Object.entries(value).forEach(([targetKey, value]) => {
+          if (fse.existsSync(value)) {
+            componentsEntry[`${namespace}-${key}-${targetKey}`] = value;
+            fileMap[key] = true;
+          }
+        });
+      } else if (typeof value === 'string' && fse.existsSync(value)) {
         componentsEntry[`${namespace}-${key}`] = value;
         fileMap[key] = true;
       }
@@ -121,17 +128,25 @@ async function build() {
     };
     Object.entries(other).forEach(([key, value]) => {
       if (fileMap[key]) {
-        const code = fse.readFileSync(path.resolve(compileProductFolderPath, `${namespace}-${key}.js`), 'utf-8');
-        if (key === 'editors') {
-          componentInfo[key] = encodeURIComponent(`(function(){return function(){${code} return MybricksComDef.default;}})()`);
+        if (key === 'target') {
+          const target = {};
+          Object.keys(value).forEach((targetKey) => {
+            target[targetKey] = encodeURIComponent(`(function(){${fse.readFileSync(path.resolve(compileProductFolderPath, `${namespace}-${key}-${targetKey}.js`), 'utf-8')} return MybricksComDef.default;})()`);
+          });
+          componentInfo[key] = target;
         } else {
-          if (key === 'runtime') {
-            runtimeComponentsMap[`${namespace}@${version}`] = {
-              runtime: encodeURIComponent(code),
-              version
-            };
+          const code = fse.readFileSync(path.resolve(compileProductFolderPath, `${namespace}-${key}.js`), 'utf-8');
+          if (key === 'editors') {
+            componentInfo[key] = encodeURIComponent(`(function(){return function(){${code} return MybricksComDef.default;}})()`);
+          } else {
+            if (key === 'runtime') {
+              runtimeComponentsMap[`${namespace}@${version}`] = {
+                runtime: encodeURIComponent(code),
+                version
+              };
+            }
+            componentInfo[key] = encodeURIComponent(`(function(){${code} return MybricksComDef.default;})()`);
           }
-          componentInfo[key] = encodeURIComponent(`(function(){${code} return MybricksComDef.default;})()`);
         }
       } else {
         componentInfo[key] = value;
