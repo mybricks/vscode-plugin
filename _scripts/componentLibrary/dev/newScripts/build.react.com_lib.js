@@ -226,23 +226,7 @@ async function build() {
 
       console.log("组件库资源地址: ", { editJs, rtJs, coms });
 
-      // 上传组件库
-      await publishToCentral({
-        sceneType: sceneInfo.type,
-        name: packageJson.description,
-        content: JSON.stringify({ editJs, rtJs, coms, deps }),
-        tags: ['react'],
-        namespace: finalConfig.namespace,
-        version: packageJson.version,
-        // description,
-        type: 'com_lib',
-        // icon,
-        // previewImg,
-        creatorName: 'Mybricks',
-        creatorId: 'Mybricks'
-      });
-
-      const chunkSize = 5;
+      const chunkSize = 3;
       const chunks = [];
 
       for (let i = 0; i < componentsArray.length; i += chunkSize) {
@@ -273,6 +257,22 @@ async function build() {
       }
 
       await uploadChunks(chunks);
+
+      // 上传组件库
+      await publishToCentral({
+        sceneType: sceneInfo.type,
+        name: packageJson.description,
+        content: JSON.stringify({ editJs, rtJs, coms, deps }),
+        tags: ['react'],
+        namespace: finalConfig.namespace,
+        version: packageJson.version,
+        // description,
+        type: 'com_lib',
+        // icon,
+        // previewImg,
+        creatorName: 'Mybricks',
+        creatorId: 'Mybricks'
+      });
 
       console.log("全部上传完成");
     } else {
