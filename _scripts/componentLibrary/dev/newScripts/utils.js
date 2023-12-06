@@ -135,18 +135,18 @@ async function getDistInfo ({configPath}) {
       value: namespace
     });
   }
-  if (!config.userName) {
-    if (!config.email) {
-      const userName = await getInput(`请输入组件库发布人名称（userName，发布至物料中心时用作平台账号）...`);
-      config.userName = userName;
-    } else {
-      config.userName = config.email;
-    }
-    pushNewObjectPropertys.push({
-      key: 'userName',
-      value: config.userName
-    });
-  }
+  // if (!config.userName) {
+  //   if (!config.email) {
+  //     const userName = await getInput(`请输入组件库发布人名称（userName，发布至物料中心时用作平台账号）...`);
+  //     config.userName = userName;
+  //   } else {
+  //     config.userName = config.email;
+  //   }
+  //   pushNewObjectPropertys.push({
+  //     key: 'userName',
+  //     value: config.userName
+  //   });
+  // }
   if (!config.tags) {
     config.tags = 'react';
     pushNewObjectPropertys.push({

@@ -78,19 +78,26 @@ async function build() {
   components.forEach((component) => {
     const { namespace, version, ...other } = component;
     const fileMap = componentFileMap[namespace] = {};
-    Object.entries(other).forEach(([key, value]) => {
-      if (key === 'target') {
-        Object.entries(value).forEach(([targetKey, value]) => {
-          if (fse.existsSync(value)) {
-            componentsEntry[`${namespace}-${key}-${targetKey}`] = value;
-            fileMap[key] = true;
-          }
-        });
-      } else if (typeof value === 'string' && fse.existsSync(value)) {
-        componentsEntry[`${namespace}-${key}`] = value;
-        fileMap[key] = true;
+    if (isPublishToDist) {
+      if (fse.existsSync(component.runtime)) {
+        fileMap['runtime'] = true;
+        componentsEntry[`${namespace}-runtime`] = component.runtime;
       }
-    });
+    } else {
+      Object.entries(other).forEach(([key, value]) => {
+        if (key === 'target') {
+          Object.entries(value).forEach(([targetKey, value]) => {
+            if (fse.existsSync(value)) {
+              componentsEntry[`${namespace}-${key}-${targetKey}`] = value;
+              fileMap[key] = true;
+            }
+          });
+        } else if (typeof value === 'string' && fse.existsSync(value)) {
+          componentsEntry[`${namespace}-${key}`] = value;
+          fileMap[key] = true;
+        }
+      });
+    }
     deps.push({namespace, version});
   });
 
