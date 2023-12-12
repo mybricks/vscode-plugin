@@ -5,6 +5,7 @@ const fse = require('fs-extra');
 const webpack = require('webpack');
 const WebpackBar = require('webpackbar');
 const { merge } = require('webpack-merge');
+const { execSync } = require('child_process');
 const generateMybricksComponentLibraryCode = require('generate-mybricks-component-library-code');
 const { getOnlineInfo, getDistInfo, getCentralInfo, getCurrentTimeYYYYMMDDHHhhmmss, uploadToOSS, publishToCentral } = require("../utils");
 // 组件库根目录
@@ -233,6 +234,16 @@ async function build() {
 
       console.log("组件库资源地址: ", { editJs, rtJs, coms });
 
+      let userId = 'Mybricks';
+
+      try {
+        const email = execSync('git config user.email').toString().trim();
+        userId = email;
+        console.log(`当前 Git 邮箱: ${email}`);
+      } catch (error) {
+        console.error('获取 Git 邮箱失败，userId默认为Mybricks: ', error);
+      }
+
       const chunkSize = 3;
       const chunks = [];
 
@@ -255,8 +266,8 @@ async function build() {
               type: 'component',
               icon: content.icon,
               previewImg: content.preview,
-              creatorName: 'Mybricks',
-              creatorId: 'Mybricks'
+              creatorName: userId,
+              creatorId: userId
             });
           }));
           await uploadChunks(chunks);
@@ -277,8 +288,8 @@ async function build() {
         type: 'com_lib',
         // icon,
         // previewImg,
-        creatorName: 'Mybricks',
-        creatorId: 'Mybricks'
+        creatorName: userId,
+        creatorId: userId
       });
 
       console.log("全部上传完成");
