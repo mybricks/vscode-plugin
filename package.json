@@ -1,7 +1,7 @@
 {
   "name": "Mybricks",
   "description": "快速便捷地开发和发布Mybricks组件",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "icon": "images/mybricks.png",
   "engines": {
     "vscode": "^1.71.0"
@@ -142,6 +142,7 @@
     "@mybricks/render-web": "^1.1.71",
     "axios": "^1.4.0",
     "babel-loader": "^8.0.6",
+    "chalk": "4.1.2",
     "css-loader": "^6.7.1",
     "eslint": "^8.20.0",
     "extra-watch-webpack-plugin": "^1.0.3",

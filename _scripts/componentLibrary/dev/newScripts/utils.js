@@ -1,9 +1,9 @@
 const fs = require('fs-extra');
 const axios = require('axios');
-const babelParser = require("@babel/parser");
+const chalk = require('chalk');
 const FormData = require('form-data');
-
 // @babel/parser 处理js字符串，使用@babel/generator转回，如何保证换行和空格都不被改变？
+const babelParser = require("@babel/parser");
 
 const readline = require('readline');
 
@@ -246,8 +246,9 @@ async function publishToCentral({
         }
       }
     });
+    const { code, message } = res.data;
 
-    console.log(`${namespace}@${version}: `, res.data);
+    console.log(`${namespace}@${version}: `, code === -1 ? chalk.yellowBright(message) : chalk.greenBright(message));
   } catch (err) {
     throw new Error(err);
   }
