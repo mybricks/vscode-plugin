@@ -5,9 +5,8 @@ const fse = require('fs-extra');
 const webpack = require('webpack');
 const WebpackBar = require('webpackbar');
 const { merge } = require('webpack-merge');
-const { execSync } = require('child_process');
 const generateMybricksComponentLibraryCode = require('generate-mybricks-component-library-code');
-const { getOnlineInfo, getDistInfo, getCentralInfo, getCurrentTimeYYYYMMDDHHhhmmss, uploadToOSS, publishToCentral } = require("../utils");
+const { getOnlineInfo, getDistInfo, getCentralInfo, getCurrentTimeYYYYMMDDHHhhmmss, uploadToOSS, publishToCentral, getGitEmail } = require("../utils");
 // 组件库根目录
 const docPath = '--replace-docPath--';
 // 配置文件
@@ -237,9 +236,13 @@ async function build() {
       let userId = 'Mybricks';
 
       try {
-        const email = execSync('git config user.email').toString().trim();
-        userId = email;
-        console.log(`当前 Git 邮箱: ${email}`);
+        const email = getGitEmail({ docPath });
+        if (email) {
+          userId = email;
+          console.log(`当前 Git 邮箱: ${email}`);
+        } else {
+          console.log('未配置 Git 邮箱，userId 默认为 Mybricks');
+        }
       } catch (error) {
         console.error('获取 Git 邮箱失败，userId默认为Mybricks: ', error);
       }

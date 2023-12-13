@@ -4,6 +4,7 @@ const chalk = require('chalk');
 const FormData = require('form-data');
 // @babel/parser 处理js字符串，使用@babel/generator转回，如何保证换行和空格都不被改变？
 const babelParser = require("@babel/parser");
+const { execSync } = require('child_process');
 
 const readline = require('readline');
 
@@ -254,10 +255,31 @@ async function publishToCentral({
   }
 }
 
+function getGitEmail({ docPath }) {
+  let email = '';
+  try {
+    email = execSync(`cd ${docPath} && git config user.email`).toString().trim();
+  } catch (error) {
+    console.log('获取组件库目录下 Git 邮箱失败，尝试从全局获取: ', error.message);
+  }
+
+  if (!email) {
+    console.log('当前组件库目录下未配置 Git 邮箱，尝试从全局获取...');
+    try {
+      email = execSync('git config user.email').toString().trim();
+    } catch (error) {
+      console.log('获取全局 Git 邮箱失败: ', error);
+    }
+  }
+
+  return email;
+}
+
 module.exports = {
   getCentralInfo,
   getOnlineInfo,
   getDistInfo,
+  getGitEmail,
 
   getLessLoaders,
   getCurrentTimeYYYYMMDDHHhhmmss,
