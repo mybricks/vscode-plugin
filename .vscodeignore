@@ -16,4 +16,4 @@ _views
 .npmignore
 _scripts/.temp
 _scripts/.temp-pub
-CHANGELOG.md
+*.md
