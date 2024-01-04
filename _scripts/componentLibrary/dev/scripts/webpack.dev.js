@@ -90,7 +90,14 @@ module.exports = {
     client: {
       logging: "warn"
     },
-    proxy
+    proxy,
+    setupMiddlewares: function (middlewares, devServer) {
+      devServer && devServer.app.get('/check-dev-server', function (req, res) {
+        res.json({ status: 'success', message: 'Dev server is running!', config });
+      });
+
+      return middlewares;
+    },
   },
   module: {
     rules: [
