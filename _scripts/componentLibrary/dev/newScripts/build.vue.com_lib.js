@@ -281,10 +281,10 @@ function getWebpckConfig({ entry, outputPath, externals = [], postCssOptions }, 
               loader: 'babel-loader',
               options: {
                 presets: [
+                  '@babel/preset-env',
                   '@babel/preset-react'
                 ],
                 plugins: [
-                  ['@babel/plugin-proposal-class-properties', {'loose': true}],
                   [babelPluginAutoCssModules]
                 ],
                 cacheDirectory: true
