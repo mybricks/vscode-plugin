@@ -44,8 +44,8 @@ async function build() {
   const { editCode, runtimeCode, components } = generateMybricksComponentLibraryCode(
     {
       id: packageJson.name,
-      name: packageJson.description,
-      version: packageJson.version,
+      name: finalConfig.name || packageJson.description,
+      version: finalConfig.version || packageJson.version,
       mybricksJsonPath: path.join(docPath, configName),
     },
     {
@@ -178,7 +178,7 @@ async function build() {
     zip.file('组件库.material@mybricks.json', JSON.stringify({
       type: "material",
       material: {
-        name: packageJson.description,
+        name: finalConfig.name || packageJson.description,
         namespace: finalConfig.namespace,
         // TODO: 这里是场景信息，不应该传1，和中心化一起改造
         sceneInfo,
@@ -196,7 +196,7 @@ async function build() {
           editJs: './resource/edit.js',
           coms: './resource/rtCom.js'
         }),
-        version: packageJson.version,
+        version: finalConfig.version || packageJson.version,
         creatorName: userName,
         creatorId: userName,
         createTime: time,
@@ -226,9 +226,9 @@ async function build() {
       console.log("上传edit.js、rt.js、rtCom.js...");
       const time = getCurrentTimeYYYYMMDDHHhhmmss();
       const [editJs, rtJs, coms] = await Promise.all([
-        await uploadToOSS({content: fse.readFileSync(editCodePath, 'utf-8'), folderPath: `comlibs/${finalConfig.namespace}/${packageJson.version}/${time}`, fileName: 'edit.js', noHash: true}),
-        await uploadToOSS({content: fse.readFileSync(rtCodePath, 'utf-8'), folderPath: `comlibs/${finalConfig.namespace}/${packageJson.version}/${time}`, fileName: 'rt.js', noHash: true}),
-        await uploadToOSS({content: runtimeComponentsMapString, folderPath: `comlibs/${finalConfig.namespace}/${packageJson.version}/${time}`, fileName: 'rtCom.js', noHash: true})
+        await uploadToOSS({content: fse.readFileSync(editCodePath, 'utf-8'), folderPath: `comlibs/${finalConfig.namespace}/${finalConfig.version || packageJson.version}/${time}`, fileName: 'edit.js', noHash: true}),
+        await uploadToOSS({content: fse.readFileSync(rtCodePath, 'utf-8'), folderPath: `comlibs/${finalConfig.namespace}/${finalConfig.version || packageJson.version}/${time}`, fileName: 'rt.js', noHash: true}),
+        await uploadToOSS({content: runtimeComponentsMapString, folderPath: `comlibs/${finalConfig.namespace}/${finalConfig.version || packageJson.version}/${time}`, fileName: 'rtCom.js', noHash: true})
       ]);
 
       console.log("组件库资源地址: ", { editJs, rtJs, coms });
@@ -282,11 +282,11 @@ async function build() {
       // 上传组件库
       await publishToCentral({
         sceneType: sceneInfo.type,
-        name: packageJson.description,
+        name: finalConfig.name || packageJson.description,
         content: JSON.stringify({ editJs, rtJs, coms, deps }),
         tags: ['react'],
         namespace: finalConfig.namespace,
-        version: packageJson.version,
+        version: finalConfig.version || packageJson.version,
         // description,
         type: 'com_lib',
         // icon,
@@ -306,11 +306,11 @@ async function build() {
           editCode: fse.readFileSync(editCodePath, 'utf-8'),
           runtimeCode: fse.readFileSync(rtCodePath, 'utf-8'),
           runtimeComponentsMapCode: runtimeComponentsMapString,
-          version: packageJson.version,
+          version: finalConfig.version || packageJson.version,
           namespace: finalConfig.namespace,
           scene: sceneInfo,
           tags: ['react'],
-          title: packageJson.description
+          title: finalConfig.name || packageJson.description
         }
       }).then(({data: { code, data, message }}) => {
         if (code === 1) {
