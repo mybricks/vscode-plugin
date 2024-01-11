@@ -7,7 +7,7 @@ const WebpackBar = require('webpackbar');
 const { merge } = require('webpack-merge');
 const { VueLoaderPlugin } = require('vue-loader');
 const generateMybricksComponentLibraryCode = require('generate-mybricks-component-library-code');
-const { getOnlineInfo, getDistInfo, getLessLoaders } = require("../utils");
+const { getOnlineInfo, getDistInfo, getLessLoaders, getCentralInfo, getCurrentTimeYYYYMMDDHHhhmmss, uploadToOSS, publishToCentral, getGitEmail } = require("../utils");
 const babelPluginAutoCssModules = require('../../scripts/babel-plugins/babel-plugin-auto-css-modules');
 // 组件库根目录
 const docPath = '--replace-docPath--';
@@ -55,8 +55,12 @@ async function build() {
   let webpackMergeConfig = getWebpackMergeConfig();
   let finalConfig;
   const isPublishToDist = publishType === 'dist';
-  if (!isPublishToDist) {
-    console.log('发布至物料中心');
+  const isPublishToCentral = publishType === 'central';
+  if (isPublishToCentral) {
+    console.log("发布至中心化");
+    finalConfig = await getCentralInfo({configPath: mybricksJsonPath});
+  } else if (!isPublishToDist) {
+    console.log("发布至物料中心");
     finalConfig = await getOnlineInfo({configPath: mybricksJsonPath});
   } else {
     console.log('保存至本地dist文件夹');
@@ -195,35 +199,115 @@ async function build() {
     fse.writeFileSync(path.resolve(docDistDirPath, '物料.zip'), content, 'utf-8'); 
     console.log(`\x1b[0m编译产物已保存至本地文件:\n \x1b[0meidt.js: \x1b[32m${path.resolve(docDistDirPath, 'edit.js')}\n   \x1b[0mrt.js: \x1b[32m${path.resolve(docDistDirPath, 'rt.js')}\n\x1b[0mrtCom.js: \x1b[32m${path.resolve(docDistDirPath, 'rtCom.js')}`);
   } else {
-    console.log('开始上传物料中心...');
     const { domain, userName } = finalConfig;
-    await axios({
-      method: 'post',
-      url: `${domain.endsWith('/') ? domain.slice(0, -1) : domain}/api/material/vsc/createComlib`,
-      data: {
-        userId: userName,
-        editCode: fse.readFileSync(editCodePath, 'utf-8'),
-        runtimeCode: fse.readFileSync(rtCodePath, 'utf-8'),
-        runtimeComponentsMapCode: runtimeComponentsMapString,
-        version: packageJson.version,
-        namespace: finalConfig.namespace,
-        scene: sceneInfo,
+
+    if (isPublishToCentral) {
+      console.log('开始上传中心化...');
+      console.log("上传edit.js、rt.js、rtCom.js...");
+      const time = getCurrentTimeYYYYMMDDHHhhmmss();
+      const [editJs, rtJs, coms] = await Promise.all([
+        await uploadToOSS({content: fse.readFileSync(editCodePath, 'utf-8'), folderPath: `comlibs/${finalConfig.namespace}/${packageJson.version}/${time}`, fileName: 'edit.js', noHash: true}),
+        await uploadToOSS({content: fse.readFileSync(rtCodePath, 'utf-8'), folderPath: `comlibs/${finalConfig.namespace}/${packageJson.version}/${time}`, fileName: 'rt.js', noHash: true}),
+        await uploadToOSS({content: runtimeComponentsMapString, folderPath: `comlibs/${finalConfig.namespace}/${packageJson.version}/${time}`, fileName: 'rtCom.js', noHash: true})
+      ]);
+
+      console.log("组件库资源地址: ", { editJs, rtJs, coms });
+
+      let userId = 'Mybricks';
+
+      try {
+        const email = getGitEmail({ docPath });
+        if (email) {
+          userId = email;
+          console.log(`当前 Git 邮箱: ${email}`);
+        } else {
+          console.log('未配置 Git 邮箱，userId 默认为 Mybricks');
+        }
+      } catch (error) {
+        console.error('获取 Git 邮箱失败，userId默认为Mybricks: ', error);
+      }
+
+      // TODO: 单组件rt和edit都需要打包
+
+      // const chunkSize = 3;
+      // const chunks = [];
+
+      // for (let i = 0; i < componentsArray.length; i += chunkSize) {
+      //   chunks.push(componentsArray.slice(i, i + chunkSize));
+      // }
+
+      // async function uploadChunks(chunks) {
+      //   const chunk = chunks.pop();
+      //   if (chunk) {
+      //     await Promise.all(chunk.map(async (content) => {
+      //       await publishToCentral({
+      //         sceneType: sceneInfo.type,
+      //         name: content.title,
+      //         content: JSON.stringify(content),
+      //         tags: ['vue2'],
+      //         namespace: content.namespace,
+      //         version: content.version,
+      //         description: content.description,
+      //         type: 'component',
+      //         icon: content.icon,
+      //         previewImg: content.preview,
+      //         creatorName: userId,
+      //         creatorId: userId
+      //       });
+      //     }));
+      //     await uploadChunks(chunks);
+      //   }
+      // }
+
+      // await uploadChunks(chunks);
+
+      // 上传组件库
+      await publishToCentral({
+        sceneType: sceneInfo.type,
+        name: packageJson.description,
+        content: JSON.stringify({ editJs, rtJs, coms }),
         tags: ['vue2'],
-        title: packageJson.description
-      }
-    }).then(({data: { code, data, message }}) => {
-      if (code === 1) {
-        console.log('发布成功: ', JSON.stringify(data, null, 2));
-      } else {
-        console.error(`发布失败: ${message}`);
-      }
-    }).catch((err) => {
-      if (err?.response?.data?.statusCode === 404) {
-        console.error(`发布失败: ${err.message}，请检查平台是否正常安装物料中心`);
-      } else {
-        console.error(`发布失败: ${err.message}，请检查是否能正常访问 ${domain}`);
-      }
-    });
+        namespace: finalConfig.namespace,
+        version: packageJson.version,
+        // description,
+        type: 'com_lib',
+        // icon,
+        // previewImg,
+        creatorName: userId,
+        creatorId: userId
+      });
+
+      console.log("全部上传完成");
+    } else {
+      console.log('开始上传物料中心...');
+      await axios({
+        method: 'post',
+        url: `${domain.endsWith('/') ? domain.slice(0, -1) : domain}/api/material/vsc/createComlib`,
+        data: {
+          userId: userName,
+          editCode: fse.readFileSync(editCodePath, 'utf-8'),
+          runtimeCode: fse.readFileSync(rtCodePath, 'utf-8'),
+          runtimeComponentsMapCode: runtimeComponentsMapString,
+          version: packageJson.version,
+          namespace: finalConfig.namespace,
+          scene: sceneInfo,
+          tags: ['vue2'],
+          title: packageJson.description
+        }
+      }).then(({data: { code, data, message }}) => {
+        if (code === 1) {
+          console.log('发布成功: ', JSON.stringify(data, null, 2));
+        } else {
+          console.error(`发布失败: ${message}`);
+        }
+      }).catch((err) => {
+        if (err?.response?.data?.statusCode === 404) {
+          console.error(`发布失败: ${err.message}，请检查平台是否正常安装物料中心`);
+        } else {
+          console.error(`发布失败: ${err.message}，请检查是否能正常访问 ${domain}`);
+        }
+      });
+    }
   }
 
   fse.remove(__filename);
