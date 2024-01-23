@@ -11,6 +11,7 @@ import toolsPlugin from "@mybricks/plugin-tools";
 import servicePlugin, {call as callConnectorHttp} from "@mybricks/plugin-connector-http"; //连接器插件和运行时
 
 import css from "./MyDesigner.less";
+import loadContentPlugin from "./plugins/load-content-plugin";
 
 const localDataKey = `--mybricks--${MYBRICKS_JSON?.componentType ?? 'NONE'}`;
 
@@ -107,7 +108,8 @@ export default function MyDesigner () {
       },
       plugins: [
         toolsPlugin(),
-        servicePlugin()
+        servicePlugin(),
+        loadContentPlugin(),
       ],
       comLibLoader() {
         return new Promise((resolve) => {
