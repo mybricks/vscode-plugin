@@ -449,7 +449,10 @@ function getWebpckConfig({ entry, outputPath, externals = [] }, webpackMergeConf
           test: /\.(gif|png|jpe?g|webp|svg|woff|woff2|eot|ttf)$/i,
           use: [
             {
-              loader: 'url-loader'
+              loader: 'url-loader',
+              options: {
+                esModule: false,
+              },
             }
           ]
         },
