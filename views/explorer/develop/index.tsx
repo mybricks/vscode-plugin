@@ -19,7 +19,7 @@ const typeToInfoMap = {
     action: "dev"
   },
   debug: {
-    label: "调试中...",
+    label: "调试中(点击停止)",
     action: "dev"
   }
 };
