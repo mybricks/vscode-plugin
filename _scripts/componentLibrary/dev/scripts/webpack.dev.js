@@ -65,6 +65,26 @@ defaultExternals.forEach(({name, library, urls}) => {
   }
 });
 
+switch (config.tags) {
+  case 'vue':
+  case 'vue2':
+    htmlScript = htmlScript + `<script src="assets/vue2.min.js"></script>
+    <script>
+      window.Vue ? (window.vue = window.Vue) : null;
+    </script>
+    <script src="assets/polyfill.vue2.js"></script>`;
+    break;
+  case 'vue3':
+    htmlScript = htmlScript + `<script src="assets/vue3.min.js"></script>
+    <script>
+      window.Vue ? (window.vue = window.Vue) : null;
+    </script>
+    <script src="assets/polyfill.vue3.js"></script>`;
+    break;
+  default:
+    break;
+}
+
 let webpackMergeConfig = getWebpackMergeConfig();
 
 function getWebpackMergeConfig () {

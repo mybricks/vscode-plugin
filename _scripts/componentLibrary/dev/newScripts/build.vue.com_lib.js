@@ -5,7 +5,7 @@ const fse = require('fs-extra');
 const webpack = require('webpack');
 const WebpackBar = require('webpackbar');
 const { merge } = require('webpack-merge');
-const { VueLoaderPlugin } = require('vue-loader');
+// const { VueLoaderPlugin } = require('vue-loader');
 const generateMybricksComponentLibraryCode = require('generate-mybricks-component-library-code');
 const { getOnlineInfo, getDistInfo, getLessLoaders, getCentralInfo, getCurrentTimeYYYYMMDDHHhhmmss, uploadToOSS, publishToCentral, getGitEmail } = require("../utils");
 const babelPluginAutoCssModules = require('../../scripts/babel-plugins/babel-plugin-auto-css-modules');
@@ -199,7 +199,9 @@ async function build() {
     fse.writeFileSync(path.resolve(docDistDirPath, '物料.zip'), content, 'utf-8'); 
     console.log(`\x1b[0m编译产物已保存至本地文件:\n \x1b[0meidt.js: \x1b[32m${path.resolve(docDistDirPath, 'edit.js')}\n   \x1b[0mrt.js: \x1b[32m${path.resolve(docDistDirPath, 'rt.js')}\n\x1b[0mrtCom.js: \x1b[32m${path.resolve(docDistDirPath, 'rtCom.js')}`);
   } else {
-    const { domain, userName } = finalConfig;
+    const { domain, userName, tags } = finalConfig;
+
+    let tag = tags === 'vue3' ? 'vue3' : 'vue2';
 
     if (isPublishToCentral) {
       console.log('开始上传中心化...');
@@ -266,7 +268,7 @@ async function build() {
         sceneType: sceneInfo.type,
         name: finalConfig.name || packageJson.description,
         content: JSON.stringify({ editJs, rtJs, coms }),
-        tags: ['vue2'],
+        tags: [tag],
         namespace: finalConfig.namespace,
         version: finalConfig.version || packageJson.version,
         // description,
@@ -291,7 +293,7 @@ async function build() {
           version: finalConfig.version || packageJson.version,
           namespace: finalConfig.namespace,
           scene: sceneInfo,
-          tags: ['vue2'],
+          tags: [tag],
           title: finalConfig.name || packageJson.description
         }
       }).then(({data: { code, data, message }}) => {
@@ -317,7 +319,7 @@ async function build() {
 build();
 
 function getWebpckConfig({ entry, outputPath, externals = [], postCssOptions }, webpackMergeConfig) {
-  return merge({
+  return merge(webpackMergeConfig, {
     mode: 'production',
     entry,
     output: {
@@ -333,13 +335,13 @@ function getWebpckConfig({ entry, outputPath, externals = [], postCssOptions }, 
     externals,
     module: {
       rules: [
-        {
-          test: /\.vue$/,
-          loader: 'vue-loader',
-          options: {
-            hotReload: false,
-          },
-        },
+        // {
+        //   test: /\.vue$/,
+        //   loader: 'vue-loader',
+        //   options: {
+        //     hotReload: false,
+        //   },
+        // },
         {
           test: /\.jsx?$/,
           use: [
@@ -418,9 +420,9 @@ function getWebpckConfig({ entry, outputPath, externals = [], postCssOptions }, 
     },
     plugins: [
       new WebpackBar(),
-      new VueLoaderPlugin()
+      // new VueLoaderPlugin()
     ]
-  }, webpackMergeConfig);
+  });
 }
 
 function getWebpackMergeConfig () {

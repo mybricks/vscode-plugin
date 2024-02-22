@@ -335,7 +335,7 @@ async function build() {
 build();
 
 function getWebpckConfig({ entry, outputPath, externals = [] }, webpackMergeConfig) {
-  return merge({
+  return merge(webpackMergeConfig, {
     mode: 'production',
     entry,
     output: {
@@ -469,7 +469,7 @@ function getWebpckConfig({ entry, outputPath, externals = [] }, webpackMergeConf
     plugins: [
       new WebpackBar(),
     ]
-  }, webpackMergeConfig);
+  });
 }
 
 function getWebpackMergeConfig () {
