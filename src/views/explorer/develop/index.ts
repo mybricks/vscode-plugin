@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import Provider from "./provider";
 
-import { ImportCom } from "./import-com";
+// import { ImportCom } from "./import-com";
 
 class Develop {
   private _context: vscode.ExtensionContext | undefined;
@@ -14,7 +14,7 @@ class Develop {
     const { subscriptions } = context;
     const debuggerPanel = new Provider(context);
 
-    const importCom = new ImportCom({ context, getWebview: () => debuggerPanel.webview });
+    // const importCom = new ImportCom({ context, getWebview: () => debuggerPanel.webview });
 
     subscriptions.push(
       vscode.commands.registerCommand("mybricks.debugger.dev", () => {
@@ -34,9 +34,9 @@ class Develop {
           retainContextWhenHidden: true
         }
       }),
-      vscode.commands.registerCommand("mybricks.import.com", (uri: vscode.Uri) => {
-        importCom.import(uri?.fsPath);
-      }),
+      // vscode.commands.registerCommand("mybricks.import.com", (uri: vscode.Uri) => {
+      //   importCom.import(uri?.fsPath);
+      // }),
     );
   }
 }

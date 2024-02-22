@@ -59,11 +59,6 @@
     },
     "menus": {
       "explorer/context": [
-        {
-          "command": "mybricks.import.com",
-          "group": "Mybricks@1",
-          "when": "explorerResourceIsFolder"
-        }
       ]
     },
     "snippets": [

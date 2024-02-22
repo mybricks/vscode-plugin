@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import * as path from 'path';
-import { parse } from 'vue-docgen-api';
+// import { parse } from 'vue-docgen-api';
 import genComFolder from "./gen-com-folder";
 
 // import Provider from "./provider";
@@ -19,47 +19,47 @@ class CreateCom {
     // const welcomePanel = new Provider(context);
 
     subscriptions.push(
-      vscode.commands.registerCommand("mybricks.import.com", (uri: vscode.Uri) => {
-        const selectFolderPath = uri?.fsPath;
+      // vscode.commands.registerCommand("mybricks.import.com", (uri: vscode.Uri) => {
+      //   const selectFolderPath = uri?.fsPath;
 
-        ;(async () => {
+      //   ;(async () => {
 
-          const importWay = await vscode.window.showQuickPick(['选择Vue单文件组件导入'], {
-            placeHolder: '选择导入方式',
-          });
+      //     const importWay = await vscode.window.showQuickPick(['选择Vue单文件组件导入'], {
+      //       placeHolder: '选择导入方式',
+      //     });
 
-          if (importWay !== '选择Vue单文件组件导入') {
-            return;
-          }
+      //     if (importWay !== '选择Vue单文件组件导入') {
+      //       return;
+      //     }
 
-          const file = await this.selectFile();
-          if (!file) {
-            return;
-          }
+      //     const file = await this.selectFile();
+      //     if (!file) {
+      //       return;
+      //     }
 
-          const schema = await this.parseVue2File(file.path);
-          schema.filePath = file.path;
+      //     const schema = await this.parseVue2File(file.path);
+      //     schema.filePath = file.path;
 
-          const namespace = await this.getComNamespace(schema);
-          schema.namespace = namespace;
+      //     const namespace = await this.getComNamespace(schema);
+      //     schema.namespace = namespace;
 
-          const savePath = await this.getSaveFolderPath(selectFolderPath, schema);
+      //     const savePath = await this.getSaveFolderPath(selectFolderPath, schema);
 
-          if (!savePath) {
-            return;
-          }
+      //     if (!savePath) {
+      //       return;
+      //     }
 
-          await vscode.window.withProgress({
-            location: vscode.ProgressLocation.Notification,
-            title: "生成组件中...",
-          }, async (progress, token) => {
-            return await genComFolder(savePath, { schema });
-          });
+      //     await vscode.window.withProgress({
+      //       location: vscode.ProgressLocation.Notification,
+      //       title: "生成组件中...",
+      //     }, async (progress, token) => {
+      //       return await genComFolder(savePath, { schema });
+      //     });
           
-        })();
+      //   })();
       
-        // welcomePanel.webview.postMessage({ action: "invalidAddress", value: dirName });
-      }),
+      //   // welcomePanel.webview.postMessage({ action: "invalidAddress", value: dirName });
+      // }),
       // vscode.commands.registerCommand("mybricks.open.url", () => {
       //   const panel = vscode.window.createWebviewPanel(
       //     'mybricks',

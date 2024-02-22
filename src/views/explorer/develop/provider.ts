@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { uuid } from "../../../utils";
-import { ImportCom } from './import-com';
+// import { ImportCom } from './import-com';
 
 export default class Provider implements vscode.WebviewViewProvider {
   private _view?: vscode.WebviewView;
@@ -41,10 +41,10 @@ export default class Provider implements vscode.WebviewViewProvider {
         case "import": 
           const { type } = data;
           // vscode.Uri.joinPath(vscode.workspace.workspaceFolders?.[0]?.uri, './src')
-          vscode.commands.executeCommand("mybricks.import.com");
+          // vscode.commands.executeCommand("mybricks.import.com");
           break;
         case "import.setSaveFolderPath": 
-          await ImportCom.selectAndSetSaveFolderPath(this._context, webviewView.webview);
+          // await ImportCom.selectAndSetSaveFolderPath(this._context, webviewView.webview);
           break;
         default:
           break;
