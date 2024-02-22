@@ -58,7 +58,19 @@ export class PublishCommands {
       const replacement = '_';
       const result = mybricksJsonPath.replace(pattern, replacement) + '.js';
       const webpackbuildjsPath = path.resolve(buildTempPath, result);
-      const webpackbuildjs = fse.readFileSync(path.resolve(projPath, `./_scripts/componentLibrary/dev/newScripts/build.${mybricksJson.tags || 'react'}.${materialType}.js`), 'utf-8');
+      let tags = 'react';
+
+      switch (mybricksJson.tags) {
+        case 'vue':
+        case 'vue2':
+        case 'vue3':
+          tags = 'vue';
+          break;
+        default:
+          break;
+      }
+
+      const webpackbuildjs = fse.readFileSync(path.resolve(projPath, `./_scripts/componentLibrary/dev/newScripts/build.${tags}.${materialType}.js`), 'utf-8');
       
       // 编写webpack
       // 
