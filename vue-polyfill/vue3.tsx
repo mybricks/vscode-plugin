@@ -1,4 +1,4 @@
-import {applyPureVueInReact} from 'veaury';
+import {applyPureVueInReact} from './src/veaury';
 
 // import { applyPureVueInReact } from './veaury'
 import React, { useMemo } from "react";
@@ -27,47 +27,93 @@ const SlotRender = ({ slots, name, params = {} }) => {
   );
 };
 
-const useHasStringObj = (obj) => {
+// const useHasStringObj = (obj) => {
 
-  const proxyObj = useMemo(() => {
+//   const proxyObj = useMemo(() => {
+//     return new Proxy({}, {
+//       get(target, key) {
+//         if (key === 'toString') {
+//           return () => '_';
+//         }
+//         return obj[key];
+//       }
+//     });
+//   }, [obj]);
+
+//   return proxyObj;
+// };
+
+/**
+ * 
+ * @description 目前引擎IO的代理不完整，当Vue使用setAttribute的时候会发生隐式调用，调用Symbol.toPrimitive 方法，必须包含
+ * @returns 
+ */
+const useValidProxy = (obj) => {
+  return useMemo(() => {
+    // if (!obj[Symbol.toPrimitive]) {
+    //   obj[Symbol.toPrimitive] = function() {return '{}';};
+    // }
+    // if (obj.toString) {
+    //   obj.toString = function() {return '{}';};
+    // }
     return new Proxy({}, {
+      has(target, key) {
+        return key in obj;
+      },
+      ownKeys(target) {
+        return Reflect.ownKeys(obj);
+      },
       get(target, key) {
-        if (key === 'toString') {
-          return () => '_';
+        if (key === Symbol.toPrimitive) {
+          return  function() {return '{}';};
         }
         return obj[key];
-      }
+      },
     });
   }, [obj]);
-
-  return proxyObj;
 };
 
 function VUEHoc(com) {
-  const Basic = applyPureVueInReact(com);
-  return function ({ data, outputs, inputs, slots, style, env, logger }) {
+  const Basic = applyPureVueInReact(com, {
+    
+  });
+  return function ({ data, outputs, inputs, slots, style, env, _env, logger, title, id }) {
     const vSlots = {};
     const _slots = {}; // slots不能直接丢进去，否则会触发bug
     for (const key in slots) {
       if (Object.prototype.hasOwnProperty.call(slots, key)) {
-        vSlots[key] = (params) => <SlotRender slots={slots} name={key} params={params} />;
+        vSlots[key] = (params) => {
+          console.warn(params);
+          return <SlotRender slots={slots} name={key} params={params} />;
+        };
         _slots[key] = slots[key];
+        
+        // 手动调用getter，触发设计器的size响应式
+        _slots[key].size;
       }
     }
 
-    const inputsProxy = useHasStringObj(inputs);
-    const outputsProxy = useHasStringObj(outputs);
+    const inputsProxy = useValidProxy(inputs);
+    const outputsProxy = useValidProxy(outputs);
+    const envProxy = useValidProxy(env);
+    
+
+    const props = {
+      id,
+      title,
+      env: envProxy,
+      _env,
+      logger,
+      data: { ...data }, // 解构才能响应
+      outputs: outputsProxy,
+      inputs: inputsProxy,
+      slots: _slots,
+    };
 
     return (
       <Basic
-        // style={style}
-        config={{ style }}
-        env={env}
-        logger={logger}
-        data={{ ...data }}
-        outputs={outputsProxy}
-        inputs={inputsProxy}
-        slots={_slots}
+        // m={{ style, ...props }}
+        {...props}
         v-slots={vSlots}
       />
     );
