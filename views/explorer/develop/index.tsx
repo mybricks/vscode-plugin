@@ -31,11 +31,11 @@ function App (): JSX.Element {
       <Debugger />
       <Divider />
       <Publish />
-      <Divider />
+      {/* <Divider />
       <Block title={'实验性功能'}>
         <ImportComponent />
         <ImportSetting />
-      </Block>
+      </Block> */}
     </div>
   );
 }

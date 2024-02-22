@@ -29,10 +29,6 @@
       {
         "command": "mybricks.create.comlib",
         "title": "创建组件库"
-      },
-      {
-        "command": "mybricks.import.com",
-        "title": "Mybricks: 导入组件"
       }
     ],
     "viewsContainers": {
