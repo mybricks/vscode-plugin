@@ -12,7 +12,7 @@
   display: none;
 }
 
-a,
+/* a,
 blockquote,
 body,
 button,
@@ -40,7 +40,7 @@ th,
 ul {
   margin: 0;
   padding: 0;
-}
+} */
 
 body,
 button,
@@ -51,7 +51,7 @@ textarea {
     Roboto, Helvetica Neue, Helvetica, sans-serif;
 }
 
-button,
+/* button,
 input,
 optgroup,
 option,
@@ -65,7 +65,7 @@ textarea {
   outline: 0;
   -webkit-appearance: none;
   appearance: none;
-}
+} */
 
 a {
   text-decoration: none;
