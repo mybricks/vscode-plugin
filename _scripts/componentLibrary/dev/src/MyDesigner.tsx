@@ -85,11 +85,11 @@ export default function MyDesigner () {
   const pcGeoView = {
     scenes: true,
     theme: {
-      css: [
-        "./assets/element-plus.index.css", 
+      css: !MYBRICKS_JSON.tags || MYBRICKS_JSON.tags === 'react' ? [
+        // "./assets/element-plus.index.css", 
         "./assets/4.21.6.antd.min.css",
         "./assets/editor.d5c483a324024fb6.css",
-      ]
+      ] : []
     }
   };
 
