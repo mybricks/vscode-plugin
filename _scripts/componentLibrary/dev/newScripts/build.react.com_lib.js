@@ -40,6 +40,7 @@ async function build() {
     title: 'PC中后台',
     type: 'PC',
   };
+  console.log(`\x1b[0m*.mybricks.json -> version: \x1b[32m${finalConfig.version}\n   \x1b[0mpackage.json -> version: \x1b[32m${packageJson.version}\n          \x1b[0m当前组件库版本号: \x1b[32m${finalConfig.version || packageJson.version}`);
 
   const { editCode, runtimeCode, components } = generateMybricksComponentLibraryCode(
     {
