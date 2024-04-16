@@ -17,21 +17,17 @@ const defaultExternals = [
   {
     "name": "@ant-design/icons",
     "library": "icons",
-    // "urls": ["https://assets.mybricks.world/pkg/@ant-design/icons-4.7.0/index.umd.min.js"]
     "urls": ["assets/1690444248634.ant-design-icons_4.7.0_min.js"]
   },
   {
     "name": "antd",
     "library": "antd",
-    // "urls": [
-    //   "https://assets.mybricks.world/pkg/antd-4.21.6/antd.min.css",
-    //   "https://assets.mybricks.world/pkg/moment-2.9.1/moment.min.js",
-    //   "https://assets.mybricks.world/pkg/antd-4.21.6/antd.min.js"
-    // ]
     "urls": [
       "assets/4.21.6.antd.min.css",
       "assets/1690443543399.2.29.4_moment.min.js",
-      "assets/1690444184854.4.21.6_antd.min.js"
+      "assets/1690444184854.4.21.6_antd.min.js",
+      "assets/antd-4.21.6-locale-zh_CN.js",
+      "assets/moment-2.29.4-locale_zh-cn.js"
     ]
   }
 ];
