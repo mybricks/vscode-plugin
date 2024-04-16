@@ -287,6 +287,7 @@ async function build() {
   const runtimeComponentsMapString = JSON.stringify(runtimeComponentsMap);
 
   if (isPublishToDist) {
+    const { domain, userName, tags, externals = [] } = finalConfig;
     const docDistDirPath = path.join(docPath, 'dist');
     if (!fse.existsSync(docDistDirPath)) {
       fse.mkdirSync(docDistDirPath);
@@ -295,8 +296,11 @@ async function build() {
     fse.writeFileSync(path.resolve(docDistDirPath, 'rtCom.js'), runtimeComponentsMapString, 'utf-8');
 
     const zip = new JSZip();
-    const userName = finalConfig.userName;
     const time = new Date().getTime();
+
+    const rtPath = `./resource/${tags}/rt.js`;
+    const editPath = `./resource/${tags}/edit.js`;
+    const comsPath = `./resource/${tags}/rtCom.js`;
 
     zip.file('组件库.material@mybricks.json', JSON.stringify({
       type: "material",
@@ -315,9 +319,13 @@ async function build() {
       },
       materialPub: {
         content: JSON.stringify({
-          rtJs: './resource/rt.js',
-          editJs: './resource/edit.js',
-          coms: './resource/rtCom.js'
+          [tags]: {
+            rtJs: rtPath,
+            editJs: editPath,
+            coms: comsPath,
+            deps,
+            externals
+          }
         }),
         version: finalConfig.version || packageJson.version,
         creatorName: userName,
@@ -328,9 +336,9 @@ async function build() {
         updatorName: userName
       }
     }));
-    zip.file('./resource/rt.js', fse.readFileSync(rtCodePath, 'utf-8'));
-    zip.file('./resource/edit.js', fse.readFileSync(editCodePath, 'utf-8'));
-    zip.file('./resource/rtCom.js', runtimeComponentsMapString);
+    zip.file(rtPath, fse.readFileSync(rtCodePath, 'utf-8'));
+    zip.file(editPath, fse.readFileSync(editCodePath, 'utf-8'));
+    zip.file(comsPath, runtimeComponentsMapString);
 
     const content = await zip.generateAsync({
       type: 'nodebuffer',
@@ -342,7 +350,7 @@ async function build() {
     fse.writeFileSync(path.resolve(docDistDirPath, '物料.zip'), content, 'utf-8');
     console.log(`\x1b[0m编译产物已保存至本地文件:\n \x1b[0meidt.js: \x1b[32m${path.resolve(docDistDirPath, 'edit.js')}\n   \x1b[0mrt.js: \x1b[32m${path.resolve(docDistDirPath, 'rt.js')}\n\x1b[0mrtCom.js: \x1b[32m${path.resolve(docDistDirPath, 'rtCom.js')}`);
   } else {
-    const { domain, userName } = finalConfig;
+    const { domain, userName, tags, externals = [] } = finalConfig;
 
     if (isPublishToCentral) {
       console.log('开始上传中心化...');
@@ -406,7 +414,7 @@ async function build() {
       await publishToCentral({
         sceneType: sceneInfo.type,
         name: finalConfig.name || packageJson.description,
-        content: JSON.stringify({ editJs, rtJs, coms, deps }),
+        content: JSON.stringify({ [tags]: { editJs, rtJs, coms, deps, externals } }),
         tags: ['react'],
         namespace: finalConfig.namespace,
         version: finalConfig.version || packageJson.version,
@@ -426,9 +434,15 @@ async function build() {
         url: `${domain.endsWith('/') ? domain.slice(0, -1) : domain}/api/material/vsc/createComlib`,
         data: {
           userId: userName,
-          editCode: fse.readFileSync(editCodePath, 'utf-8'),
-          runtimeCode: fse.readFileSync(rtCodePath, 'utf-8'),
-          runtimeComponentsMapCode: runtimeComponentsMapString,
+          content: {
+            [tags]: {
+              editJs: fse.readFileSync(editCodePath, 'utf-8'),
+              rtJs: fse.readFileSync(rtCodePath, 'utf-8'),
+              coms: runtimeComponentsMapString,
+              deps,
+              externals
+            }
+          },
           version: finalConfig.version || packageJson.version,
           namespace: finalConfig.namespace,
           scene: sceneInfo,
