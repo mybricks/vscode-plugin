@@ -34,7 +34,8 @@ export function publishConfigValidCheck({ docPath, configName, publishType }: an
   const config = fse.readJSONSync(configPath);
   const isPublishToDist = publishType === 'dist';
   const isPublishToCentral = publishType === 'central';
-  if (!isPublishToDist && !isPublishToCentral) {
+  const isPublishToNpm = publishType === 'npm';
+  if (!isPublishToDist && !isPublishToCentral && !isPublishToNpm) {
     if (!config.domain) {
       vscode.window.showErrorMessage(`发布到物料中心需要正确填写domain，比如 https://my.mybricks.world`);
       throw new Error(`发布到物料中心需要正确填写domain，比如 https://my.mybricks.world`);
