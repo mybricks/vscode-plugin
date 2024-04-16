@@ -1,4 +1,5 @@
 const path = require('path');
+const cp = require("child_process");
 const JSZip = require('jszip');
 const axios = require('axios');
 const fse = require('fs-extra');
@@ -6,7 +7,7 @@ const webpack = require('webpack');
 const WebpackBar = require('webpackbar');
 const { merge } = require('webpack-merge');
 const generateMybricksComponentLibraryCode = require('generate-mybricks-component-library-code');
-const { getOnlineInfo, getDistInfo, getCentralInfo, getCurrentTimeYYYYMMDDHHhhmmss, uploadToOSS, publishToCentral, getGitEmail } = require("../utils");
+const { getOnlineInfo, getDistInfo, getCentralInfo, getNpmInfo, getCurrentTimeYYYYMMDDHHhhmmss, uploadToOSS, publishToCentral, getGitEmail } = require("../utils");
 // 组件库根目录
 const docPath = '--replace-docPath--';
 // 配置文件
@@ -22,15 +23,149 @@ async function build() {
   let finalConfig;
   const isPublishToDist = publishType === 'dist';
   const isPublishToCentral = publishType === 'central';
+  const isPublishToMaterial = publishType === 'material';
+  const isPublishToNpm = publishType === 'npm';
   if (isPublishToCentral) {
     console.log("发布至中心化");
     finalConfig = await getCentralInfo({configPath: mybricksJsonPath});
-  } else if (!isPublishToDist) {
+  } else if (isPublishToMaterial) {
     console.log("发布至物料中心");
     finalConfig = await getOnlineInfo({configPath: mybricksJsonPath});
+  } else if (isPublishToNpm) {
+    console.log("发布至npm");
+    finalConfig = await getNpmInfo({configPath: mybricksJsonPath});
   } else {
     console.log('保存至本地dist文件夹');
     finalConfig = await getDistInfo({configPath: mybricksJsonPath});
+  }
+
+  const { externals } = mybricksJson;
+  const externalsMap = {
+    'react': 'React',
+    'react-dom': 'ReactDOM',
+  };
+  if (Array.isArray(externals)) {
+    externals.forEach(({name, library, urls}) => {
+      if (name && library && Array.isArray(urls)) {
+        externalsMap[name] = library;
+      }
+    });
+  }
+
+  console.log(`\x1b[0m*.mybricks.json -> version: \x1b[32m${finalConfig.version}\n   \x1b[0mpackage.json -> version: \x1b[32m${packageJson.version}\n          \x1b[0m当前组件库版本号: \x1b[32m${finalConfig.version || packageJson.version}`);
+
+  if (isPublishToNpm) {
+    /** 最终需要处理的comAry */
+    let finalComAry = [];
+
+    const { comAry } = finalConfig;
+
+    if (isArray(comAry)) {
+      finalComAry = comAry;
+    } else if (isObject(comAry)) {
+      const { publish } = comAry;
+      finalComAry = publish;
+    }
+
+    /** 创建临时文件夹 */
+    const compileProductFolderPath = path.resolve(__dirname, `compile${String(Math.random()).replace('\.', '_')}`);
+    fse.mkdirSync(compileProductFolderPath);
+    /** 拷贝用于npm发布的package.json文件 */
+    packageJson.main = "dist/index.js";
+    packageJson.types = "dist/index.d.ts";
+    Reflect.deleteProperty(packageJson, "dependencies");
+    Reflect.deleteProperty(packageJson, "devDependencies");
+    fse.writeJSONSync(path.resolve(compileProductFolderPath, "./package.json"), packageJson, "utf-8");
+    /** 写入tsconfig.json，用于生成类型文件 */
+    // try {
+    //   const tsConfigJSON = fse.readJSONSync(path.join(docPath, "./tsconfig.json"));
+    //   tsConfigJSON.compilerOptions.declaration = true;
+    //   tsConfigJSON.compilerOptions.outDir = "dist";
+    //   fse.writeJSONSync(path.resolve(compileProductFolderPath, "./tsconfig.json"), tsConfigJSON, "utf-8");
+    // } catch {
+    //   console.log("未配置tsconfig.json");
+    // }
+    /** 组件列表，导入并导出 */
+    const indexComponents = [];
+
+    function traverseComAry(comAry) {
+      comAry.forEach((com) => {
+        if (isString(com)) {
+          const comJsonPath = path.resolve(docPath, com);
+          const comPath = path.resolve(comJsonPath, '../');
+          const comJson = JSON.parse(fse.readFileSync(comJsonPath, 'utf-8'));
+          const { namespace, runtime, rtType } = comJson;
+          const name = getComponentName({namespace, rtType});
+          indexComponents.push({
+            /** 函数名 */
+            name,
+            /** 函数路径 */
+            path: path.resolve(comPath, runtime.replace(/\.tsx|\.ts/, ""))
+          });
+        } else if (isObject(com)) {
+          const { comAry } = com;
+          traverseComAry(comAry);
+        }
+      });
+    }
+
+    traverseComAry(finalComAry);
+
+    let indexImportCode = "";
+    let indexExportCode = "";
+    let indexDTSCode = "";
+
+    indexComponents.forEach(({ name, path }) => {
+      indexExportCode = indexExportCode + `export { default as ${name} } from "${path}";\n`;
+      indexDTSCode = indexDTSCode + `export declare const ${name}: any;\n`;
+    });
+
+    const indexPath = path.resolve(compileProductFolderPath, "./index.ts");
+
+    /** 写入入口代码 */
+    fse.writeFileSync(indexPath, `${indexImportCode}${indexExportCode}`, "utf-8");
+    Object.keys(externalsMap).forEach((key) => {
+      externalsMap[key] = key;
+    });
+    await new Promise((resolve, reject) => {
+      webpack(getWebpckConfig2({ entry: indexPath, outputPath: path.resolve(compileProductFolderPath, "./dist"), externals: [externalsMap], library: packageJson.name }, webpackMergeConfig), (err, stats) => {
+        if (err || stats.hasErrors()) {
+          console.error(err || stats.compilation.errors);
+          reject(err || stats);
+        }
+        resolve();
+      });
+    });
+    /** 写入types代码 */
+    fse.writeFileSync(path.resolve(compileProductFolderPath, "./dist/index.d.ts"), indexDTSCode, "utf-8");
+    /** 删除入口代码，npm包中不需要包含 */
+    fse.removeSync(indexPath); // 临时注释
+
+    function npmPublish(projectPath) {
+      return new Promise((resolve, reject) => {
+        cp.exec(`cd ${projectPath} && npm publish`, (error, stdout, stderr) => {
+          console.log(stdout);
+          console.log(stderr);
+          if (error) {
+            reject();
+          } else {
+            resolve();
+          }
+        });
+      });
+    }
+
+    // 临时注释
+    npmPublish(compileProductFolderPath).then(() => {
+      console.log("\n发布成功");
+    }).catch(() => {
+      console.log("\n发布失败");
+    }).finally(() => {
+      fse.remove(__filename);
+      fse.remove(compileProductFolderPath);
+    });
+
+    return;
   }
 
   const sceneInfo = ['H5', 'KH5'].includes(mybricksJson?.componentType) ? {
@@ -40,7 +175,6 @@ async function build() {
     title: 'PC中后台',
     type: 'PC',
   };
-  console.log(`\x1b[0m*.mybricks.json -> version: \x1b[32m${finalConfig.version}\n   \x1b[0mpackage.json -> version: \x1b[32m${packageJson.version}\n          \x1b[0m当前组件库版本号: \x1b[32m${finalConfig.version || packageJson.version}`);
 
   const { editCode, runtimeCode, components } = generateMybricksComponentLibraryCode(
     {
@@ -56,18 +190,6 @@ async function build() {
   );
   const compileProductFolderPath = path.resolve(__dirname, `compile${String(Math.random()).replace('\.', '_')}`);
   fse.mkdirSync(compileProductFolderPath);
-  const { externals } = mybricksJson;
-  const externalsMap = {
-    'react': 'React',
-    'react-dom': 'ReactDOM',
-  };
-  if (Array.isArray(externals)) {
-    externals.forEach(({name, library, urls}) => {
-      if (name && library && Array.isArray(urls)) {
-        externalsMap[name] = library;
-      }
-    });
-  }
   const editCodePath = path.resolve(compileProductFolderPath, 'edit.js');
   fse.writeFileSync(editCodePath, editCode, 'utf-8');
   const rtCodePath = path.resolve(compileProductFolderPath, 'rt.js');
@@ -514,4 +636,191 @@ function getWebpackMergeConfig () {
     }
   }
   return webpackMergeConfig || {};
+}
+
+
+function isObject(v) {
+  return v !== null && v !== undefined && typeof v === 'object' && !isArray(v);
+}
+
+function isArray(v) {
+  return Array.isArray(v);
+}
+
+function isString(v) {
+  return (
+    v !== null &&
+    v !== undefined &&
+    (typeof v === 'string' || v instanceof String)
+  );
+}
+
+/** 非字母和数字转下划线 */
+function convertToUnderscore(input) {
+  return input.replace(/[^a-zA-Z0-9]/g, "_");
+}
+
+function capitalizeFirstLetter(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function getComponentName({ namespace, rtType }) {
+  const lastIndex = namespace.lastIndexOf('.');
+  return convertToUnderscore((lastIndex !== -1 ? namespace.substring(lastIndex + 1) : namespace)).split('_').filter((str) => str).reduce((p, c, index) => {
+    return p + (rtType?.match(/^js/gi) ? (index ? capitalizeFirstLetter(c) : c) : capitalizeFirstLetter(c));
+  }, "");
+}
+
+/** 打包成npm包，module形式 */
+function getWebpckConfig2({ entry, outputPath, externals = [], library }, webpackMergeConfig) {
+  const { externals: mergeExternals } = webpackMergeConfig;
+  if (Array.isArray(mergeExternals)) {
+    const external = mergeExternals[0];
+    Object.keys(external).forEach((key) => {
+      external[key] = key;
+    });
+  }
+  return merge(webpackMergeConfig, {
+    mode: 'production',
+    entry,
+    // output: {
+    //   path: outputPath,
+    //   filename: "index.js",
+    //   libraryTarget: "module"
+    // },
+    output: {
+      path: outputPath,
+      filename: 'index.js',
+      libraryTarget: 'umd',
+      library
+    },
+    // experiments: {
+    //   outputModule: true,
+    // },
+    resolve: {
+      alias: {},
+      extensions: ['.js', '.jsx', '.ts', '.tsx'],
+    },
+    externals,
+    module: {
+      rules: [
+        {
+          test: /\.jsx?$/,
+          use: [
+            {
+              loader: 'babel-loader',
+              options: {
+                presets: [
+                  '@babel/preset-env',
+                  '@babel/preset-react'
+                ],
+                cacheDirectory: true
+              }
+            }
+          ]
+        },
+        {
+          test: /\.tsx?$/,
+          use: [
+            {
+              loader: 'babel-loader',
+              options: {
+                presets: [
+                  '@babel/preset-env',
+                  '@babel/preset-react'
+                ],
+                cacheDirectory: true
+              }
+            },
+            {
+              loader: 'ts-loader',
+              options: {
+                  silent: true,
+                  transpileOnly: true,
+              },
+            },
+          ]
+        },
+        {
+          test: /\.css$/i,
+          use: ['style-loader', 'css-loader'],
+          sideEffects: true
+        },
+        {
+          test: /\.less$/i,
+          use: [
+            {
+              loader: 'style-loader',
+              options: {attributes: {title: 'less'}}
+            },
+            {
+              loader: 'css-loader',
+              options: {
+                modules: {
+                  localIdentName: '[local]-[hash:5]'
+                }
+              }
+            },
+            {
+              loader: 'less-loader',
+              options: {
+                lessOptions: {
+                  javascriptEnabled: true
+                },
+              },
+            }
+          ],
+          exclude: /node_modules/
+        },
+        {
+          test: /\.less$/i,
+          use: [
+            {
+              loader: 'style-loader',
+              options: {attributes: {title: 'less'}}
+            },
+            {
+              loader: 'css-loader',
+              options: {
+                modules: {
+                  localIdentName: '[local]'
+                }
+              }
+            },
+            {
+              loader: 'less-loader',
+              options: {
+                lessOptions: {
+                  javascriptEnabled: true
+                },
+              },
+            }
+          ],
+          include: /node_modules/
+        },
+        {
+          test: /\.(gif|png|jpe?g|webp|svg|woff|woff2|eot|ttf)$/i,
+          use: [
+            {
+              loader: 'url-loader',
+              options: {
+                esModule: false,
+              },
+            }
+          ]
+        },
+        {
+          test: /\.d.ts$/i,
+          use: [{ loader: 'raw-loader' }]
+        },
+        {
+          test: /\.(xml|txt|html|cjs|theme)$/i,
+          use: [{ loader: 'raw-loader' }]
+        }
+      ]
+    },
+    plugins: [
+      new WebpackBar(),
+    ]
+  });
 }

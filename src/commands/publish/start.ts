@@ -83,7 +83,8 @@ async function start2() {
 
   const publishTypeitems = [
     {label: "组件库产物保存至本地dist文件夹内", value: "dist"},
-    {label: "发布至物料中心，需在配置文件内正确配置平台地址（domain）", value: "material"}
+    {label: "发布至物料中心，需在配置文件内正确配置平台地址（domain）", value: "material"},
+    {label: "发布至npm（使用当前本地npm账号发布）", value: "npm"}
   ];
 
   if ((vscode.workspace.getConfiguration("mybricks").get("components.publishConfig") as any).toCentral === "08edac515e841c3222ba352fe8e32403b258316b0c10ae6e45f754d5bb5b5034") {
