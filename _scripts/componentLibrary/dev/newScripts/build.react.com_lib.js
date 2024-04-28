@@ -72,7 +72,9 @@ async function build() {
     fse.mkdirSync(compileProductFolderPath);
     /** 拷贝用于npm发布的package.json文件 */
     packageJson.main = "dist/index.js";
-    packageJson.types = "dist/index.d.ts";
+    packageJson.types = "es/index.d.ts";
+    packageJson.module = "es/index.js";
+    packageJson.version = finalConfig.version || packageJson.version;
     Reflect.deleteProperty(packageJson, "dependencies");
     Reflect.deleteProperty(packageJson, "devDependencies");
     fse.writeJSONSync(path.resolve(compileProductFolderPath, "./package.json"), packageJson, "utf-8");
@@ -114,21 +116,37 @@ async function build() {
     let indexImportCode = "";
     let indexExportCode = "";
     let indexDTSCode = "";
+    let esIndexImportCode = "";
 
-    indexComponents.forEach(({ name, path }) => {
-      indexExportCode = indexExportCode + `export { default as ${name} } from "${path}";\n`;
+    const componentsEntry = [];
+
+    indexComponents.forEach(({ name, path: comPath }) => {
+      fse.outputFileSync(path.resolve(compileProductFolderPath, `es/${name}/index.js`), `import ${name} from "./${name}";\nexport default ${name};`, "utf-8");
+      // fse.outputFileSync(path.resolve(compileProductFolderPath, `es/${name.toLowerCase()}/${name}.ts`), `export { default as ${name} } from "${comPath}";`, "utf-8");
+
+      fse.outputFileSync(path.resolve(compileProductFolderPath, `es/${name}/index.d.ts`), `declare const ${name}: any;\nexport default ${name};`, "utf-8");
+
+      esIndexImportCode = esIndexImportCode + `export { default as ${name} } from './${name}';\n`;
+
+      indexExportCode = indexExportCode + `export { default as ${name} } from "${comPath}";\n`;
       indexDTSCode = indexDTSCode + `export declare const ${name}: any;\n`;
+
+      componentsEntry[`es/${name}/${name}`] = comPath;
     });
 
     const indexPath = path.resolve(compileProductFolderPath, "./index.ts");
 
     /** 写入入口代码 */
-    fse.writeFileSync(indexPath, `${indexImportCode}${indexExportCode}`, "utf-8");
+    fse.outputFileSync(indexPath, `${indexImportCode}${indexExportCode}`, "utf-8");
+    /** 写入es入口代码 */
+    fse.outputFileSync(path.resolve(compileProductFolderPath, "./es/index.js"), esIndexImportCode, "utf-8");
     Object.keys(externalsMap).forEach((key) => {
       externalsMap[key] = key;
     });
     await new Promise((resolve, reject) => {
-      webpack(getWebpckConfig2({ entry: indexPath, outputPath: path.resolve(compileProductFolderPath, "./dist"), externals: [externalsMap], library: packageJson.name }, webpackMergeConfig), (err, stats) => {
+      // indexPathpath.resolve(compileProductFolderPath, "./dist")
+      // { entry: { [`dist/index`]: indexPath, ...componentsEntry }
+      webpack(getWebpckConfig2({ entry: {...componentsEntry}, outputPath: compileProductFolderPath, externals: [externalsMap], library: packageJson.name }, webpackMergeConfig), (err, stats) => {
         if (err || stats.hasErrors()) {
           console.error(err || stats.compilation.errors);
           reject(err || stats);
@@ -137,7 +155,7 @@ async function build() {
       });
     });
     /** 写入types代码 */
-    fse.writeFileSync(path.resolve(compileProductFolderPath, "./dist/index.d.ts"), indexDTSCode, "utf-8");
+    fse.writeFileSync(path.resolve(compileProductFolderPath, "./es/index.d.ts"), indexDTSCode, "utf-8");
     /** 删除入口代码，npm包中不需要包含 */
     fse.removeSync(indexPath); // 临时注释
 
@@ -627,13 +645,21 @@ function getWebpackMergeConfig () {
     }
   }
 
+  let catchE;
+
   if (!webpackMergeConfig) {
     for (const webpackConfigFileName of ['webpack.config.prod.js', 'webpack.config.js']) {
       try {
         webpackMergeConfig = require(path.resolve(docPath, webpackConfigFileName));
         break;
-      } catch {}
+      } catch (e) {
+        // console.log("读取webpack配置报错: ", e);
+        catchE = e;
+      }
     }
+  }
+  if (!webpackMergeConfig && catchE) {
+    console.log("读取webpack配置报错: ", catchE);
   }
   return webpackMergeConfig || {};
 }
@@ -690,13 +716,18 @@ function getWebpckConfig2({ entry, outputPath, externals = [], library }, webpac
     // },
     output: {
       path: outputPath,
-      filename: 'index.js',
-      libraryTarget: 'umd',
-      library
+      // filename: 'index.js',
+      filename: '[name].js',
+      // libraryTarget: 'umd',
+      libraryTarget: 'module',
+      // library
     },
-    // experiments: {
-    //   outputModule: true,
+    // optimization: {
+    //   usedExports: true,
     // },
+    experiments: {
+      outputModule: true,
+    },
     resolve: {
       alias: {},
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
