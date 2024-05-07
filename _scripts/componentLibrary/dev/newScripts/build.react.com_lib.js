@@ -102,7 +102,10 @@ async function build() {
             /** 函数名 */
             name,
             /** 函数路径 */
-            path: path.resolve(comPath, runtime.replace(/\.tsx|\.ts/, ""))
+            runtimePath: path.resolve(comPath, runtime.replace(/\.tsx|\.ts/, "")),
+            /** comjson path */
+            comPath,
+            comJson
           });
         } else if (isObject(com)) {
           const { comAry } = com;
@@ -120,18 +123,32 @@ async function build() {
 
     const componentsEntry = [];
 
-    indexComponents.forEach(({ name, path: comPath }) => {
-      fse.outputFileSync(path.resolve(compileProductFolderPath, `es/${name}/index.js`), `import ${name} from "./${name}";\nexport default ${name};`, "utf-8");
-      // fse.outputFileSync(path.resolve(compileProductFolderPath, `es/${name.toLowerCase()}/${name}.ts`), `export { default as ${name} } from "${comPath}";`, "utf-8");
+    indexComponents.forEach(({ name, runtimePath, comPath, comJson }) => {
+      // 默认空对象
+      let data = {};
+      try {
+        data = JSON.parse(fse.readFileSync(path.resolve(comPath, comJson.data), 'utf-8'));
+      } catch {}
+      const inputs = comJson.inputs ? comJson.inputs.map(({ id }) => id) : [];
+      const outputs = comJson.outputs ? comJson.outputs.map(({ id }) => id) : [];
+      const isJS = comJson.rtType?.match(/^js/gi);
+
+      fse.outputFileSync(path.resolve(compileProductFolderPath, `es/${name}/index.js`), `import ${name} from "./${name}";\nexport default {
+        runtime: ${name},
+        data: ${JSON.stringify(data)},
+        inputs: ${JSON.stringify(inputs.concat(isJS ? [] : ['show', 'hide', 'showOrHide']))},
+        outputs: ${JSON.stringify(outputs)}
+      };`, "utf-8");
+      // fse.outputFileSync(path.resolve(compileProductFolderPath, `es/${name.toLowerCase()}/${name}.ts`), `export { default as ${name} } from "${runtimePath}";`, "utf-8");
 
       fse.outputFileSync(path.resolve(compileProductFolderPath, `es/${name}/index.d.ts`), `declare const ${name}: any;\nexport default ${name};`, "utf-8");
 
       esIndexImportCode = esIndexImportCode + `export { default as ${name} } from './${name}';\n`;
 
-      indexExportCode = indexExportCode + `export { default as ${name} } from "${comPath}";\n`;
+      indexExportCode = indexExportCode + `export { default as ${name} } from "${runtimePath}";\n`;
       indexDTSCode = indexDTSCode + `export declare const ${name}: any;\n`;
 
-      componentsEntry[`es/${name}/${name}`] = comPath;
+      componentsEntry[`es/${name}/${name}`] = runtimePath;
     });
 
     const indexPath = path.resolve(compileProductFolderPath, "./index.ts");
