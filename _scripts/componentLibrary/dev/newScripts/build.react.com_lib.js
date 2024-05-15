@@ -507,6 +507,137 @@ async function build() {
 build();
 
 function getWebpckConfig({ entry, outputPath, externals = [] }, webpackMergeConfig) {
+  let rules = [
+    {
+      test: /\.jsx?$/,
+      use: [
+        {
+          loader: 'babel-loader',
+          options: {
+            presets: [
+              '@babel/preset-env',
+              '@babel/preset-react'
+            ],
+            cacheDirectory: true
+          }
+        }
+      ]
+    },
+    {
+      test: /\.tsx?$/,
+      use: [
+        {
+          loader: 'babel-loader',
+          options: {
+            presets: [
+              '@babel/preset-env',
+              '@babel/preset-react'
+            ],
+            cacheDirectory: true
+          }
+        },
+        {
+          loader: 'ts-loader',
+          options: {
+              silent: true,
+              transpileOnly: true,
+          },
+        },
+      ]
+    },
+    {
+      test: /\.css$/i,
+      use: ['style-loader', 'css-loader'],
+      sideEffects: true
+    },
+    {
+      test: /\.less$/i,
+      use: [
+        {
+          loader: 'style-loader',
+          options: {attributes: {title: 'less'}}
+        },
+        {
+          loader: 'css-loader',
+          options: {
+            modules: {
+              localIdentName: '[local]-[hash:5]'
+            }
+          }
+        },
+        {
+          loader: 'less-loader',
+          options: {
+            lessOptions: {
+              javascriptEnabled: true
+            },
+          },
+        }
+      ],
+      exclude: /node_modules/
+    },
+    {
+      test: /\.less$/i,
+      use: [
+        {
+          loader: 'style-loader',
+          options: {attributes: {title: 'less'}}
+        },
+        {
+          loader: 'css-loader',
+          options: {
+            modules: {
+              localIdentName: '[local]'
+            }
+          }
+        },
+        {
+          loader: 'less-loader',
+          options: {
+            lessOptions: {
+              javascriptEnabled: true
+            },
+          },
+        }
+      ],
+      include: /node_modules/
+    },
+    {
+      test: /\.(gif|png|jpe?g|webp|svg|woff|woff2|eot|ttf)$/i,
+      use: [
+        {
+          loader: 'url-loader',
+          options: {
+            esModule: false,
+          },
+        }
+      ]
+    },
+    {
+      test: /\.d.ts$/i,
+      use: [{ loader: 'raw-loader' }]
+    },
+    {
+      test: /\.(xml|txt|html|cjs|theme)$/i,
+      use: [{ loader: 'raw-loader' }]
+    }
+  ];
+
+  // 外部传入的
+  const mergeRuleTestStrs = [];
+  const mergeRules = webpackMergeConfig?.module?.rules;
+  if (Array.isArray(mergeRules)) {
+    mergeRules.forEach(({ test }) => {
+      const testStr = test.toString();
+      if (testStr.includes('.less')) {
+        mergeRuleTestStrs.push('.less');
+      }
+    });
+    rules = rules.filter(({ test }) => {
+      return !mergeRuleTestStrs.find((mergeTest) => test.toString().includes(mergeTest));
+    });
+  }
+
   return merge(webpackMergeConfig, {
     mode: 'production',
     entry,
@@ -522,121 +653,7 @@ function getWebpckConfig({ entry, outputPath, externals = [] }, webpackMergeConf
     },
     externals,
     module: {
-      rules: [
-        {
-          test: /\.jsx?$/,
-          use: [
-            {
-              loader: 'babel-loader',
-              options: {
-                presets: [
-                  '@babel/preset-env',
-                  '@babel/preset-react'
-                ],
-                cacheDirectory: true
-              }
-            }
-          ]
-        },
-        {
-          test: /\.tsx?$/,
-          use: [
-            {
-              loader: 'babel-loader',
-              options: {
-                presets: [
-                  '@babel/preset-env',
-                  '@babel/preset-react'
-                ],
-                cacheDirectory: true
-              }
-            },
-            {
-              loader: 'ts-loader',
-              options: {
-                  silent: true,
-                  transpileOnly: true,
-              },
-            },
-          ]
-        },
-        {
-          test: /\.css$/i,
-          use: ['style-loader', 'css-loader'],
-          sideEffects: true
-        },
-        {
-          test: /\.less$/i,
-          use: [
-            {
-              loader: 'style-loader',
-              options: {attributes: {title: 'less'}}
-            },
-            {
-              loader: 'css-loader',
-              options: {
-                modules: {
-                  localIdentName: '[local]-[hash:5]'
-                }
-              }
-            },
-            {
-              loader: 'less-loader',
-              options: {
-                lessOptions: {
-                  javascriptEnabled: true
-                },
-              },
-            }
-          ],
-          exclude: /node_modules/
-        },
-        {
-          test: /\.less$/i,
-          use: [
-            {
-              loader: 'style-loader',
-              options: {attributes: {title: 'less'}}
-            },
-            {
-              loader: 'css-loader',
-              options: {
-                modules: {
-                  localIdentName: '[local]'
-                }
-              }
-            },
-            {
-              loader: 'less-loader',
-              options: {
-                lessOptions: {
-                  javascriptEnabled: true
-                },
-              },
-            }
-          ],
-          include: /node_modules/
-        },
-        {
-          test: /\.(gif|png|jpe?g|webp|svg|woff|woff2|eot|ttf)$/i,
-          use: [
-            {
-              loader: 'url-loader',
-              options: {
-                esModule: false,
-              },
-            }
-          ]
-        },
-        {
-          test: /\.d.ts$/i,
-          use: [{ loader: 'raw-loader' }]
-        },
-        {
-          test: /\.(xml|txt|html|cjs|theme)$/i,
-          use: [{ loader: 'raw-loader' }]
-        }
-      ]
+      rules
     },
     plugins: [
       new WebpackBar(),
