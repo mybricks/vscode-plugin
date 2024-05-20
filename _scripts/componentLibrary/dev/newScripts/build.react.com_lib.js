@@ -263,7 +263,7 @@ async function build() {
 
   await Promise.all([
     new Promise((resolve, reject) => {
-      webpack(getWebpckConfig({ entry: { edit: editCodePath, ...componentsEntry}, outputPath: compileProductFolderPath, externals: [externalsMap] }, webpackMergeConfig), (err, stats) => {
+      webpack(getWebpckConfig({ entry: { edit: editCodePath }, outputPath: compileProductFolderPath, externals: [externalsMap] }, webpackMergeConfig), (err, stats) => {
         if (err || stats.hasErrors()) {
           console.error(err || stats.compilation.errors);
           reject(err || stats);
@@ -272,7 +272,7 @@ async function build() {
       });
     }),
     new Promise((resolve, reject) => {
-      webpack(getWebpckConfig({ entry: { 'rt': rtCodePath }, outputPath: compileProductFolderPath, externals: [externalsMap] }, webpackMergeConfig), (err, stats) => {
+      webpack(getWebpckConfig({ entry: { 'rt': rtCodePath, ...componentsEntry }, outputPath: compileProductFolderPath, externals: [externalsMap] }, webpackMergeConfig), (err, stats) => {
         if (err || stats.hasErrors()) {
           console.error(err || stats.compilation.errors);
           reject(err || stats);
@@ -623,22 +623,35 @@ function getWebpckConfig({ entry, outputPath, externals = [] }, webpackMergeConf
     }
   ];
 
-  // 外部传入的
-  const mergeRuleTestStrs = [];
-  const mergeRules = webpackMergeConfig?.module?.rules;
+  let mergeRules = webpackMergeConfig?.module?.rules;
   if (Array.isArray(mergeRules)) {
-    mergeRules.forEach(({ test }) => {
-      const testStr = test.toString();
-      if (testStr.includes('.less')) {
-        mergeRuleTestStrs.push('.less');
-      }
-    });
-    rules = rules.filter(({ test }) => {
-      return !mergeRuleTestStrs.find((mergeTest) => test.toString().includes(mergeTest));
-    });
+    if (entry.rt) {
+      // 运行时代码
+      // 删除默认的less
+      const mergeRuleTestStrs = [];
+      mergeRules.forEach(({ test }) => {
+        const testStr = test.toString();
+        if (testStr.includes('.less')) {
+          mergeRuleTestStrs.push('.less');
+        }
+      });
+      rules = rules.filter(({ test }) => {
+        return !mergeRuleTestStrs.find((mergeTest) => test.toString().includes(mergeTest));
+      });
+    } else {
+      // 编辑时代码
+      // 删除传入的less
+      mergeRules = webpackMergeConfig.module.rules.filter(({ test }) => {
+        return !test.toString().includes('.less');
+      });
+    }
   }
 
-  return merge(webpackMergeConfig, {
+  if (!Array.isArray(mergeRules)) {
+    mergeRules = [];
+  }
+
+  return merge({...webpackMergeConfig, module: {...webpackMergeConfig.module, rules: mergeRules }}, {
     mode: 'production',
     entry,
     output: {

@@ -109,6 +109,14 @@ function getWebpackMergeConfig () {
       } catch {}
     }
   }
+  try {
+    const mergeRules = webpackMergeConfig?.module?.rules;
+    if (Array.isArray(mergeRules)) {
+      webpackMergeConfig.module.rules = webpackMergeConfig.module.rules.filter(({ test }) => {
+        return !test.toString().includes('.less');
+      });
+    }
+  } catch {}
   return webpackMergeConfig || {};
 }
 
