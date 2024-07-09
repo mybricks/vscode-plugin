@@ -258,6 +258,7 @@ function initEditJS ({libName, libVersion, description, dependencies}) {
       title: "${description}",
       version: "${libVersion}",
       dependencies: ${JSON.stringify(dependencies || [])},
+      target: "nodejs",
       comAray
     })
     let comDef;

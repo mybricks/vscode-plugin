@@ -90,7 +90,7 @@ export class PublishCommands {
         'utf-8'
       );
 
-      if(libCfg?.target === 'node') {
+      if(['node', 'nodejs'].includes(libCfg?.target)) {
         showInformationMessage("编译目标为node...");
         devTerminal.sendText(`node ${projPath}/_scripts/generateCodePublish.js docPath=${docPath} configName=${configName} && export filename=${filename} && npm run --prefix ${projPath} ${'publish:comlib-node'}`);
       } else {
@@ -173,7 +173,7 @@ export class PublishCommands {
       if (publishType === 'dist') {
         let cmd = 'publish:comlib';
         // 针对搭建产物为node的组件库
-        if(libCfg?.target === 'node') {
+        if(['node', 'nodejs'].includes(libCfg?.target)) {
           cmd = 'publish:comlib-node';
           showInformationMessage("编译目标为node...");
           devTerminal.sendText(`node ${projPath}/_scripts/generateCodePublish.js docPath=${docPath} configName=${configName} && export filename=${filename} && npm run --prefix ${projPath} ${cmd}`);
