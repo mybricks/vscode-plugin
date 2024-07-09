@@ -35,13 +35,13 @@ const baseConfig = {
   mode: "production",
   // target: 'node',
   // entry,
-  output: {
-    path: path.resolve(docPath, './dist'),
-    filename: "[name].js",
-    libraryTarget: "umd",
-    library: "MybricksComDef",
-    chunkFilename: 'chunk_[name]_[contenthash:4].js'
-  },
+  // output: {
+  //   path: path.resolve(docPath, './dist'),
+  //   filename: "[name].js",
+  //   libraryTarget: "umd",
+  //   library: "MybricksComDef",
+  //   chunkFilename: 'chunk_[name]_[contenthash:4].js'
+  // },
   resolve: {
     alias: {},
     extensions: [".js", ".jsx", ".ts", ".tsx"],
@@ -128,12 +128,25 @@ const changeEditEntry = (filePath) => {
 const editJsConfig = {
   ...baseConfig,
   target: 'web',
+  output: {
+    path: path.resolve(docPath, './dist'),
+    filename: "[name].js",
+    libraryTarget: "umd",
+    library: "MybricksComDef",
+    chunkFilename: 'chunk_[name]_[contenthash:4].js'
+  },
   entry: { edit: entry.edit}
 };
 
 const rtJsConfig = {
   ...baseConfig,
   target: 'node',
+  output: {
+    path: path.resolve(docPath, './dist'),
+    filename: "[name].js",
+    libraryTarget: "commonjs",
+    chunkFilename: 'chunk_[name]_[contenthash:4].js'
+  },
   entry: {rt: entry.rt}
 };
 
