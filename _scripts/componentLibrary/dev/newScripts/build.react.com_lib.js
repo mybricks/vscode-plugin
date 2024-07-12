@@ -306,7 +306,7 @@ async function build() {
           } else {
             if (key === 'runtime') {
               runtimeComponentsMap[`${namespace}@${version}`] = {
-                runtime: encodeURIComponent(code),
+                runtime: encodeURIComponent(`(function(){${code} return MybricksComDef.default;})()`),
                 version
               };
             }
