@@ -137,7 +137,9 @@ async function build() {
         runtime: ${name},
         data: ${JSON.stringify(data)},
         inputs: ${JSON.stringify(inputs.concat(isJS ? [] : ['show', 'hide', 'showOrHide']))},
-        outputs: ${JSON.stringify(outputs)}
+        outputs: ${JSON.stringify(outputs)},
+        namespace: "${comJson.namespace}",
+        version: "${comJson.version}"
       };`, "utf-8");
       // fse.outputFileSync(path.resolve(compileProductFolderPath, `es/${name.toLowerCase()}/${name}.ts`), `export { default as ${name} } from "${runtimePath}";`, "utf-8");
 
