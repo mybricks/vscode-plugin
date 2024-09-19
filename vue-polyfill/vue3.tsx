@@ -83,7 +83,6 @@ function VUEHoc(com) {
     for (const key in slots) {
       if (Object.prototype.hasOwnProperty.call(slots, key)) {
         vSlots[key] = (params) => {
-          console.warn(params);
           return <SlotRender slots={slots} name={key} params={params} />;
         };
         _slots[key] = slots[key];

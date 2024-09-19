@@ -100,11 +100,19 @@ class VueComponentLoader extends React.Component {
   pushReactPortal (reactPortal) {
     let { portals } = this.state
     const key = this.__veauryPortalKeyPool__.shift() || this.__veauryMaxPortalCount__++
-    portals.push({
+    // portals.push({
+    //   Portal: reactPortal,
+    //   key
+    // })
+    // this.setState({ portals })
+    // [Mybricks Hack] push的话引用值还是一样的，这里必须要更新引用值，否则react组件不更新
+    this.__my__ = [...(this.__my__ ?? []), {
       Portal: reactPortal,
       key
-    })
-    this.setState({ portals })
+    }];
+    this.setState({
+      portals: this.__my__
+    });
   }
 
   removeReactPortal (reactPortal) {
