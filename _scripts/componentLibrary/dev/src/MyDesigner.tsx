@@ -70,6 +70,22 @@ export default function MyDesigner () {
     }
   }, []);
 
+  /** 将 external 中的 css 文件注入到 geoView 中 */
+  const externalCss = useMemo(() => {
+    const cssFiles: any = [];
+    const externals = MYBRICKS_JSON?.externals ?? [];
+    if (Array.isArray(externals)) {
+      externals.forEach((ex) => {
+        (ex?.urls ?? []).forEach((url: string) => {
+          if (url.includes('.css')) {
+            cssFiles.push(url);
+          }
+        });
+      });
+    }
+    return cssFiles;
+  }, []);
+
   const h5GeoView = {
     type: "mobile",
     width: 375,
@@ -86,10 +102,9 @@ export default function MyDesigner () {
     scenes: true,
     theme: {
       css: !MYBRICKS_JSON.tags || MYBRICKS_JSON.tags === 'react' ? [
-        // "./assets/element-plus.index.css", 
         "./assets/4.21.6.antd.min.css",
         "./assets/editor.d5c483a324024fb6.css",
-      ] : []
+      ] : [...externalCss]
     }
   };
 
