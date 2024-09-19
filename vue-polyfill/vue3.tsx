@@ -95,7 +95,6 @@ function VUEHoc(com) {
     const inputsProxy = useValidProxy(inputs);
     const outputsProxy = useValidProxy(outputs);
     const envProxy = useValidProxy(env);
-    
 
     const props = {
       id,
@@ -103,7 +102,7 @@ function VUEHoc(com) {
       env: envProxy,
       _env,
       logger,
-      data: { ...data }, // 解构才能响应
+      data: JSON.parse(JSON.stringify(data)), // 深拷贝成js对象，同时触发所有getter用于
       outputs: outputsProxy,
       inputs: inputsProxy,
       slots: _slots,
