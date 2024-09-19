@@ -41,6 +41,8 @@ function externalUrlsHandle (urls) {
       htmlScript = htmlScript + `<script src="${url}"></script>\n`;
     } else if (url.endsWith('.css')) {
       htmlLink = htmlLink + `<link rel="stylesheet" href="${url}">\n`;
+    } else {
+      htmlScript = htmlScript + `<script src="${url}"></script>\n`;
     }
   });
 }
@@ -64,18 +66,18 @@ defaultExternals.forEach(({name, library, urls}) => {
 switch (config.tags) {
   case 'vue':
   case 'vue2':
-    htmlScript = htmlScript + `<script src="assets/vue2.min.js"></script>
+    htmlScript = `<script src="assets/vue2.min.js"></script>
     <script>
       window.Vue ? (window.vue = window.Vue) : null;
     </script>
-    <script src="assets/polyfill.vue2.js"></script>`;
+    <script src="assets/polyfill.vue2.js"></script>` + htmlScript;
     break;
   case 'vue3':
-    htmlScript = htmlScript + `<script src="assets/vue3.min.js"></script>
+    htmlScript = `<script src="assets/vue3.min.js"></script>
     <script>
       window.Vue ? (window.vue = window.Vue) : null;
     </script>
-    <script src="assets/polyfill.vue3.js"></script>`;
+    <script src="assets/polyfill.vue3.js"></script>` + htmlScript;
     break;
   default:
     break;
