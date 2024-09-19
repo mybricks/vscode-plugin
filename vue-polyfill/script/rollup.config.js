@@ -46,7 +46,10 @@ module.exports = [
     output: {
       dir: path.resolve(__dirname, `./../dist/${packageJson.version}`),
       // dir: '/Users/cocolbell/Desktop/projects/apps/mybricks-app-th5/assets/js',
-      format: 'umd'
+      format: 'umd',
+      globals: {
+        vue: 'Vue'
+      }
     },
     external: ['react', 'react-dom', 'vue'],
     plugins: [
@@ -81,7 +84,10 @@ module.exports = [
     input: [path.resolve(__dirname, './../vue3.tsx')],
     output: {
       dir: path.resolve(__dirname, `./../dist/${packageJson.version}`),
-      format: 'umd'
+      format: 'umd',
+      globals: {
+        vue: 'Vue'
+      }
     },
     external: ['react', 'react-dom', 'vue'],
     plugins: [

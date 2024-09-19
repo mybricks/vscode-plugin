@@ -67,16 +67,10 @@ switch (config.tags) {
   case 'vue':
   case 'vue2':
     htmlScript = `<script src="assets/vue2.min.js"></script>
-    <script>
-      window.Vue ? (window.vue = window.Vue) : null;
-    </script>
     <script src="assets/polyfill.vue2.js"></script>` + htmlScript;
     break;
   case 'vue3':
     htmlScript = `<script src="assets/vue3.min.js"></script>
-    <script>
-      window.Vue ? (window.vue = window.Vue) : null;
-    </script>
     <script src="assets/polyfill.vue3.js"></script>` + htmlScript;
     break;
   default:
