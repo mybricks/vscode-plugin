@@ -1,0 +1,30 @@
+{
+  "title": "按钮",
+  "namespace": "your-team.lib.button",
+  "version": "1.0.0",
+  "description": "按钮",
+  "author": "MyBricks team",
+  "author_name": "板砖团队",
+  "data": "./data.json",
+  "icon":"./icon.svg",
+  "runtime": "./runtime.vue",
+  "editors": "./editors.tsx",
+  "inputs": [
+    {
+      "id": "setText",
+      "title": "修改文本",
+      "schema": {
+        "type": "string"
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "id": "click",
+      "title": "单击",
+      "schema": {
+        "type": "string"
+      }
+    }
+  ]
+}

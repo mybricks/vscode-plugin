@@ -1,0 +1,15 @@
+{
+  "name": "@your-team/pc-lib0",
+  "version": "1.0.0",
+  "description": "Vue3组件库示例",
+  "main": "index.js",
+  "scripts": {},
+  "license": "ISC",
+  "dependencies": {
+    "ant-design-vue": "3.2.20"
+  },
+  "devDependencies": {
+    "vue": "^3.4.19",
+    "vue-loader": "^17.4.2"
+  }
+}

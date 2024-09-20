@@ -338,9 +338,27 @@ function getLessLoaders({ postCssOptions }) {
     },
     {
       test: /\.less$/i,
-      use: getLessModuleLoaders({ postCssOptions: postCssOptions ?? {} }),
+      use: getLessNoModulesLoaders({ postCssOptions: postCssOptions ?? {} }),
       include: /node_modules/
     },
+    // {
+    //   test: /\.less$/i,
+    //   oneOf: [
+    //     {
+    //       resourceQuery: /modules/,
+    //       use: getLessModuleLoaders({ postCssOptions: postCssOptions ?? {} })
+    //     },
+    //     {
+    //       use: getLessNoModulesLoaders({ postCssOptions: postCssOptions ?? {} }),
+    //     }
+    //   ],
+    //   exclude: /node_modules/
+    // },
+    // {
+    //   test: /\.less$/i,
+    //   use: getLessModuleLoaders({ postCssOptions: postCssOptions ?? {} }),
+    //   include: /node_modules/
+    // },
   ];
 };
 

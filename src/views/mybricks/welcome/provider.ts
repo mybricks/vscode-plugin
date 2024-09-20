@@ -39,6 +39,23 @@ export default class Provider implements vscode.WebviewViewProvider {
           }
         }
           break;
+        case data.action === "create" && data.type === "pcComlib-vue3": {
+
+          const saveRtn = await vscode.window.showSaveDialog({
+            title: "请选择项目要保存的文件夹"
+          });
+
+          const projectDir = saveRtn?.fsPath;
+
+          if (projectDir) {
+            const tptDirPath = vscode.Uri.joinPath(this._context.extensionUri, "_templates/comlib-pc-vue3").fsPath;
+
+            fse.copySync(tptDirPath, projectDir);
+
+            openFolder(projectDir);
+          }
+        }
+          break;
         
         case data.action === "create" && data.type === "h5VueComlib": {
           const saveRtn = await vscode.window.showSaveDialog({

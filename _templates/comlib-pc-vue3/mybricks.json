@@ -1,0 +1,12 @@
+{
+  "comAry": [
+    "./src/_muilt-inputJs/com.json",
+    "./src/button/com.json",
+    "./src/card/com.json"
+  ],
+  "domain": "",
+  "componentType": "PC",
+  "namespace": "my_comlib",
+  "tags": "vue3",
+  "externals": []
+}

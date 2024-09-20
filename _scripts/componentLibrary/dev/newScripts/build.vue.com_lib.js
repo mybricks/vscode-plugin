@@ -92,7 +92,7 @@ async function build() {
   fse.mkdirSync(compileProductFolderPath);
   const { externals } = mybricksJson;
   const externalsMap = {
-    'vue': 'vue',
+    'vue': 'Vue',
   };
   if (Array.isArray(externals)) {
     externals.forEach(({name, library, urls}) => {
