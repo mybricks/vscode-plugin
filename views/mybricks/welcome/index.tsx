@@ -93,27 +93,29 @@ function QuickStart (): JSX.Element {
     vscode.postMessage({action: 'openDir', value: dirName});
   }, []);
 
-  return recentProjectPaths.length ? (
-    <>
-      <div data-mybricks-text>最近打开</div>
-      {recentProjectPaths.map(recentProjectPath => {
-        const dirName = recentProjectPath.split('/').pop();
-        const isCurrent = currentProjectPath === recentProjectPath;
+  return <></>;
 
-        return dirName && (
-          <div
-            data-mybricks-btn={isCurrent ? "debug" : true}
-            key={recentProjectPath}
-            onClick={() => onClick(recentProjectPath)}
-          >
-            {/* <Tooltip title={recentProjectPath}> */}
-              <div>{isCurrent ? "(当前)" : ""}{dirName}</div>
-            {/* </Tooltip> */}
-          </div>
-        );
-      })}
-    </>
-  ) : <></>;
+  // return recentProjectPaths.length ? (
+  //   <>
+  //     <div data-mybricks-text>最近打开</div>
+  //     {recentProjectPaths.map(recentProjectPath => {
+  //       const dirName = recentProjectPath.split('/').pop();
+  //       const isCurrent = currentProjectPath === recentProjectPath;
+
+  //       return dirName && (
+  //         <div
+  //           data-mybricks-btn={isCurrent ? "debug" : true}
+  //           key={recentProjectPath}
+  //           onClick={() => onClick(recentProjectPath)}
+  //         >
+  //           {/* <Tooltip title={recentProjectPath}> */}
+  //             <div>{isCurrent ? "(当前)" : ""}{dirName}</div>
+  //           {/* </Tooltip> */}
+  //         </div>
+  //       );
+  //     })}
+  //   </>
+  // ) : <></>;
 }
 
 // function Tooltip (props: React.PropsWithChildren<{title: string}>) {

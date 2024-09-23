@@ -45,12 +45,19 @@ export default class Provider implements vscode.WebviewViewProvider {
             title: "请选择项目要保存的文件夹"
           });
 
+          console.log("MYBRICKS saveRtn：", saveRtn);
           const projectDir = saveRtn?.fsPath;
+          console.log("MYBRICKS projectDir: ", projectDir);
 
           if (projectDir) {
             const tptDirPath = vscode.Uri.joinPath(this._context.extensionUri, "_templates/comlib-pc-vue3").fsPath;
-
-            fse.copySync(tptDirPath, projectDir);
+            console.log("MYBRICKS tptDirPath: ", tptDirPath);
+            console.log("MYBRICKS projectDir: ", projectDir);
+            try {
+              fse.copySync(tptDirPath, projectDir);
+            } catch (e) {
+              console.error("MYBRICKS catch：", e);
+            }
 
             openFolder(projectDir);
           }
@@ -174,7 +181,10 @@ export default class Provider implements vscode.WebviewViewProvider {
  */
 function openFolder (dirPath: string): boolean {
   if (fse.existsSync(dirPath)) {
-    const url = vscode.Uri.parse(dirPath);
+    // const url = vscode.Uri.parse(dirPath);
+    const url = vscode.Uri.file(dirPath);
+
+    console.log("MYBRICKS openFolder: ", dirPath, url);
 
     vscode.commands.executeCommand(`vscode.openFolder`, url, true);
 
