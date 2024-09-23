@@ -106,9 +106,40 @@ async function build() {
   const rtCodePath = path.resolve(compileProductFolderPath, 'rt.js');
   fse.writeFileSync(rtCodePath, runtimeCode, 'utf-8');
 
+  const componentsEntry = {};
+  const componentFileMap = {};
+  const deps = [];
+  components.forEach((component) => {
+    const { namespace, version, ...other } = component;
+    const fileMap = componentFileMap[namespace] = {};
+    if (isPublishToDist) {
+      if (fse.existsSync(component.runtime)) {
+        fileMap['runtime'] = true;
+        componentsEntry[`${namespace}-runtime`] = component.runtime;
+      }
+    } else {
+      Object.entries(other).forEach(([key, value]) => {
+        if (key === 'target') {
+          Object.entries(value).forEach(([targetKey, value]) => {
+            if (fse.existsSync(value)) {
+              componentsEntry[`${namespace}-${key}-${targetKey}`] = value;
+              fileMap[key] = true;
+            }
+          });
+        } else if (typeof value === 'string' && fse.existsSync(value)) {
+          componentsEntry[`${namespace}-${key}`] = value;
+          fileMap[key] = true;
+        }
+      });
+    }
+    deps.push({namespace, version});
+  });
+
+  /** TODO: 后续单组件的runtime需要打两份，一份编辑时的，一份runtime，如果需要类似px转vw的能力 */
+
   await Promise.all([
     new Promise((resolve, reject) => {
-      webpack(getWebpckConfig({ entry: { 'edit': editCodePath }, outputPath: compileProductFolderPath, externals: [externalsMap], postCssOptions: getPostCssOption({}) }, webpackMergeConfig), (err, stats) => {
+      webpack(getWebpckConfig({ entry: { edit: editCodePath }, outputPath: compileProductFolderPath, externals: [externalsMap], postCssOptions: getPostCssOption({}) }, webpackMergeConfig), (err, stats) => {
         if (err || stats.hasErrors()) {
           console.error(err || stats.compilation.errors);
           reject(err || stats);
@@ -117,11 +148,7 @@ async function build() {
       });
     }),
     new Promise((resolve, reject) => {
-      const entry = components.reduce((f, s) => {
-        f[s.namespace] = s.runtime;
-        return f;
-      }, {});
-      webpack(getWebpckConfig({ entry: { 'rt': rtCodePath, ...entry }, outputPath: compileProductFolderPath, externals: [externalsMap], postCssOptions: getPostCssOption(mybricksJson) }, webpackMergeConfig), (err, stats) => {
+      webpack(getWebpckConfig({ entry: { 'rt': rtCodePath, ...componentsEntry }, outputPath: compileProductFolderPath, externals: [externalsMap], postCssOptions: getPostCssOption(mybricksJson) }, webpackMergeConfig), (err, stats) => {
         if (err || stats.hasErrors()) {
           console.error(err || stats.compilation.errors);
           reject(err || stats);
@@ -131,18 +158,42 @@ async function build() {
     })
   ]);
 
-  const deps = [];
+  const componentsArray = [];
   const runtimeComponentsMap = {};
-  components.forEach(({ version, namespace }) => {
-    deps.push({namespace, version});
-    const componentJsPath = path.resolve(compileProductFolderPath, `${namespace}.js`);
-    runtimeComponentsMap[`${namespace}@${version}`] = {
-      runtime: encodeURIComponent(fse.readFileSync(componentJsPath, 'utf-8')),
+  components.forEach((component) => {
+    const { namespace, version, ...other } = component;
+    const fileMap = componentFileMap[namespace];
+    const componentInfo = {
+      namespace,
       version
     };
-    if (isPublishToDist) {
-      fse.unlinkSync(componentJsPath);
-    }
+    Object.entries(other).forEach(([key, value]) => {
+      if (fileMap[key]) {
+        if (key === 'target') {
+          const target = {};
+          Object.keys(value).forEach((targetKey) => {
+            target[targetKey] = encodeURIComponent(`(function(){${fse.readFileSync(path.resolve(compileProductFolderPath, `${namespace}-${key}-${targetKey}.js`), 'utf-8')} return MybricksComDef.default;})()`);
+          });
+          componentInfo[key] = target;
+        } else {
+          const code = fse.readFileSync(path.resolve(compileProductFolderPath, `${namespace}-${key}.js`), 'utf-8');
+          if (key === 'editors') {
+            componentInfo[key] = encodeURIComponent(`(function(){return function(){${code} return MybricksComDef.default;}})()`);
+          } else {
+            if (key === 'runtime') {
+              runtimeComponentsMap[`${namespace}@${version}`] = {
+                runtime: encodeURIComponent(`(function(){${code} return MybricksComDef.default;})()`),
+                version
+              };
+            }
+            componentInfo[key] = encodeURIComponent(`(function(){${code} return MybricksComDef.default;})()`);
+          }
+        }
+      } else {
+        componentInfo[key] = value;
+      }
+    });
+    componentsArray.push(componentInfo);
   });
   const runtimeComponentsMapString = JSON.stringify(runtimeComponentsMap);
 
