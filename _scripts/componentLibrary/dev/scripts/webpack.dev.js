@@ -48,9 +48,8 @@ function externalUrlsHandle (urls) {
 }
 
 if (Array.isArray(externals)) {
-  externals.forEach(({name, library, urls}) => {
-    if (name && library && Array.isArray(urls) && !externalsMap[name]) {
-      externalsMap[name] = library;
+  externals.forEach(({urls}) => {
+    if (Array.isArray(urls)) {
       externalUrlsHandle(urls);
     }
   });

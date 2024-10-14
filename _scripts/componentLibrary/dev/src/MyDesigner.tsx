@@ -104,6 +104,7 @@ export default function MyDesigner () {
       css: !MYBRICKS_JSON.tags || MYBRICKS_JSON.tags === 'react' ? [
         "./assets/4.21.6.antd.min.css",
         "./assets/editor.d5c483a324024fb6.css",
+        ...externalCss
       ] : [...externalCss]
     }
   };
