@@ -9,27 +9,55 @@ const { mybricksJsonPath, docPath } = process.env;
 const outputPath = path.resolve(__dirname, "../../public");
 const config = fse.readJSONSync(mybricksJsonPath);
 const { externals, proxy = [] } = config;
-const externalsMap = {
-  "react": "React",
-  "react-dom": "ReactDOM"
-};
-const defaultExternals = [
-  {
+
+if (config.namespace === "mybricks.normal-pc" && !externals.length) {
+  externals.push({
     "name": "@ant-design/icons",
     "library": "icons",
-    "urls": ["assets/1690444248634.ant-design-icons_4.7.0_min.js"]
+    "urls": [
+      "public/ant-design-icons@4.7.0.min.js"
+    ]
+  },
+  {
+    "name": "moment",
+    "library": "moment",
+    "urls": [
+      "public/moment/moment@2.29.4.min.js",
+      "public/moment/locale/zh-cn.min.js"
+    ]
   },
   {
     "name": "antd",
     "library": "antd",
     "urls": [
-      "assets/4.21.6.antd.min.css",
-      "assets/1690443543399.2.29.4_moment.min.js",
-      "assets/1690444184854.4.21.6_antd.min.js",
-      "assets/antd-4.21.6-locale-zh_CN.js",
-      "assets/moment-2.29.4-locale_zh-cn.js"
+      "public/antd/antd@4.21.6.variable.min.css",
+      "public/antd/antd@4.21.6.min.js",
+      "public/antd/locale/zh_CN.js"
     ]
-  }
+  });
+}
+
+const externalsMap = {
+  "react": "React",
+  "react-dom": "ReactDOM"
+};
+const defaultExternals = [
+  // {
+  //   "name": "@ant-design/icons",
+  //   "library": "icons",
+  //   "urls": ["assets/1690444248634.ant-design-icons_4.7.0_min.js"]
+  // },
+  // {
+  //   "name": "antd",
+  //   "library": "antd",
+  //   "urls": [
+  //     "assets/4.21.6.antd.min.css",
+  //     "assets/1690443543399.2.29.4_moment.min.js",
+  //     "assets/1690444184854.4.21.6_antd.min.js",
+  //     "assets/antd-4.21.6-locale-zh_CN.js",
+  //     "assets/moment-2.29.4-locale_zh-cn.js"
+  //   ]
+  // }
 ];
 
 let htmlLink = "";
@@ -40,7 +68,7 @@ function externalUrlsHandle (urls) {
     if (url.endsWith('.js')) {
       htmlScript = htmlScript + `<script src="${url}"></script>\n`;
     } else if (url.endsWith('.css')) {
-      htmlLink = htmlLink + `<link rel="stylesheet" href="${url}">\n`;
+      // htmlLink = htmlLink + `<link rel="stylesheet" href="${url}">\n`;
     } else {
       htmlScript = htmlScript + `<script src="${url}"></script>\n`;
     }

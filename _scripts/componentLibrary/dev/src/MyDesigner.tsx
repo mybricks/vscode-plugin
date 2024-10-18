@@ -13,6 +13,12 @@ import servicePlugin, {call as callConnectorHttp} from "@mybricks/plugin-connect
 import css from "./MyDesigner.less";
 import loadContentPlugin from "./plugins/load-content-plugin";
 
+import * as antd from "antd";
+import * as icons from "@ant-design/icons";
+
+window.MyBricks_antd = antd;
+window.MyBricks_icons = icons;
+
 const localDataKey = `--mybricks--${MYBRICKS_JSON?.componentType ?? 'NONE'}`;
 
 const isH5 = ['H5', 'KH5'].includes(MYBRICKS_JSON?.componentType);
@@ -28,18 +34,25 @@ export default function MyDesigner () {
   }, []);
 
   useMemo(() => {
-    if (isH5 && Array.isArray(MYBRICKS_JSON?.comlibs)) { // 临时在H5调试中添加H5基础组件库
-      const scriptEle = document.createElement('script');
-      scriptEle.src = '/assets/comlibs/mybricks.normal-h5-comlib.vue/0.0.14/edit.js';
+    // if (isH5 && Array.isArray(MYBRICKS_JSON?.comlibs)) { // 临时在H5调试中添加H5基础组件库
+    //   const scriptEle = document.createElement('script');
+    //   scriptEle.src = '/assets/comlibs/mybricks.normal-h5-comlib.vue/0.0.14/edit.js';
 
-      document.body.appendChild(scriptEle);
+    //   document.body.appendChild(scriptEle);
 
-      scriptEle.onload = () => {
-        (window as any).mybricks.SPADesigner && setSPADesigner((window as any).mybricks.SPADesigner);
-      };
-      return;
-    }
-		(window as any).mybricks.SPADesigner && setSPADesigner((window as any).mybricks.SPADesigner);
+    //   scriptEle.onload = () => {
+    //     (window as any).mybricks.SPADesigner && setSPADesigner((window as any).mybricks.SPADesigner);
+    //   };
+    //   return;
+    // }
+		// (window as any).mybricks.SPADesigner && setSPADesigner((window as any).mybricks.SPADesigner);
+
+    const script = document.createElement("script");
+    script.src = "/assets/designer-spa/3.8.036_test/index.min.js";
+    script.onload = () => {
+      (window as any).mybricks.SPADesigner && setSPADesigner((window as any).mybricks.SPADesigner);
+    };
+    document.body.appendChild(script);
 	}, []);
 
   const save = useCallback(() => {
@@ -102,8 +115,8 @@ export default function MyDesigner () {
     scenes: true,
     theme: {
       css: !MYBRICKS_JSON.tags || MYBRICKS_JSON.tags === 'react' ? [
-        "./assets/4.21.6.antd.min.css",
-        "./assets/editor.d5c483a324024fb6.css",
+        // "./assets/4.21.6.antd.min.css",
+        // "./assets/editor.d5c483a324024fb6.css",
         ...externalCss
       ] : [...externalCss]
     }
