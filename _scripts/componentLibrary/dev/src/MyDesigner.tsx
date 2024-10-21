@@ -12,12 +12,8 @@ import servicePlugin, {call as callConnectorHttp} from "@mybricks/plugin-connect
 
 import css from "./MyDesigner.less";
 import loadContentPlugin from "./plugins/load-content-plugin";
+import { getAiEncryptData } from "./get-ai-encrypt-data";
 
-import * as antd from "antd";
-import * as icons from "@ant-design/icons";
-
-window.MyBricks_antd = antd;
-window.MyBricks_icons = icons;
 
 const localDataKey = `--mybricks--${MYBRICKS_JSON?.componentType ?? 'NONE'}`;
 
@@ -48,7 +44,7 @@ export default function MyDesigner () {
 		// (window as any).mybricks.SPADesigner && setSPADesigner((window as any).mybricks.SPADesigner);
 
     const script = document.createElement("script");
-    script.src = "/assets/designer-spa/3.8.036_test/index.min.js";
+    script.src = "/assets/designer-spa/3.8.036/index.min.js";
     script.onload = () => {
       (window as any).mybricks.SPADesigner && setSPADesigner((window as any).mybricks.SPADesigner);
     };
@@ -152,6 +148,7 @@ export default function MyDesigner () {
         //   return PcEditor({editConfig})
         // }
       },
+      // aiView: getAiView(true, {}),
       pageContentLoader() {//加载页面内容
         return new Promise((resolve) => {
           if (projectJson) {
@@ -228,3 +225,89 @@ export default function MyDesigner () {
     </>
   );
 }
+
+
+const getAiView = (enableAI, option) => {
+  const { model } = option ?? {};
+
+  if (enableAI) {
+    return {
+      async request(messages) {
+        // console.log(messages[0].content)
+        // console.log(messages[messages.length - 1].content)
+
+        let content = '处理失败'
+        try {
+          let res = await axios({
+            method: 'POST',
+            url: '//ai.mybricks.world/code',
+            withCredentials: false,
+            data: getAiEncryptData({
+              model: !!model ? model : undefined,
+              messages
+            }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }).then((res) => res.data);
+
+          content = res.choices[0].message.content;
+          return content;
+        } catch (e) {
+          console.error(e);
+        } finally {
+          //     console.log(`prompts: ${prompts},
+          // question: ${question},
+          // 返回结果: ${content}`)
+        }
+      },
+      async requestAsStream(messages, tools, { write, complete, error }) {
+        try {
+          // console.log(messages[0].content)
+          // console.log(messages[messages.length - 1].content)
+
+          // messages[0].1 = '你好'
+
+          // 用于debug用户当前使用的模型
+          window._ai_use_model_ = model;
+
+          const response = await fetch('//ai.mybricks.world/stream', {
+            method: 'POST',
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(
+              getAiEncryptData({
+                model: !!model ? model : undefined,
+                // model: 'qwen-max-latest',
+                // model: 'qwen-plus-latest',
+                // model: 'qwen-turbo-latest',
+                // model: 'openai/gpt-4o-mini',
+                messages,
+              })
+            ),
+          });
+
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) {
+              break;
+            }
+
+            const chunk = decoder.decode(value, { stream: true });
+            write(chunk);
+          }
+
+          complete();
+        } catch (ex) {
+          error(ex);
+        }
+      },
+    };
+  }
+
+  return void 0;
+};

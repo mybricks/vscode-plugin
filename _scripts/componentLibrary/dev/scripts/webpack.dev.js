@@ -42,22 +42,22 @@ const externalsMap = {
   "react-dom": "ReactDOM"
 };
 const defaultExternals = [
-  // {
-  //   "name": "@ant-design/icons",
-  //   "library": "icons",
-  //   "urls": ["assets/1690444248634.ant-design-icons_4.7.0_min.js"]
-  // },
-  // {
-  //   "name": "antd",
-  //   "library": "antd",
-  //   "urls": [
-  //     "assets/4.21.6.antd.min.css",
-  //     "assets/1690443543399.2.29.4_moment.min.js",
-  //     "assets/1690444184854.4.21.6_antd.min.js",
-  //     "assets/antd-4.21.6-locale-zh_CN.js",
-  //     "assets/moment-2.29.4-locale_zh-cn.js"
-  //   ]
-  // }
+  {
+    "name": "@ant-design/icons",
+    "library": "icons",
+    "urls": ["public/ant-design-icons@4.7.0.min.js"]
+  },
+  {
+    "name": "antd",
+    "library": "antd",
+    "urls": [
+      "public/antd/antd@4.21.6.variable.min.css",
+      "public/moment/moment@2.29.4.min.js",
+      "public/antd/antd@4.21.6.min.js",
+      "public/antd/locale/zh_CN.js",
+      "public/moment/locale/zh-cn.min.js"
+    ]
+  }
 ];
 
 let htmlLink = "";
