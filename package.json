@@ -1,7 +1,7 @@
 {
   "name": "MyBricks",
   "description": "快速便捷地开发和发布Mybricks组件",
-  "version": "0.1.65",
+  "version": "0.1.66",
   "icon": "images/mybricks.png",
   "engines": {
     "vscode": "^1.71.0"
@@ -29,6 +29,10 @@
       {
         "command": "mybricks.create.comlib",
         "title": "创建组件库"
+      },
+      {
+        "command": "mybricks.webview.develop.show",
+        "title": "打开MyBricks调试与发布面板"
       }
     ],
     "viewsContainers": {

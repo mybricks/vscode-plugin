@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 
 export function logger(...args: any) {
   console.log("======");
-  console.error("[Mybricks]", ...args);
+  console.log("[Mybricks]", ...args);
   console.log("======");
 }
 
@@ -25,11 +25,15 @@ export function registerCommand(command: string, commandHandler: (...args: any[]
 export function getWorkspaceFsPath () {
   const wsFolders = vscode.workspace.workspaceFolders;
 
+  logger("wsFolders => ", wsFolders);
+
   if (!wsFolders) {
     return;
   };
 
   const wsFsPath = wsFolders[0]?.uri?.fsPath;
+
+  logger("wsFsPath => ", wsFsPath);
 
   return wsFsPath;
 }
@@ -42,14 +46,17 @@ export function getWorkspaceFsPath () {
  */
 export function checkIsMybricksProject(wsFsPath = getWorkspaceFsPath()) {
   if (!wsFsPath || !fse.existsSync(wsFsPath)) {
+    logger("路径不存在");
     return false;
   }
 
   const mybricksFiles = fse.readdirSync(wsFsPath).filter((docName) => {
+    logger("docName => ", docName);
     return docName === "mybricks.json" || docName.endsWith(".mybricks.json");
   });
 
   if (!mybricksFiles.length) {
+    logger("未找到mybricks配置文件");
     return false;
   }
 

@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { getWorkspaceFsPath, checkIsMybricksProject } from "../utils";
+import { getWorkspaceFsPath, checkIsMybricksProject, logger } from "../utils";
 
 export function initListener (context: vscode.ExtensionContext) {
   autoSetContextByProject();
@@ -44,5 +44,9 @@ export function initListener (context: vscode.ExtensionContext) {
 }
 
 function autoSetContextByProject() {
-  vscode.commands.executeCommand("setContext", "mybricks:isComlib", checkIsMybricksProject());
+  const bool = checkIsMybricksProject();
+  logger("判断是否mybricks => ", bool, !!bool);
+  if (bool) {
+    vscode.commands.executeCommand("setContext", "mybricks:isComlib", bool);
+  }
 }

@@ -243,6 +243,8 @@ function start (): Promise<{docPath: string, configName: string}> {
           configName
         });
       }
+    } else {
+      vscode.window.showInformationMessage(!docPath ? "未打开工程目录" : "缺失*mybricks.json配置文件");
     }
   });
 }

@@ -12,8 +12,14 @@ import { initViews } from "./views";
 import { initCommands } from "./commands";
 import { initListener } from "./listener";
 import { initSnippets, disposeSnippets } from "./snippets";
+import { logger } from "./utils";
 
 export function activate(context: vscode.ExtensionContext) {
+  vscode.commands.registerCommand('mybricks.webview.develop.show', () => {
+    logger("设置 mybricks:isComlib 为 true");
+    vscode.commands.executeCommand("setContext", "mybricks:isComlib", true);
+  });
+  
   // const regist = () => {
   //   // 注册代码片段
   //   initSnippets(context);
