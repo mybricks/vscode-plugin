@@ -238,7 +238,7 @@ async function build() {
   components.forEach((component) => {
     const { namespace, version, ...other } = component;
     const fileMap = componentFileMap[namespace] = {};
-    if (isPublishToDist) {
+    if (isPublishToDist && false) {
       if (fse.existsSync(component.runtime)) {
         fileMap['runtime'] = true;
         componentsEntry[`${namespace}-runtime`] = component.runtime;
@@ -338,6 +338,7 @@ async function build() {
     const rtPath = `./resource/${tags}/rt.js`;
     const editPath = `./resource/${tags}/edit.js`;
     const comsPath = `./resource/${tags}/rtCom.js`;
+    const comsDefPath = `./resource/${tags}/comsDef.js`;
 
     zip.file('组件库.material@mybricks.json', JSON.stringify({
       type: "material",
@@ -352,7 +353,10 @@ async function build() {
         createTime: time,
         updateTime: time,
         updatorId: userName,
-        updatorName: userName
+        updatorName: userName,
+        tags: [
+          tags
+        ]
       },
       materialPub: {
         content: JSON.stringify({
@@ -360,6 +364,7 @@ async function build() {
             rtJs: rtPath,
             editJs: editPath,
             coms: comsPath,
+            comsDef: comsDefPath,
             deps,
             externals
           }
@@ -373,9 +378,38 @@ async function build() {
         updatorName: userName
       }
     }));
+    let userId = 'Mybricks';
+
+    try {
+      const email = getGitEmail({ docPath });
+      if (email) {
+        userId = email;
+        console.log(`当前 Git 邮箱: ${email}`);
+      } else {
+        console.log('未配置 Git 邮箱，userId 默认为 Mybricks');
+      }
+    } catch (error) {
+      console.error('获取 Git 邮箱失败，userId默认为Mybricks: ', error);
+    }
     zip.file(rtPath, fse.readFileSync(rtCodePath, 'utf-8'));
     zip.file(editPath, fse.readFileSync(editCodePath, 'utf-8'));
     zip.file(comsPath, runtimeComponentsMapString);
+    zip.file(comsDefPath, JSON.stringify(componentsArray.map((content) => {
+      return {
+        sceneType: sceneInfo.type,
+        name: content.title,
+        content: JSON.stringify(content),
+        tags: ['react'],
+        namespace: content.namespace,
+        version: content.version,
+        description: content.description,
+        type: 'component',
+        icon: content.icon,
+        previewImg: content.preview,
+        creatorName: userId,
+        creatorId: userId
+      };
+    })));
 
     const content = await zip.generateAsync({
       type: 'nodebuffer',
