@@ -14,7 +14,6 @@ import css from "./MyDesigner.less";
 import loadContentPlugin from "./plugins/load-content-plugin";
 import { getAiEncryptData } from "./get-ai-encrypt-data";
 
-
 const localDataKey = `--mybricks--${MYBRICKS_JSON?.componentType ?? 'NONE'}`;
 
 const isH5 = ['H5', 'KH5'].includes(MYBRICKS_JSON?.componentType);
@@ -44,7 +43,7 @@ export default function MyDesigner () {
 		// (window as any).mybricks.SPADesigner && setSPADesigner((window as any).mybricks.SPADesigner);
 
     const script = document.createElement("script");
-    script.src = "/assets/designer-spa/3.8.036/index.min.js";
+    script.src = MYBRICKS_JSON?.designerUrl || "/assets/designer-spa/3.9.200/index.min.js";
     script.onload = () => {
       (window as any).mybricks.SPADesigner && setSPADesigner((window as any).mybricks.SPADesigner);
     };
@@ -133,7 +132,9 @@ export default function MyDesigner () {
       },
       plugins: [
         toolsPlugin(),
-        servicePlugin(),
+        servicePlugin({
+          isPrivatization: false
+        }),
         loadContentPlugin(),
       ],
       comLibLoader() {
@@ -163,14 +164,21 @@ export default function MyDesigner () {
           i18n(title: any) {//多语言
             return title;
           },
-          callConnector(connector: any, params: any) {//调用连接器
-            if (connector.type === 'http') {//服务接口类型
-              return callConnectorHttp(connector, params, {
-                // 发送请求前的钩子函数
-                before(options) {
-                  return {
-                    ...options
-                  };
+          callConnector(connector, params, connectorConfig = {}) {
+            const plugin = designerRef.current?.getPlugin(connector.connectorName);
+            if (plugin) {
+              // console.log("env.callConnector => ", {
+              //   connector, params, connectorConfig
+              // })
+              // 发送请求
+              return plugin.callConnector({
+                ...connector,
+                useProxy: false
+              }, params, {
+                ...connectorConfig,
+                before: options => {
+                  // 接口发起请求前的钩子，可处理请求参数、header 等
+                  return options;
                 }
               });
             } else {
