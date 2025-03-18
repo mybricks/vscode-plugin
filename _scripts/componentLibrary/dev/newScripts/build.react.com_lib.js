@@ -19,7 +19,7 @@ const mybricksJson = fse.readJSONSync(mybricksJsonPath);
 const packageJson = fse.readJSONSync(path.join(docPath, "./package.json"));
 
 async function build() {
-  let webpackMergeConfig = getWebpackMergeConfig();
+  let webpackMergeConfig = getWebpackMergeConfig({ webpackConfig: mybricksJson.webpackConfig });
   let finalConfig;
   const isPublishToDist = publishType === 'dist';
   const isPublishToCentral = publishType === 'central';
@@ -232,38 +232,39 @@ async function build() {
   const rtCodePath = path.resolve(compileProductFolderPath, 'rt.js');
   fse.writeFileSync(rtCodePath, runtimeCode, 'utf-8');
 
-  const componentsEntry = {};
-  const componentFileMap = {};
-  const deps = [];
-  components.forEach((component) => {
-    const { namespace, version, ...other } = component;
-    const fileMap = componentFileMap[namespace] = {};
-    if (isPublishToDist && false) {
-      if (fse.existsSync(component.runtime)) {
-        fileMap['runtime'] = true;
-        componentsEntry[`${namespace}-runtime`] = component.runtime;
-      }
-    } else {
-      Object.entries(other).forEach(([key, value]) => {
-        if (key === 'target') {
-          Object.entries(value).forEach(([targetKey, value]) => {
-            if (fse.existsSync(value)) {
-              componentsEntry[`${namespace}-${key}-${targetKey}`] = value;
-              fileMap[key] = true;
-            }
-          });
-        } else if (typeof value === 'string' && fse.existsSync(value)) {
-          componentsEntry[`${namespace}-${key}`] = value;
-          fileMap[key] = true;
-        }
-      });
-    }
-    deps.push({namespace, version});
-  });
+  const { componentsEntry, componentFileMap, deps } = handleComponents(components);
+  // const componentsEntry = {};
+  // const componentFileMap = {};
+  // const deps = [];
+  // components.forEach((component) => {
+  //   const { namespace, version, ...other } = component;
+  //   const fileMap = componentFileMap[namespace] = {};
+  //   if (isPublishToDist && false) {
+  //     if (fse.existsSync(component.runtime)) {
+  //       fileMap['runtime'] = true;
+  //       componentsEntry[`${namespace}-runtime`] = component.runtime;
+  //     }
+  //   } else {
+  //     Object.entries(other).forEach(([key, value]) => {
+  //       if (key === 'target') {
+  //         Object.entries(value).forEach(([targetKey, value]) => {
+  //           if (fse.existsSync(value)) {
+  //             componentsEntry[`${namespace}-${key}-${targetKey}`] = value;
+  //             fileMap[key] = true;
+  //           }
+  //         });
+  //       } else if (typeof value === 'string' && fse.existsSync(value)) {
+  //         componentsEntry[`${namespace}-${key}`] = value;
+  //         fileMap[key] = true;
+  //       }
+  //     });
+  //   }
+  //   deps.push({namespace, version});
+  // });
 
   /** TODO: 后续单组件的runtime需要打两份，一份编辑时的，一份runtime，如果需要类似px转vw的能力 */
 
-  await Promise.all([
+  const buildPromise = [
     new Promise((resolve, reject) => {
       webpack(getWebpckConfig({ entry: { edit: editCodePath }, outputPath: compileProductFolderPath, externals: [externalsMap] }, webpackMergeConfig), (err, stats) => {
         if (err || stats.hasErrors()) {
@@ -282,7 +283,38 @@ async function build() {
         resolve();
       });
     })
-  ]);
+  ];
+
+  if (isPublishToDist) {
+    const { build: buildConfig } = finalConfig;
+    if (buildConfig) {
+      Object.entries(buildConfig).forEach(([type, config]) => {
+        const webpackMergeConfig = getWebpackMergeConfig({ webpackConfig: config.webpackConfig });
+        const { componentsEntry } = handleComponents(components, {
+          filterKeys: ['runtime'],
+        });
+
+        buildPromise.push(new Promise((resolve, reject) => {
+          webpack(getWebpckConfig({
+            entry: componentsEntry,
+            output: {
+              filename: `[name].${type}.js`,
+            },
+            outputPath: compileProductFolderPath,
+            externals: [externalsMap]
+          }, webpackMergeConfig), (err, stats) => {
+            if (err || stats.hasErrors()) {
+              console.error(err || stats.compilation.errors);
+              reject(err || stats);
+            }
+            resolve();
+          });
+        }));
+      });
+    }
+  }
+
+  await Promise.all(buildPromise);
 
   const componentsArray = [];
   const runtimeComponentsMap = {};
@@ -542,7 +574,7 @@ async function build() {
 
 build();
 
-function getWebpckConfig({ entry, outputPath, externals = [] }, webpackMergeConfig) {
+function getWebpckConfig({ entry, output = {}, outputPath, externals = [] }, webpackMergeConfig) {
   let rules = [
     {
       test: /\.jsx?$/,
@@ -690,12 +722,12 @@ function getWebpckConfig({ entry, outputPath, externals = [] }, webpackMergeConf
   return merge({...webpackMergeConfig, module: {...webpackMergeConfig.module, rules: mergeRules }}, {
     mode: 'production',
     entry,
-    output: {
+    output: Object.assign({
       path: outputPath,
       filename: '[name].js',
       libraryTarget: 'umd',
       library: 'MybricksComDef'
-    },
+    }, output),
     resolve: {
       alias: {},
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
@@ -710,10 +742,8 @@ function getWebpckConfig({ entry, outputPath, externals = [] }, webpackMergeConf
   });
 }
 
-function getWebpackMergeConfig () {
+function getWebpackMergeConfig ({ webpackConfig }) {
   let webpackMergeConfig;
-
-  const { webpackConfig } = mybricksJson;
 
   if (webpackConfig) {
     const typeWebpackConfig = Object.prototype.toString.call(webpackConfig);
@@ -937,4 +967,42 @@ function getWebpckConfig2({ entry, outputPath, externals = [], library }, webpac
       new WebpackBar(),
     ]
   });
+}
+
+const suffixReg = /\.[^.]+$/;
+
+function handleComponents(components, config = {}) {
+  const { filterKeys, suffix = "" } = config;
+  const componentsEntry = {};
+  const componentFileMap = {};
+  const deps = [];
+  components.forEach((component) => {
+    const { namespace, version, ...other } = component;
+    const fileMap = componentFileMap[namespace] = {};
+    Object.entries(other).forEach(([key, value]) => {
+      if (filterKeys && !filterKeys.includes(key)) {
+        return;
+      }
+      if (key === 'target') {
+        Object.entries(value).forEach(([targetKey, value]) => {
+          if (fse.existsSync(value)) {
+            componentsEntry[`${namespace}-${key}-${targetKey}`] = value;
+            fileMap[key] = true;
+          }
+        });
+      } else if (typeof value === 'string' && fse.existsSync(value)) {
+        componentsEntry[`${namespace}-${key}`] = suffix ? value.replace(suffixReg, (substring) => {
+          return `.${suffix}${substring}`;
+        }) : value;
+        fileMap[key] = true;
+      }
+    });
+    deps.push({namespace, version});
+  });
+
+  return {
+    componentsEntry,
+    componentFileMap,
+    deps
+  };
 }
