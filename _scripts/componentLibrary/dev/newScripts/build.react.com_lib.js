@@ -841,16 +841,15 @@ function getWebpckConfig2({ entry, outputPath, externals = [], library }, webpac
       path: outputPath,
       // filename: 'index.js',
       filename: '[name].js',
-      // libraryTarget: 'umd',
-      libraryTarget: 'module',
-      // library
+      libraryTarget: 'umd',
+      // libraryTarget: 'module',
     },
     // optimization: {
     //   usedExports: true,
     // },
-    experiments: {
-      outputModule: true,
-    },
+    // experiments: {
+    //   outputModule: true,
+    // },
     resolve: {
       alias: {},
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
