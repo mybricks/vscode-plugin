@@ -339,10 +339,20 @@ async function build() {
             componentInfo[key] = encodeURIComponent(`(function(){return function(){${code} return MybricksComDef.default;}})()`);
           } else {
             if (key === 'runtime') {
-              runtimeComponentsMap[`${namespace}@${version}`] = {
+              const result = {
                 runtime: encodeURIComponent(`(function(){${code} return MybricksComDef.default;})()`),
                 version
               };
+              if (isPublishToDist) {
+                const { build: buildConfig } = finalConfig;
+                if (buildConfig) {
+                  Object.keys(buildConfig).forEach((type) => {
+                    const code = fse.readFileSync(path.resolve(compileProductFolderPath, `${namespace}-${key}.${type}.js`), 'utf-8');
+                    result[`runtime.${type}`] = encodeURIComponent(`(function(){${code} return MybricksComDef.default;})()`);
+                  });
+                }
+              }
+              runtimeComponentsMap[`${namespace}@${version}`] = result;
             }
             componentInfo[key] = encodeURIComponent(`(function(){${code} return MybricksComDef.default;})()`);
           }
