@@ -78,7 +78,6 @@ async function build() {
   
   const { editCode, runtimeCode, components } = generateMybricksComponentLibraryCode(
     {
-      id: packageJson.name,
       name: finalConfig.name || packageJson.description,
       version: finalConfig.version || packageJson.version,
       mybricksJsonPath: path.join(docPath, configName),
