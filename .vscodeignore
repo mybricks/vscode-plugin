@@ -16,3 +16,4 @@ _views
 _scripts/.temp
 _scripts/.temp-pub
 *.md
+**/*.md

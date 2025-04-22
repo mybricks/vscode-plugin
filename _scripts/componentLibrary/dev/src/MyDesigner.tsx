@@ -43,7 +43,7 @@ export default function MyDesigner () {
 		// (window as any).mybricks.SPADesigner && setSPADesigner((window as any).mybricks.SPADesigner);
 
     const script = document.createElement("script");
-    script.src = MYBRICKS_JSON?.designerUrl || "/assets/designer-spa/3.9.263/index.min.js";
+    script.src = MYBRICKS_JSON?.designerUrl || "/assets/designer-spa/3.9.324/index.min.js";
     script.onload = () => {
       (window as any).mybricks.SPADesigner && setSPADesigner((window as any).mybricks.SPADesigner);
     };
