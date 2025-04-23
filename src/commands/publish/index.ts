@@ -37,7 +37,7 @@ export class PublishCommands {
     const config = await start();
 
     configValidCheck(config);
-    publishConfigValidCheck(config);
+    // publishConfigValidCheck(config);
 
     if (config) {
       const { configName, docPath, materialType, publishType } = config;
@@ -68,6 +68,19 @@ export class PublishCommands {
           break;
         default:
           break;
+      }
+
+      if (libCfg?.componentType === 'MP') {
+        if (publishType === "dist") {
+          devTerminal.sendText(`node ${projPath}/_scripts/buildmp.js ${mybricksJsonPath}`);
+          devTerminal.show();
+        } else if (publishType === "material") {
+          devTerminal.sendText(`node ${projPath}/_scripts/publishmp.js ${mybricksJsonPath}`);
+          devTerminal.show();
+        } else {
+          vscode.window.showInformationMessage(`未支持的发布模式 - ${publishType}`);
+        }
+        return;
       }
 
       const webpackbuildjs = fse.readFileSync(path.resolve(projPath, `./_scripts/componentLibrary/dev/newScripts/build.${tags}.${materialType}.js`), 'utf-8');

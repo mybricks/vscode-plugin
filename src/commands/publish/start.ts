@@ -1,5 +1,7 @@
 import * as vscode from "vscode";
 import { window, Disposable, QuickInput, QuickPickItem, QuickInputButton, QuickInputButtons } from "vscode";
+import { readJsonSync } from 'fs-extra';
+import * as path from "path";
 
 import { getWorkspaceFsPath, checkIsMybricksProject } from "../../utils";
 
@@ -92,12 +94,13 @@ async function start2() {
   }
   
   async function pickPublishType(input: MultiStepInput, state: Partial<State>) {
+    const libCfg = readJsonSync(path.join(docPath, state.mybricksJsonFile.value));
     state.publishType = await input.showQuickPick<MyQuickPickItem, QuickPickParameters<MyQuickPickItem>>({ // TODO:类型是否合适
 			title,
 			step: 2,
 			totalSteps: 2,
 			placeholder: '请选择发布方式',
-			items: publishTypeitems,
+			items: libCfg?.componentType === 'MP' ? publishTypeitems.slice(0, 2) : publishTypeitems,
 			// activeItem: state.publishType.value,
 			shouldResume: shouldResume
 		});
