@@ -111,7 +111,8 @@ export class DebuggerCommands {
             fse.writeFileSync(webpackdevjsPath, webpackdevjs.replace('const { mybricksJsonPath, docPath } = process.env;', `const mybricksJsonPath = decodeURIComponent("${encodeURIComponent(mybricksJsonPath)}");\nconst docPath = decodeURIComponent("${encodeURIComponent(docPath)}");`), 'utf-8');
 
             if (mybricksJson.componentType === 'MP') {
-              devTerminal.sendText(`node ${projPath}/_scripts/devmp.js ${mybricksJsonPath}`);
+              // devTerminal.sendText(`node ${projPath}/_scripts/devmp.js ${mybricksJsonPath}`);
+              devTerminal.sendText(`node ${projPath}/_scripts/devmp.js ${mybricksJsonPath} ${projPath} ${webpackdevjsPath}`);
             } else {
               // devTerminal.sendText(`export mybricksJsonPath=${mybricksJsonPath} && npm run --prefix ${projPath} dev:comlib`);
               

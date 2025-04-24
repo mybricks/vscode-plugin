@@ -38,14 +38,20 @@ function CreateProject (): JSX.Element {
         data-mybricks-btn
         onClick={() => { onCreate("pcComlib"); }}
       >
-        <div>新建PC组件库（React）</div>
+        <div>新建PC端组件库</div>
       </div>
       <div
+        data-mybricks-btn
+        onClick={() => { onCreate("mpComlib"); }}
+      >
+        <div>新建移动端组件库</div>
+      </div>
+      {/* <div
         data-mybricks-btn
         onClick={() => { onCreate("pcComlib-vue3"); }}
       >
         <div>新建PC组件库（Vue3）</div>
-      </div>
+      </div> */}
       {/* <div
         data-mybricks-btn
         onClick={() => { onCreate("h5VueComlib"); }}

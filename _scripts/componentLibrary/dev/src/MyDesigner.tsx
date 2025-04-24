@@ -138,6 +138,13 @@ export default function MyDesigner () {
         loadContentPlugin(),
       ],
       comLibLoader() {
+        if (window.debugComlibUrl) {
+          return new Promise((resolve) => {
+            // resolve(['./libEdt.js']); 
+            // @ts-ignore
+            resolve([window.debugComlibUrl]);
+          });
+        }
         return new Promise((resolve) => {
           // resolve(['./libEdt.js']); 
           // @ts-ignore

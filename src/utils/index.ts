@@ -51,7 +51,6 @@ export function checkIsMybricksProject(wsFsPath = getWorkspaceFsPath()) {
   }
 
   const mybricksFiles = fse.readdirSync(wsFsPath).filter((docName) => {
-    logger("docName => ", docName);
     return docName === "mybricks.json" || docName.endsWith(".mybricks.json");
   });
 
@@ -59,6 +58,8 @@ export function checkIsMybricksProject(wsFsPath = getWorkspaceFsPath()) {
     logger("未找到mybricks配置文件");
     return false;
   }
+
+  logger("mybricksFiles => ", mybricksFiles);
 
   return mybricksFiles;
 }

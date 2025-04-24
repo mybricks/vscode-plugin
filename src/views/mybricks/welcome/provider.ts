@@ -88,6 +88,23 @@ export default class Provider implements vscode.WebviewViewProvider {
             vscode.commands.executeCommand("mybricks.welcome.invalidAddress", value);
           }
           break;
+        case data.action === "create" && data.type === "mpComlib": {
+          const saveRtn = await vscode.window.showSaveDialog({
+            title: "请选择项目要保存的文件夹"
+          });
+
+          const projectDir = saveRtn?.fsPath;
+
+          if (projectDir) {
+            const tptDirPath = vscode.Uri.joinPath(this._context.extensionUri, "_templates/comlib-mp").fsPath;
+
+            fse.copySync(tptDirPath, projectDir);
+
+            openFolder(projectDir);
+          }
+        }
+          break;
+        
         default:
           break;
       }

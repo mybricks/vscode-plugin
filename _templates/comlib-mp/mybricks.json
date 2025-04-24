@@ -1,0 +1,11 @@
+{
+  "componentType": "MP",
+  "comAry": [
+    {
+      "title": "基础",
+      "comAry": [
+        "./src/button/com.json"
+      ]
+    }
+  ]
+}

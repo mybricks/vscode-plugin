@@ -1,0 +1,20 @@
+{
+  "title": "按钮",
+  "namespace": "your-team.mp.button",
+  "version": "1.0.0",
+  "description": "按钮",
+  "author": "MyBricks",
+  "author_name": "MyBricks",
+  "data": "./data.json",
+  "runtime": "./runtime.tsx",
+  "editors": "./editors.tsx",
+  "outputs": [
+    {
+      "id": "click",
+      "title": "单击",
+      "schema": {
+        "type": "any"
+      }
+    }
+  ]
+}

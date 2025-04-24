@@ -143,6 +143,23 @@ function getWebpackMergeConfig () {
   return webpackMergeConfig || {};
 }
 
+const isMP = config.componentType === "MP";
+
+const plugins = [];
+
+if (isMP) {
+  htmlScript += `
+    <script>
+      window.debugComlibUrl = "http://127.0.0.1:8000/libEdt.js";
+    </script>
+  `;
+} else {
+  plugins.push(new MybricksPluginConnectComlibApp({
+    mybricksJsonPath,
+    webpackConfig: webpackMergeConfig
+  }));
+}
+
 module.exports = {
   mode: "development",
   entry: {
@@ -329,15 +346,12 @@ module.exports = {
       templateParameters: {
         title: "MyBricks-设计器（SPA版）Demo",
         link: htmlLink,
-        script: htmlScript + "<script src=\"./preview.js\" defer></script>"
+        script: htmlScript + (isMP ? `<script src="http://127.0.0.1:8000/libEdt.js"></script>` : "") + "<script src=\"./preview.js\" defer></script>"
       }
     }),
     new webpack.DefinePlugin({
       'MYBRICKS_JSON': JSON.stringify(config),
     }),
-    new MybricksPluginConnectComlibApp({
-      mybricksJsonPath,
-      webpackConfig: webpackMergeConfig
-    })
+    ...plugins
   ]
 };

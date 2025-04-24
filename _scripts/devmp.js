@@ -1,5 +1,7 @@
 const readline = require('readline');
 
+const [mybricksJsonPath, projPath, webpackdevjsPath] = process.argv.slice(2);
+
 const mybricksConfig = {
   h5: {
     viewWidth: 375,
@@ -27,19 +29,24 @@ function getInput(prompt) {
 
 const dev = async () => {
   const { uniPack } = require('mybricks-uni-pack');
-  const [mybricksJsonPath] = process.argv.slice(2);
+  console.log("[MP:dev - webpackdevjsPath] => ", webpackdevjsPath);
   console.log("[MP:dev - mybricksJsonPath] => ", mybricksJsonPath);
-  const url = await getInput("请填写期望用于调试组件库的搭建页面 URL: ");
+  // const url = await getInput("请填写期望用于调试组件库的搭建页面 URL: ");
   await uniPack.initMybricks({ ...mybricksConfig, mybricksJsonPath });
   await uniPack.dev({
-    /** 配置自动打开的调试URL链接 */
-    open: ({ debugServerUrl, packageName, namespace }) => {
-      debugServerUrl = `debugServerUrl=${encodeURIComponent(debugServerUrl)}`;
-      packageName = `packageName=${encodeURIComponent(packageName)}`;
-      namespace = `namespace=${encodeURIComponent(namespace)}`;
-
-      return `${url}&${debugServerUrl}&${packageName}&${namespace}`;
-    },
+    open() {
+      console.log("[MP:dev - success]");
+      const cp = require("child_process");
+      // cp.execSync(`npm run --prefix ${projPath} dev:comlib ${webpackdevjsPath}`);
+      cp.exec(`npm run --prefix ${projPath} dev:comlib ${webpackdevjsPath}`, (error, stdout, stderr) => {
+        if (error) {
+          console.error(`exec error: ${error}`);
+          return;
+        }
+        console.log(`stdout: ${stdout}`);
+        console.error(`stderr: ${stderr}`);
+      });
+    }
   });
 };
 

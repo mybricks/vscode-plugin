@@ -1,0 +1,27 @@
+{
+  "name": "comlib-mp",
+  "version": "1.0.0",
+  "description": "移动端组件库",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tarojs/components": "4.0.6",
+    "@tarojs/taro-h5": "4.0.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.20",
+    "@types/react-dom": "^18.3.6",
+    "mybricks-cli": "^0.0.36"
+  },
+  "resolutions": {
+    "ics": "3.5.0"
+  },
+  "overrides": {
+    "ics": "3.5.0"
+  }
+}
