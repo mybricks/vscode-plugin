@@ -1,7 +1,7 @@
 {
   "name": "MyBricks",
   "description": "快速便捷地开发和发布Mybricks组件",
-  "version": "0.1.77",
+  "version": "0.1.78",
   "icon": "images/mybricks.png",
   "engines": {
     "vscode": "^1.71.0"
@@ -149,7 +149,7 @@
     "jszip": "^3.10.1",
     "less": "^4.1.3",
     "less-loader": "^11.0.0",
-    "mybricks-cli": "^0.0.35",
+    "mybricks-cli": "^0.0.39",
     "mybricks-plugin-connect-comlib-app": "^0.0.43",
     "ora": "^5.4.1",
     "pid-descendant": "^1.0.4",
