@@ -1,7 +1,7 @@
 {
   "name": "MyBricks",
   "description": "快速便捷地开发和发布Mybricks组件",
-  "version": "0.1.79",
+  "version": "0.1.80",
   "icon": "images/mybricks.png",
   "engines": {
     "vscode": "^1.71.0"

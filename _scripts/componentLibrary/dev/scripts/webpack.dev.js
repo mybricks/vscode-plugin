@@ -143,7 +143,7 @@ function getWebpackMergeConfig () {
   return webpackMergeConfig || {};
 }
 
-const isMP = config.componentType === "MP";
+const isMP = ["MP", "HM"].includes(config.componentType);
 
 const plugins = [];
 
