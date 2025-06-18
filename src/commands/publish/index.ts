@@ -72,10 +72,21 @@ export class PublishCommands {
 
       if (libCfg?.componentType === 'MP') {
         if (publishType === "dist") {
-          devTerminal.sendText(`node ${projPath}/_scripts/buildmp.js ${mybricksJsonPath}`);
+          devTerminal.sendText(`npx mybricks build --mybricksJsonPath ${mybricksJsonPath}`);
           devTerminal.show();
         } else if (publishType === "material") {
           devTerminal.sendText(`node ${projPath}/_scripts/publishmp.js ${mybricksJsonPath}`);
+          devTerminal.show();
+        } else {
+          vscode.window.showInformationMessage(`未支持的发布模式 - ${publishType}`);
+        }
+        return;
+      } else if (libCfg?.componentType === "HM") {
+        if (publishType === "dist") {
+          devTerminal.sendText(`npx mybricks buildComlib --mybricksJsonPath ${mybricksJsonPath}`);
+          devTerminal.show();
+        } else if (publishType === "material") {
+          devTerminal.sendText(`npx mybricks buildComlib --mybricksJsonPath ${mybricksJsonPath} --customVersion nextVersion && node ${projPath}/_scripts/getOnlineInfo.js ${mybricksJsonPath} && npx mybricks publish2 --mybricksJsonPath ${mybricksJsonPath} --customVersion nextVersion`);
           devTerminal.show();
         } else {
           vscode.window.showInformationMessage(`未支持的发布模式 - ${publishType}`);

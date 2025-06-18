@@ -110,9 +110,11 @@ export class DebuggerCommands {
             const webpackdevjs = fse.readFileSync(path.resolve(projPath, './_scripts/componentLibrary/dev/scripts/webpack.dev.js'), 'utf-8');
             fse.writeFileSync(webpackdevjsPath, webpackdevjs.replace('const { mybricksJsonPath, docPath } = process.env;', `const mybricksJsonPath = decodeURIComponent("${encodeURIComponent(mybricksJsonPath)}");\nconst docPath = decodeURIComponent("${encodeURIComponent(docPath)}");`), 'utf-8');
 
-            if (mybricksJson.componentType === 'MP') {
+            if (["MP", "HM"].includes(mybricksJson.componentType)) {
+              // 小程序和鸿蒙，调试是同一的
               // devTerminal.sendText(`node ${projPath}/_scripts/devmp.js ${mybricksJsonPath}`);
-              devTerminal.sendText(`node ${projPath}/_scripts/devmp.js ${mybricksJsonPath} ${projPath} ${webpackdevjsPath}`);
+              // devTerminal.sendText(`node ${projPath}/_scripts/devmp.js ${mybricksJsonPath} ${projPath} ${webpackdevjsPath}`);
+              devTerminal.sendText(`npx mybricks onlyStartComlib --mybricksJsonPath ${mybricksJsonPath} --next "npm run --prefix ${projPath} dev:comlib ${webpackdevjsPath}"`);
             } else {
               // devTerminal.sendText(`export mybricksJsonPath=${mybricksJsonPath} && npm run --prefix ${projPath} dev:comlib`);
               

@@ -100,7 +100,7 @@ async function start2() {
 			step: 2,
 			totalSteps: 2,
 			placeholder: '请选择发布方式',
-			items: libCfg?.componentType === 'MP' ? publishTypeitems.slice(0, 2) : publishTypeitems,
+			items: ["MP", "HM"].includes(libCfg?.componentType) ? publishTypeitems.slice(0, 2) : publishTypeitems,
 			// activeItem: state.publishType.value,
 			shouldResume: shouldResume
 		});
