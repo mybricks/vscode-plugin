@@ -498,26 +498,34 @@ async function build() {
       }
 
       async function uploadChunks(chunks) {
-        const chunk = chunks.pop();
-        if (chunk) {
-          await Promise.all(chunk.map(async (content) => {
-            await publishToCentral({
-              sceneType: sceneInfo.type,
-              name: content.title,
-              content: JSON.stringify(content),
-              tags: ['react'],
-              namespace: content.namespace,
-              version: content.version,
-              description: content.description,
-              type: 'component',
-              icon: content.icon,
-              previewImg: content.preview,
-              creatorName: userId,
-              creatorId: userId
-            });
-          }));
-          await uploadChunks(chunks);
-        }
+        return new Promise(async (resolve) => {
+          const chunk = chunks.pop();
+          if (chunk) {
+            await Promise.all(chunk.map(async (content) => {
+              await publishToCentral({
+                sceneType: sceneInfo.type,
+                name: content.title,
+                content: JSON.stringify(content),
+                tags: ['react'],
+                namespace: content.namespace,
+                version: content.version,
+                description: content.description,
+                type: 'component',
+                icon: content.icon,
+                previewImg: content.preview,
+                creatorName: userId,
+                creatorId: userId
+              });
+            }));
+            setTimeout(() => {
+              uploadChunks(chunks).then(() => {
+                resolve();
+              });
+            }, 3000);
+          } else {
+            resolve();
+          }
+        });
       }
 
       await uploadChunks(chunks);
