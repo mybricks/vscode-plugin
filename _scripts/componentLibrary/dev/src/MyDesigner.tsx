@@ -43,7 +43,7 @@ export default function MyDesigner () {
 		// (window as any).mybricks.SPADesigner && setSPADesigner((window as any).mybricks.SPADesigner);
 
     const script = document.createElement("script");
-    script.src = MYBRICKS_JSON?.designerUrl || "/assets/designer-spa/3.9.324/index.min.js";
+    script.src = MYBRICKS_JSON?.designerUrl || "/assets/designer-spa/index.min.js";
     script.onload = () => {
       (window as any).mybricks.SPADesigner && setSPADesigner((window as any).mybricks.SPADesigner);
     };
@@ -58,8 +58,10 @@ export default function MyDesigner () {
   }, []);
 
   const clear = useCallback(() => {
-    window.localStorage.removeItem(localDataKey);
-    window.location.reload();
+    if (confirm("确认清空本地数据")) {
+      window.localStorage.removeItem(localDataKey);
+      window.location.reload();
+    }
   }, []);
 
   const preview = useCallback(() => {
@@ -103,7 +105,8 @@ export default function MyDesigner () {
       css: [
         "./assets/editor-h5-reset.css",
       ]
-    }
+    },
+    toolbarContainer: '#vscode_toolbar_center',
   };
 
   const pcGeoView = {
@@ -114,7 +117,8 @@ export default function MyDesigner () {
         // "./assets/editor.d5c483a324024fb6.css",
         ...externalCss
       ] : [...externalCss]
-    }
+    },
+    toolbarContainer: '#vscode_toolbar_center',
   };
 
   const getConfig = useCallback(({projectJson}: any) => {
@@ -223,12 +227,12 @@ export default function MyDesigner () {
       <div className={css.show}>
         <div className={css.toolbar}>
           <div className={css.tt}>&lt;定制您自己的无代码设计解决方案&gt;</div>
-          <div className={css.btns}>
-            {/*<button onClick={switchSlider}>激活连接器插件</button>*/}
+          <div id="vscode_toolbar_center"></div>
+          <div className={css.action}>
+            <button className={css.primary} onClick={save}>保存</button>
+            <button onClick={clear}>清空本地数据</button>
+            { !isH5 && <button onClick={preview}>预览</button> }
           </div>
-          <button className={css.primary} onClick={save}>保存</button>
-          <button onClick={clear}>清空本地数据</button>
-          { !isH5 && <button onClick={preview}>预览</button> }
         </div>
         <div className={css.designer}>
           {
