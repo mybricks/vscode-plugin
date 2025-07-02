@@ -1,7 +1,7 @@
 {
   "name": "MyBricks",
-  "description": "快速便捷地开发和发布Mybricks组件",
-  "version": "0.1.82",
+  "description": "快速便捷地开发和发布MyBricks组件",
+  "version": "0.1.83",
   "icon": "images/mybricks.png",
   "engines": {
     "vscode": "^1.71.0"
@@ -39,7 +39,7 @@
       "activitybar": [
         {
           "id": "mybricks",
-          "title": "Mybricks",
+          "title": "MyBricks",
           "icon": "images/mybricks-tabitem.png"
         }
       ]
@@ -89,7 +89,7 @@
           "items": {
             "type": "string"
           },
-          "markdownDescription": "最近打开过的Mybricks项目地址"
+          "markdownDescription": "最近打开过的MyBricks项目地址"
         }
       }
     }

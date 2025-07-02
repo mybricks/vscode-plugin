@@ -6,7 +6,7 @@
 >[去安装](https://marketplace.visualstudio.com/items?itemName=Mybricks.Mybricks)
 
 ## 创建组件库
-点击 VS Code 界面左侧活动栏上的「Mybricks 图标」，新建一个PC组件库。
+点击 VS Code 界面左侧活动栏上的「MyBricks 图标」，新建一个PC组件库。
 
 ![创建组件库](img.png)
 

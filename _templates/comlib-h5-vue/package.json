@@ -1,7 +1,7 @@
 {
   "name": "@your-team/h5-lib0",
   "version": "1.0.0",
-  "description": "Mybricks H5组件库 vue",
+  "description": "MyBricks H5组件库 vue",
   "main": "index.js",
   "scripts": {},
   "license": "ISC",
