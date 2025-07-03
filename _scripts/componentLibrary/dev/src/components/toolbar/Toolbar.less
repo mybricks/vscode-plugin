@@ -1,0 +1,89 @@
+.toolbar {
+  height: 40px;
+  padding: 5px 13px 5px 13px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  font-size: 12px;
+  box-shadow: rgba(18, 17, 42, 0.07) 0px 1px 0px;
+  z-index: 107;
+
+  .left {
+    display: flex;
+    align-items: center;
+
+    a {
+      margin-left: 10px;
+      color: var(--mybricks-color-primary, #FA6400);
+    }
+
+    .title {
+      font-weight: bold;
+      font-size: 14px;
+      font-style: italic;
+      color: #999;
+    }
+  }
+
+  .right {
+    display: flex;
+    align-items: center;
+
+    .action_btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 25px;
+      height: 25px;
+      margin-left: 7px !important;
+      margin-right: 5px !important;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: #eeeeee;
+      }
+    }
+
+    >*:not(:last-child) {
+      margin: 0px 5px;
+    }
+
+    >*:last-child {
+      margin-right: 0px;
+    }
+  }
+
+  .button {
+    outline: 0;
+    border: #ebebeb solid 1px;
+    letter-spacing: 0;
+    padding: 3px 13px;
+    margin: 0 5px;
+    font-size: 12px;
+    line-height: 12px;
+    height: 24px;
+    position: relative;
+    background-color: #fff;
+    border-radius: 6px;
+    color: rgba(0, 0, 0, 0.9);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: transform 0.3s ease;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+
+  .mainButton {
+    background: #FA6400;
+    border: #FA6400 solid 1px;
+    color: #FFF;
+    font-weight: bold;
+    transition: transform 0.3s ease;
+  }
+}

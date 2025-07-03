@@ -13,6 +13,7 @@ import servicePlugin, {call as callConnectorHttp} from "@mybricks/plugin-connect
 import css from "./MyDesigner.less";
 import loadContentPlugin from "./plugins/load-content-plugin";
 import { getAiEncryptData } from "./get-ai-encrypt-data";
+import { Toolbar } from "./components";
 
 const localDataKey = `--mybricks--${MYBRICKS_JSON?.componentType ?? 'NONE'}`;
 
@@ -225,15 +226,11 @@ export default function MyDesigner () {
   return (
     <>
       <div className={css.show}>
-        <div className={css.toolbar}>
-          <div className={css.tt}>&lt;定制您自己的无代码设计解决方案&gt;</div>
-          <div id="vscode_toolbar_center"></div>
-          <div className={css.action}>
-            <button className={css.primary} onClick={save}>保存</button>
-            <button onClick={clear}>清空本地数据</button>
-            { !isH5 && <button onClick={preview}>预览</button> }
-          </div>
-        </div>
+        <Toolbar
+          onSave={save}
+          onPreview={isH5 ? undefined : preview}
+          onDelete={clear}
+        />
         <div className={css.designer}>
           {
             // @ts-ignore
