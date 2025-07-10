@@ -1,7 +1,7 @@
 {
   "name": "MyBricks",
   "description": "快速便捷地开发和发布MyBricks组件",
-  "version": "0.1.85",
+  "version": "0.1.86",
   "icon": "images/mybricks.png",
   "engines": {
     "vscode": "^1.71.0"
@@ -15,6 +15,7 @@
   "activationEvents": [
     "onView:mybricks_welcome",
     "onView:mybricks_develop",
+    "onView:mybricks_appConfigPanel",
     "onCommand:mybricks.helloWorld",
     "*"
   ],
@@ -57,6 +58,11 @@
           "type": "webview",
           "id": "mybricks_develop",
           "name": "调试与发布",
+          "when": "mybricks:isComlib"
+        },
+        {
+          "id": "mybricks_appConfigPanel",
+          "name": "配置",
           "when": "mybricks:isComlib"
         }
       ]

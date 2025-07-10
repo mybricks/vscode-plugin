@@ -18,6 +18,7 @@ import { Toolbar } from "./components";
 const localDataKey = `--mybricks--${MYBRICKS_JSON?.componentType ?? 'NONE'}`;
 
 const isH5 = ['H5', 'KH5'].includes(MYBRICKS_JSON?.componentType);
+import application from "./application";
 
 export default function MyDesigner () {
   const designerRef = useRef<{ dump: () => any, toJSON: () => any }>();
@@ -220,6 +221,7 @@ export default function MyDesigner () {
           }
         },
       },
+      domainLoader: application.domainLoader
     };
   }, []);
 

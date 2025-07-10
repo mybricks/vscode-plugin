@@ -1,8 +1,9 @@
 import * as vscode from "vscode";
 import { welcomeMybricks } from "./mybricks";
-import { developExplorer } from "./explorer";
+import { developExplorer, appConfigExplorer } from "./explorer";
 
-export function initViews (context: vscode.ExtensionContext) {
+export async function initViews (context: vscode.ExtensionContext) {
   welcomeMybricks.init(context);
+  await appConfigExplorer.init(context);
   developExplorer.init(context);
 }

@@ -2,13 +2,20 @@ const path = require("path");
 const fse = require("fs-extra");
 const WebpackBar = require("webpackbar");
 const webpack = require('webpack');
+const { merge: webpackMerge } = require('webpack-merge');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MybricksPluginConnectComlibApp = require("mybricks-plugin-connect-comlib-app");
 
-const { mybricksJsonPath, docPath } = process.env;
+const { mybricksJsonPath, docPath, appConfigWebpcakJsPath, appConfigApplicationJsxPath } = process.env;
 const outputPath = path.resolve(__dirname, "../../public");
 const config = fse.readJSONSync(mybricksJsonPath);
 const { externals, proxy = [] } = config;
+
+let appConfigWebpack = {};
+
+try {
+  appConfigWebpack = require(appConfigWebpcakJsPath);
+} catch {}
 
 if (config.namespace === "mybricks.normal-pc" && !externals.length) {
   externals.push({
@@ -160,17 +167,31 @@ if (isMP) {
   }));
 }
 
-module.exports = {
+
+const applicationJsxPath = path.join(__dirname, "../../src/application.jsx");
+fse.copyFileSync(appConfigApplicationJsxPath, applicationJsxPath);
+
+fse.watch(appConfigApplicationJsxPath, (eventType, filename) => {
+  if (filename) {
+    fse.writeFileSync(applicationJsxPath, fse.readFileSync(appConfigApplicationJsxPath));
+  }
+});
+
+const webConfig = webpackMerge({
   mode: "development",
   entry: {
     bundle: path.resolve(__dirname, "../../src/index.tsx"),
-    preview: path.resolve(__dirname, "../../src/preview/index.tsx")
+    preview: path.resolve(__dirname, "../../src/preview/index.tsx"),
   },
   output: {
     path: outputPath,
     filename: "[name].js",
     libraryTarget: "umd",
-    library: "[name]"
+    // library: "[name]"
+    library: {
+      name: ['MyBricksApp', '[name]'], // 这会将每个 entry 挂在 window.MyApp.bundle 和 window.MyApp.preview 上
+      type: 'var'
+    }
   },
   stats: {
     colors: true,
@@ -336,7 +357,7 @@ module.exports = {
       templateParameters: {
         title: "MyBricks-设计器（SPA版）Demo",
         link: htmlLink,
-        script: htmlScript + "<script src=\"./bundle.js\" defer></script>"
+        script: htmlScript + "<script src=\"./bundle.js\" defer></script><script src=\"./appConfig.js\"></script>"
       }
     }),
     new HtmlWebpackPlugin({
@@ -354,4 +375,6 @@ module.exports = {
     }),
     ...plugins
   ]
-};
+}, appConfigWebpack);
+
+module.exports = webConfig;

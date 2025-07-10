@@ -108,7 +108,15 @@ export class DebuggerCommands {
             const result = mybricksJsonPath.replace(pattern, replacement) + '.js';
             const webpackdevjsPath = path.resolve(devTempPath, result);
             const webpackdevjs = fse.readFileSync(path.resolve(projPath, './_scripts/componentLibrary/dev/scripts/webpack.dev.js'), 'utf-8');
-            fse.writeFileSync(webpackdevjsPath, webpackdevjs.replace('const { mybricksJsonPath, docPath } = process.env;', `const mybricksJsonPath = decodeURIComponent("${encodeURIComponent(mybricksJsonPath)}");\nconst docPath = decodeURIComponent("${encodeURIComponent(docPath)}");`), 'utf-8');
+            const appConfigDirPath = path.join(this._context.globalStorageUri.fsPath, "appConfig");
+            const appConfigWebpcakJsPath = path.join(appConfigDirPath, "webpack.js");
+            const appConfigApplicationJsxPath = path.join(appConfigDirPath, "application.jsx");
+            fse.writeFileSync(webpackdevjsPath, webpackdevjs.replace('const { mybricksJsonPath, docPath, appConfigWebpcakJsPath, appConfigApplicationJsxPath } = process.env;', `
+              const mybricksJsonPath = decodeURIComponent("${encodeURIComponent(mybricksJsonPath)}");
+              const docPath = decodeURIComponent("${encodeURIComponent(docPath)}");
+              const appConfigWebpcakJsPath = decodeURIComponent("${encodeURIComponent(appConfigWebpcakJsPath)}");
+              const appConfigApplicationJsxPath = decodeURIComponent("${encodeURIComponent(appConfigApplicationJsxPath)}");
+            `), 'utf-8');
 
             if (["MP", "HM"].includes(mybricksJson.componentType)) {
               // 小程序和鸿蒙，调试是同一的
