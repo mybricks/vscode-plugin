@@ -28,15 +28,7 @@ class AppConfig {
       // 文件已存在
     } catch {
       // 文件不存在，创建一个空文件或写入初始内容
-      await fs.promises.writeFile(appConfigWebpcakJsPath, "hello", "utf-8");
-    }
-
-    try {
-      await fs.promises.access(appConfigWebpcakJsPath, fs.constants.F_OK);
-      // 文件已存在
-    } catch {
-      // 文件不存在，创建一个空文件或写入初始内容
-      await fs.promises.writeFile(appConfigWebpcakJsPath, "", "utf-8");
+      await fs.promises.writeFile(appConfigWebpcakJsPath, "module.exports = {}", "utf-8");
     }
 
     try {
@@ -44,7 +36,7 @@ class AppConfig {
       // 文件已存在
     } catch {
       // 文件不存在，创建一个空文件或写入初始内容
-      await fs.promises.writeFile(appConfigApplicationJsxPath, "", "utf-8");
+      await fs.promises.writeFile(appConfigApplicationJsxPath, "export default {}", "utf-8");
     }
 
     new View(context, {
