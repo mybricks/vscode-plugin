@@ -357,7 +357,7 @@ const webConfig = webpackMerge({
       templateParameters: {
         title: "MyBricks-设计器（SPA版）Demo",
         link: htmlLink,
-        script: htmlScript + "<script src=\"./bundle.js\" defer></script><script src=\"./appConfig.js\"></script>"
+        script: htmlScript + "<script src=\"./bundle.js\" defer></script>"
       }
     }),
     new HtmlWebpackPlugin({
