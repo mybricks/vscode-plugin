@@ -14,11 +14,12 @@ import css from "./MyDesigner.less";
 import loadContentPlugin from "./plugins/load-content-plugin";
 import { getAiEncryptData } from "./get-ai-encrypt-data";
 import { Toolbar } from "./components";
+import mergeWith from "lodash/mergeWith";
 
 const localDataKey = `--mybricks--${MYBRICKS_JSON?.componentType ?? 'NONE'}`;
 
 const isH5 = ['H5', 'KH5'].includes(MYBRICKS_JSON?.componentType);
-import application from "./application";
+import application from "@vscode/application";
 
 export default function MyDesigner () {
   const designerRef = useRef<{ dump: () => any, toJSON: () => any }>();
@@ -124,7 +125,7 @@ export default function MyDesigner () {
   };
 
   const getConfig = useCallback(({projectJson}: any) => {
-    return {
+    const defaultConfig = {
       geoView: isH5 ? h5GeoView : pcGeoView ,
       toplView: {
         title: '交互',
@@ -223,6 +224,14 @@ export default function MyDesigner () {
       },
       domainLoader: application.domainLoader
     };
+
+    const res = mergeWith(defaultConfig, application, (pre, cur) => {
+      if (Array.isArray(pre) && Array.isArray(cur)) {
+        return pre.concat(cur);
+      }
+      return undefined;
+    });
+    return res;
   }, []);
 
   return (

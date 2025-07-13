@@ -168,14 +168,14 @@ if (isMP) {
 }
 
 
-const applicationJsxPath = path.join(__dirname, "../../src/application.jsx");
-fse.copyFileSync(appConfigApplicationJsxPath, applicationJsxPath);
+// const applicationJsxPath = path.join(__dirname, "../../src/application.jsx");
+// fse.copyFileSync(appConfigApplicationJsxPath, applicationJsxPath);
 
-fse.watch(appConfigApplicationJsxPath, (eventType, filename) => {
-  if (filename) {
-    fse.writeFileSync(applicationJsxPath, fse.readFileSync(appConfigApplicationJsxPath));
-  }
-});
+// fse.watch(appConfigApplicationJsxPath, (eventType, filename) => {
+//   if (filename) {
+//     fse.writeFileSync(applicationJsxPath, fse.readFileSync(appConfigApplicationJsxPath));
+//   }
+// });
 
 const webConfig = webpackMerge({
   mode: "development",
@@ -187,18 +187,16 @@ const webConfig = webpackMerge({
     path: outputPath,
     filename: "[name].js",
     libraryTarget: "umd",
-    // library: "[name]"
-    library: {
-      name: ['MyBricksApp', '[name]'], // 这会将每个 entry 挂在 window.MyApp.bundle 和 window.MyApp.preview 上
-      type: 'var'
-    }
+    library: "[name]"
   },
   stats: {
     colors: true,
     preset: 'normal'
   },
   resolve: {
-    alias: {},
+    alias: {
+      "@vscode/application": appConfigApplicationJsxPath
+    },
     extensions: [".js", ".jsx", ".ts", ".tsx"],
   },
   externals: [externalsMap],
