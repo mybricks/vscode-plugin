@@ -167,16 +167,6 @@ if (isMP) {
   }));
 }
 
-
-// const applicationJsxPath = path.join(__dirname, "../../src/application.jsx");
-// fse.copyFileSync(appConfigApplicationJsxPath, applicationJsxPath);
-
-// fse.watch(appConfigApplicationJsxPath, (eventType, filename) => {
-//   if (filename) {
-//     fse.writeFileSync(applicationJsxPath, fse.readFileSync(appConfigApplicationJsxPath));
-//   }
-// });
-
 const webConfig = webpackMerge({
   mode: "development",
   entry: {
