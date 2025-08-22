@@ -304,6 +304,24 @@ function getGitEmail({ docPath }) {
   return email;
 }
 
+function updateJsonFile(params) {
+  const { path, values } = params;
+  const jsonCode = fs.readFileSync(path, 'utf-8');
+  const json = JSON.parse(jsonCode);
+  const newJson = {};
+  // TODO: 转ast是为了保证原JSON顺序不变
+  const ast = babelParser.parse(`(${jsonCode})`);
+  const properties = ast.program.body[0].expression.properties;
+  properties.forEach((propertie) => {
+    const key = propertie.key.value;
+    newJson[key] = json[key];
+  });
+  values.forEach(({ key, value }) => {
+    newJson[key] = value;
+  });
+  fs.writeJSONSync(path, newJson, { spaces: 2 });
+}
+
 module.exports = {
   getCentralInfo,
   getOnlineInfo,
@@ -314,7 +332,8 @@ module.exports = {
   getLessLoaders,
   getCurrentTimeYYYYMMDDHHhhmmss,
   uploadToOSS,
-  publishToCentral
+  publishToCentral,
+  updateJsonFile
 };
 
 

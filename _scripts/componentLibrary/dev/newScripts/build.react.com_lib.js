@@ -7,7 +7,7 @@ const webpack = require('webpack');
 const WebpackBar = require('webpackbar');
 const { merge } = require('webpack-merge');
 const generateMybricksComponentLibraryCode = require('generate-mybricks-component-library-code');
-const { getOnlineInfo, getDistInfo, getCentralInfo, getNpmInfo, getCurrentTimeYYYYMMDDHHhhmmss, uploadToOSS, publishToCentral, getGitEmail } = require("../utils");
+const { getOnlineInfo, getDistInfo, getCentralInfo, getNpmInfo, getCurrentTimeYYYYMMDDHHhhmmss, uploadToOSS, publishToCentral, getGitEmail, updateJsonFile } = require("../utils");
 // 组件库根目录
 const docPath = '--replace-docPath--';
 // 配置文件
@@ -52,7 +52,10 @@ async function build() {
     });
   }
 
-  console.log(`\x1b[0m*.mybricks.json -> version: \x1b[32m${finalConfig.version}\n   \x1b[0mpackage.json -> version: \x1b[32m${packageJson.version}\n          \x1b[0m当前组件库版本号: \x1b[32m${finalConfig.version || packageJson.version}`);
+  if (isPublishToDist || isPublishToCentral || isPublishToNpm) {
+    // 发布物料中心，由平台自增版本，不需要打印提示
+    console.log(`\x1b[0m*.mybricks.json -> version: \x1b[32m${finalConfig.version}\n   \x1b[0mpackage.json -> version: \x1b[32m${packageJson.version}\n          \x1b[0m当前组件库版本号: \x1b[32m${finalConfig.version || packageJson.version}`);
+  }
 
   if (isPublishToNpm) {
     /** 最终需要处理的comAry */
@@ -572,6 +575,19 @@ async function build() {
       }).then(({data: { code, data, message }}) => {
         if (code === 1) {
           console.log('发布成功: ', JSON.stringify(data, null, 2));
+          const url = data.react.editJs;
+          const versionMatch = url.match(/\/(\d+\.\d+\.\d+)\//);
+          if (versionMatch) {
+            updateJsonFile({
+              path: mybricksJsonPath,
+              values: [
+                {
+                  key: "version",
+                  value: versionMatch[1]
+                }
+              ]
+            });
+          }
         } else {
           console.error(`发布失败: ${message}`);
         }
