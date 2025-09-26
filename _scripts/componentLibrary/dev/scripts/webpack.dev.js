@@ -55,14 +55,20 @@ const defaultExternals = [
     "urls": ["public/ant-design-icons@4.7.0.min.js"]
   },
   {
+    "name": "moment",
+    "library": "moment",
+    "urls": [
+      "public/moment/moment@2.29.4.min.js",
+      "public/moment/locale/zh-cn.min.js"
+    ]
+  },
+  {
     "name": "antd",
     "library": "antd",
     "urls": [
       "public/antd/antd@4.21.6.variable.min.css",
-      "public/moment/moment@2.29.4.min.js",
       "public/antd/antd@4.21.6.min.js",
       "public/antd/locale/zh_CN.js",
-      "public/moment/locale/zh-cn.min.js"
     ]
   }
 ];
@@ -82,20 +88,59 @@ function externalUrlsHandle (urls) {
   });
 }
 
-if (Array.isArray(externals)) {
-  externals.forEach(({urls}) => {
-    if (Array.isArray(urls)) {
-      externalUrlsHandle(urls);
-    }
-  });
-}
-
 defaultExternals.forEach(({name, library, urls}) => {
   if (!externalsMap[name]) {
     externalsMap[name] = library;
     externalUrlsHandle(urls);
   }
 });
+
+if (Array.isArray(externals)) {
+  externals.forEach(({name, library, urls}) => {
+    if (Array.isArray(urls)) {
+      if (externalsMap[name] !== library) {
+        externalUrlsHandle(urls);
+      }
+    }
+  });
+}
+
+function getPreviewUrls(externals) {
+  const externalsMap = {};
+  const htmlScript = [];
+  const htmlLink = [];
+  externals.forEach(({ name, library, urls }) => {
+    if (externalsMap[name] !== library) {
+      externalsMap[name] = library;
+      urls.forEach((url) => {
+        if (url.endsWith('.js')) {
+          htmlScript.push(`<script src="${url}"></script>`);
+        } else if (url.endsWith('.css')) {
+          htmlLink.push(`<link rel="stylesheet" href="${url}">`);
+        } else {
+          htmlScript.push(`<script src="${url}"></script>`);
+        }
+      });
+    }
+  });
+
+  return { htmlLink, htmlScript };
+}
+
+function getPreviewHtmlWebpackPlugin (externals) {
+  const { htmlScript, htmlLink } = getPreviewUrls(externals);
+
+  return new HtmlWebpackPlugin({
+    inject: false,
+    filename: "preview.html",
+    template: path.resolve(__dirname, "../../public/preview.ejs"),
+    templateParameters: {
+      title: "MyBricks-设计器（SPA版）Demo",
+      link: htmlLink.join("\n"),
+      script: htmlScript.join("\n") + (isMP ? `<script src="http://127.0.0.1:8000/libEdt.js"></script>` : "") + "<script src=\"./preview.js\" defer></script>"
+    }
+  });
+}
 
 switch (config.tags) {
   case 'vue':
@@ -348,16 +393,7 @@ const webConfig = webpackMerge({
         script: htmlScript + "<script src=\"./bundle.js\" defer></script>"
       }
     }),
-    new HtmlWebpackPlugin({
-      inject: false,
-      filename: "preview.html",
-      template: path.resolve(__dirname, "../../public/index.ejs"),
-      templateParameters: {
-        title: "MyBricks-设计器（SPA版）Demo",
-        link: htmlLink,
-        script: htmlScript + (isMP ? `<script src="http://127.0.0.1:8000/libEdt.js"></script>` : "") + "<script src=\"./preview.js\" defer></script>"
-      }
-    }),
+    getPreviewHtmlWebpackPlugin(externals),
     new webpack.DefinePlugin({
       'MYBRICKS_JSON': JSON.stringify(config),
     }),
