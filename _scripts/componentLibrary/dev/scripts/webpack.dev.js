@@ -109,20 +109,22 @@ function getPreviewUrls(externals) {
   const externalsMap = {};
   const htmlScript = [];
   const htmlLink = [];
-  externals.forEach(({ name, library, urls }) => {
-    if (externalsMap[name] !== library) {
-      externalsMap[name] = library;
-      urls.forEach((url) => {
-        if (url.endsWith('.js')) {
-          htmlScript.push(`<script src="${url}"></script>`);
-        } else if (url.endsWith('.css')) {
-          htmlLink.push(`<link rel="stylesheet" href="${url}">`);
-        } else {
-          htmlScript.push(`<script src="${url}"></script>`);
-        }
-      });
-    }
-  });
+  if (Array.isArray(externals)) {
+    externals.forEach(({ name, library, urls }) => {
+      if (externalsMap[name] !== library) {
+        externalsMap[name] = library;
+        urls.forEach((url) => {
+          if (url.endsWith('.js')) {
+            htmlScript.push(`<script src="${url}"></script>`);
+          } else if (url.endsWith('.css')) {
+            htmlLink.push(`<link rel="stylesheet" href="${url}">`);
+          } else {
+            htmlScript.push(`<script src="${url}"></script>`);
+          }
+        });
+      }
+    });
+  }
 
   return { htmlLink, htmlScript };
 }
