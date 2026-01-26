@@ -179,5 +179,6 @@
     "webpack-dev-server": "^4.9.3",
     "webpack-merge": "^5.10.0",
     "webpackbar": "^5.0.2"
-  }
+  },
+  "license": "MIT"
 }
