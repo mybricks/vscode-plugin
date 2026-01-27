@@ -20,6 +20,7 @@ const localDataKey = `--mybricks--${MYBRICKS_JSON?.componentType ?? 'NONE'}`;
 
 const isH5 = ['H5', 'KH5'].includes(MYBRICKS_JSON?.componentType);
 import application from "@vscode/application";
+import hack from "./hack";
 
 export default function MyDesigner () {
   const designerRef = useRef<{ dump: () => any, toJSON: () => any }>();
@@ -234,6 +235,14 @@ export default function MyDesigner () {
     return res;
   }, []);
 
+  const onDebug = useCallback(() => {
+    hack.useMessage(5);
+
+    return () => {
+      hack.useMessage(4);
+    };
+  }, []);
+
   return (
     <>
       <div className={css.show}>
@@ -245,7 +254,13 @@ export default function MyDesigner () {
         <div className={css.designer}>
           {
             // @ts-ignore
-            projectJson && SPADesigner && <SPADesigner config={getConfig({ projectJson })} ref={designerRef}/>
+            projectJson && SPADesigner && (
+              <SPADesigner
+                config={getConfig({ projectJson })}
+                ref={designerRef}
+                onDebug={onDebug}
+              />
+            )
           }
         </div>
       </div>
