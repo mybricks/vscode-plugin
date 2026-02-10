@@ -652,7 +652,7 @@ function getWebpckConfig({ entry, output = {}, outputPath, externals = [] }, web
       sideEffects: true
     },
     {
-      test: /\.less$/i,
+      test: /^(?!.*\.lazy\.less$).*\.less$/i,
       use: [
         {
           loader: 'style-loader',
@@ -678,7 +678,7 @@ function getWebpckConfig({ entry, output = {}, outputPath, externals = [] }, web
       exclude: /node_modules/
     },
     {
-      test: /\.less$/i,
+      test: /^(?!.*\.lazy\.less$).*\.less$/i,
       use: [
         {
           loader: 'style-loader',
@@ -702,6 +702,36 @@ function getWebpckConfig({ entry, output = {}, outputPath, externals = [] }, web
         }
       ],
       include: /node_modules/
+    },
+    {
+      test: /\.lazy.less$/i,
+      use: [
+        {
+          loader: 'style-loader',
+          options: {
+            injectType: "lazyStyleTag",
+            insert: function insertIntoTarget(element, options) {
+              (options.target || document.head).appendChild(element)
+            },
+          },
+        },
+        {
+          loader: 'css-loader',
+          options: {
+            modules: {
+              localIdentName: '[local]-[hash:5]'
+            }
+          }
+        },
+        {
+          loader: 'less-loader',
+          options: {
+            lessOptions: {
+              javascriptEnabled: true,
+            }
+          }
+        }
+      ]
     },
     {
       test: /\.(gif|png|jpe?g|webp|svg|woff|woff2|eot|ttf)$/i,
